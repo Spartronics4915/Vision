@@ -21,7 +21,7 @@ def clientValueChanged(table, key, value, isNew):
     global last_time
     if key != "latency" or value != "server":
         return
-    print(str((time.perf_counter()-last_time)/1000) + "ms")
+    print(str((time.perf_counter()-last_time)*1000) + "ms")
     last_time = time.perf_counter()
     sd.putString("latency", "client")
 
