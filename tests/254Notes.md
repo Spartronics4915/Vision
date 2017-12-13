@@ -84,7 +84,35 @@ RobotState:
         * transforms from field_to_camera to field_to_goals
         * invokes goalTracker.update(
 
-
 RigidTransform2d:
     * has-a Translate2d
     * has-a Rotation2d
+
+Drive:
+    * is-a Subsystem
+    * has-a DriveControlState (enumerating all possible drive states)
+        (OPEN_LOOP, VELOCITY_SETPOINT, PATH_FOLLOWING, AIM_TO_GOAL, etc)
+    * has-a PathFollower
+    * has-a Loop subclass, delivered via registerEnabledLoops
+        * implements onLoop which behaves according to mDriveControllerState
+            * PATH_FOLLOWING: ->updatePathFollower
+    * implements updatePathFollower:
+        * getCurrentPose(), 
+        * Twist2d cmd = mPathFollower.update(), 
+        * if(!done) updateVelocitySetpoint(Kinematics.inverseKinematics(cmd))
+
+PathFollower:
+    * has-a Path
+    * has-a AdaptivePurePursuitController: mSteeringController
+    * has-a ProfileFollower: mVelocityController
+    * implements update():
+        * mSteeringController->update() returns APPC::Command
+        * mVelocityController.setGoalAndConstraints
+
+## Notes on 254 Vision_app
+
+CameraTargetInfo
+    * has a m_y, m_z (x is "optical axis", y is left/right, z is top/bottom)
+      (m_x is always 1, so distance detection occurs on client)
+
+
