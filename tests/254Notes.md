@@ -1,20 +1,50 @@
 ## Notes on Team 254 FRC-2017 codebase
 
+_work in progress_
+
 #### Robot
+* is-a IterativeRobot
+* has-a ControlBaordInterface (OI)
+    * currently cosntructs ControlBoard, not GamepadControlBoard
+* has-a SubsystemManager
+* has-a instance of all Subsystems
+    * uses mSuperstructure to manage systems conflicts
+* has-a CheesyDriveHelper
 * has-a RobotState
 * has-a VisionServer
 * has-a Looper (mEnabledLooper)
     * enables VisionProcessor singleton
     * enables RobotStateEstimator singleton
+* has-a AutoModeExecutor
+* implements automousInit(), autonomousPeriodic()
+    * samples the autoMode and starts mEnabledLooper, AutoModeExecuter
+* implements teleopInit(), teleopPeriodic() 
+    * The code uses state machines to ensure that no matter what buttons 
+        the driver presses, the robot behaves in a safe and consistent manner.
+         Based on driver input, the code sets a desired state for each 
+         subsystem. Each subsystem will constantly compare its desired and 
+         actual states and act to bring the two closer.
+* implements allPeriodic()
+    * updates smart dashboard, logs
+    * updates ConnectionManager timestamp
+
+#### ControlBoardInterface
+* is-a abstract base for ControlBoard and GamepadControlBoard
+* implements sampling functions for each OI operation. 
+Names are abstract - ie:  getAimButton(), not getButton3()
+
+#### SubsystemManager
+Used to reset, start, stop and update all subsystems at once.
+* has-a list of all subsystems
+* implements registerEnabledLoops() with the mEnabledLooper
 
 #### VisionServer
 * is-a CrashTrackingRunnable
-* has-a list of VisionUpdateReceivers
-* has-a ServerThread (actually a list, but..)
-
+* has-a List<VisionUpdateReceivers>
+* has-a List<ServerThread> (but uses only one)
 
 #### VisionServer::ServerThread
-* is-a CrashTrackingRunnable   (Runnable implements run())
+* is-a CrashTrackingRunnable (Runnable implements run())
 * implements handleMessage, called via runCrashTracxked()
     * timestamps messages when they are received (over the wire)
     * produces a VisionUpdate object which is distributed to all receivers
@@ -82,11 +112,43 @@ RobotState class definition
     * corrects for camera pitch and yaw as installed on robot
     * estimates distance to Boiler via known height to target
     * transforms from field_to_camera to field_to_goals
-    * invokes goalTracker.update(
+    * invokes goalTracker.update()
 
 #### RigidTransform2d
 * has-a Translate2d
 * has-a Rotation2d
+
+#### Superstructure
+The superstructure subsystem is the overarching superclass containing 
+all components of the superstructure: the intake, hopper, feeder, shooter 
+and LEDs. The superstructure subsystem also contains some miscellaneous 
+hardware that is located in the superstructure but isn't part of any 
+other subsystems like the compressor, pressure sensor, and hopper wall 
+pistons.  Instead of interacting with subsystems like the feeder and 
+intake directly, the Robot class interacts with the superstructure, 
+which passes on the commands to the correct subsystem. The superstructure 
+also coordinates actions between different subsystems like the feeder 
+and shooter.
+* is-a Subsystem
+* has-a SystemState
+
+
+#### Superstruct::SystemState
+```
+IDLE,
+WAITING_FOR_ALIGNMENT, // waiting for the drivebase to aim
+WAITING_FOR_FLYWHEEL, // waiting for the shooter to spin up
+SHOOTING, // shooting
+SHOOTING_SPIN_DOWN, // short period after the driver releases the shoot button where the flywheel
+                    // continues to spin so the last couple of shots don't go short
+UNJAMMING, // unjamming the feeder and hopper
+UNJAMMING_WITH_SHOOT, // unjamming while the flywheel spins
+JUST_FEED, // run hopper and feeder but not the shooter
+EXHAUSTING, // exhaust the feeder, hopper, and intake
+HANGING, // run shooter in reverse, everything else is idle
+RANGE_FINDING // blink the LED strip to let drivers know if they are at an optimal shooting range
+
+```
 
 #### Drive
 * is-a Subsystem
@@ -108,6 +170,33 @@ RobotState class definition
 * implements update():
     * mSteeringController->update() returns APPC::Command
     * mVelocityController.setGoalAndConstraints
+
+#### CheesyDriveHelper
+Helper class to implement "Cheesy Drive". "Cheesy Drive" simply means 
+that the "turning" stick controls the curvature * of the robot's path 
+rather than its rate of heading change. This helps make the robot more 
+controllable at high speeds. Also handles the robot's quick turn 
+functionality - "quick turn" overrides constant-curvature turning for
+turn-in-place maneuvers. Values returned are DriveSignals which are
+intended to be passed directly to motors running in Open Loop mode,
+bypassing entirely WPI's RobotDrive class and its arcadeDrive method.
+
+* implements cheesyDrive(throttle, turn, isQuick, isHigh)
+
+#### Looper 
+runs all of the robot's loops. Loop objects are stored in a List object. 
+They are started when the robot powers up and stopped after the match.
+* has-a Notifier
+* has-a List<Loop>
+
+#### Action
+an interface that describes an iterative action. It is run by an 
+autonomous action, called by the method runAction in AutoModeBase 
+(or more commonly in autonomous modes that extend AutoModeBase)
+
+#### AutoModeBase
+an abstract class that is the basis of the robot's autonomous routines. 
+This is implemented in auto modes (which are routines that perform actions).
 
 ## Notes on 254 Vision_app
 
