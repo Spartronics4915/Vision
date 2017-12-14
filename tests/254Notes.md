@@ -4,11 +4,11 @@ _work in progress_
 
 #### Robot
 * is-a IterativeRobot
-* has-a ControlBaordInterface (OI)
-    * currently cosntructs ControlBoard, not GamepadControlBoard
+* has-a ControlBoardInterface (OI)
+    * currently constructs ControlBoard, not GamepadControlBoard
 * has-a SubsystemManager
 * has-a instance of all Subsystems
-    * uses mSuperstructure to manage systems conflicts
+    * uses mSuperstructure to manage state conflicts
 * has-a CheesyDriveHelper
 * has-a RobotState
 * has-a VisionServer
