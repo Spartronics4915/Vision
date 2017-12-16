@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description="Test roundtrip latency between a NetworkTables server and client.")
 parser.add_argument("--server", action="store_true", help="run in server mode")
-parser.add_argument("--host", action="store_true", help="hostname to connect to or listen on", default="127.0.0.1")
+parser.add_argument("--host", help="hostname to connect to or listen on", default="127.0.0.1")
 parser.add_argument("--port", type=int, help="port to connect to or listen on", default="1735")
 parser.add_argument("--samples", type=int, dest="total_samples", help="number of roundtrip latency samples to average", default="100")
 args = parser.parse_args()
