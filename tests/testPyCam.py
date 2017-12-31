@@ -7,6 +7,8 @@ import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
+import networktables
+
 import time
 import sys
 import argparse
@@ -28,6 +30,10 @@ def parse_args():
     parser.add_argument("--fps", dest="fps",
                         help="FPS",
                         default=60, type=int)
+
+    parser.add_argument("--nettab", dest="nettab",
+                        help="nettab target (off, local, roborio)",
+                        default="off")
 
     parser.add_argument("--brightness", dest="brightness",
                         help="brightness: [0, 100]",
