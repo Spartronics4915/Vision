@@ -10,13 +10,15 @@ import logging
 
 class Control:
     def __init__(self):
-        self.imuHeading = None
         self.targeting = None
+        self.imuHeading = None
 
 class Target:
     def __init__(self):
         self.angleX = None
         self.angleY = None
+
+theComm = None
 
 class Comm:
     def __init__(self, receiverIP):
@@ -44,11 +46,22 @@ class Comm:
 
             self.fpsHistory = []
             self.lastUpdate = time.time()
+            theComm = self
 
         except:
             xcpt = sys.exc_info()
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
+
+    def Shutdown(self):
+        self.targetState.SetFPS(0)
+        self.visTable.removeTableListener(self.visValueChanged)
+        self.visTable.removeConnectionListener(self.connectionListener)
+
+    def SetTarget(self, t):
+        self.targetTable.putNumber("ax", t.angleX);
+        self.targetTable.putNumber("ay", t.angleY);
+        self.target = t
 
     def GetTarget(self):
         return self.target
@@ -63,36 +76,21 @@ class Comm:
             self.targetState.SetFPS(sum(self.fpsHistory)/len(self.fpsHistory))
             self.lastUpdate = time.time()
 
-    def Shutdown(self):
-        self.targetState.SetFPS(0)
-        self.visTable.removeTableListener(self.visValueChanged)
-        self.visTable.removeConnectionListener(self.connectionListener)
-
-    # NewTarget: we require that kp is in absolute, not screen-relative coords
-    def NewTarget(self, kp):
-        return self.targetState.NewTarget(kp)
-
-    def NewLines(self, llist):
-        return self.targetState.NewLines(llist)
+    def controlEvent(self, key, value, isNew):
+        if key == 'SetTarget':
+        	self.control.targeting = value
+        elif key == 'IMUHeading':
+        	self.control.imuHeading = value
+            #print(value)
+        else:
+        	print("Unexpected key in visValueChanged")
 
     @staticmethod
     def visionControlEvent(table, key, value, isNew):
         # This is where we can be woken up if the driver station 
         # (or robot) wants to talk to us. This method fires only
         # on changes to /SmartDashboard/Vision/*
-        if key == 'TargetHigh':
-        	self.targetHigh = value
-            #print(value)
-        elif key == 'AutoAimEnabled':
-        	self.autoAimEnabled = value
-            #print(value)
-        elif key == 'IMUHeading':
-        	self.imuHeading = value
-            #print(value)
-        else:
-            pass
-        	# print("Unexpected key in visValueChanged")
-
+        theComm.controlEvent(key, value, isNew)
 
     @staticmethod
     def connectionListener(connected, connectionInfo):
