@@ -7,7 +7,7 @@ import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 
-import networktables
+import comm
 
 import time
 import sys
@@ -24,17 +24,17 @@ def parse_args():
     parser.add_argument("--width", dest="image_width",
                         help="image width [320]",
                         default=320, type=int)
-    parser.add_argument("--height", dest="image_height",
+    parser.add_argument("--height", dest="iheight",
                         help="image width [240]",
                         default=240, type=int)
     parser.add_argument("--fps", dest="fps",
                         help="FPS",
                         default=60, type=int)
-
-    parser.add_argument("--nettab", dest="nettab",
-                        help="nettab target (off, local, roborio)",
-                        default="off")
-
+    parser.add_argument("--display", dest="display",
+                        default=0, type=int)
+    parser.add_argument("--robot", dest="robot",
+                        help="robot (off, localhost, roborio)",
+                        default="localhost")
     parser.add_argument("--brightness", dest="brightness",
                         help="brightness: [0, 100]",
                         default=50, type=int)
@@ -51,10 +51,11 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def processFrame(image):
-    cv2.imshow("Frame", image)
+def processFrame(image, display):
+    if display:
+        cv2.imshow("Frame", image)
 
-def readCam(width, height, fps, exposure):
+def readCam(commChan, width, height, fps, exposure):
     with PiCamera(resolution=(width,height),
                       framerate=fps,
                       sensor_mode=7  # for fastest frame rates, 0 is auto
@@ -90,24 +91,30 @@ def readCam(width, height, fps, exposure):
         print("  shutter_speed:%d us" % camera.shutter_speed)
         print("  framerate:%s" % camera.framerate)
 
+        target = comm.Target()
+
         for frame in camera.capture_continuous(rawCapture, format="bgr", 
                                             use_video_port=True):
             image = frame.array
+            if commChan:
+                target.clock = time.clock()
+                commChan.SetTarget(target)
 
-            # show the frame
-            key = cv2.waitKey(1) & 0xFF
             rawCapture.truncate() # clear the stream for the next frame
             rawCapture.seek(0) 
-            processFrame(image)
 
-            if key == ord("q") or key == 27:
-                break
-            elif key == 255:
-                pass
-            elif key == 22:
-               print("22 --");
-            else:
-                print(key)
+            processFrame(image, args.display)
+
+            if args.display:
+                key = cv2.waitKey(1) & 0xFF
+                if key == ord("q") or key == 27:
+                    break
+                elif key == 255:
+                    pass
+                elif key == 22:
+                   print("22 --");
+                else:
+                    print(key)
 
 if __name__ == "__main__":
     args = parse_args()
@@ -115,5 +122,15 @@ if __name__ == "__main__":
     print(args)
     print("OpenCV version: {}".format(cv2.__version__))
 
-    readCam(args.image_width, args.image_height, args.fps, args.exposure)
+    if args.robot != "none":
+        if args.robot == "roborio":
+            ip = "10.49.15.2"
+        else:
+            ip = "localhost"
+        print("starting comm on " + ip)
+        commChan = comm.Comm(ip)
+    else:
+        commChan = None
+
+    readCam(commChan, args.image_width, args.iheight, args.fps, args.exposure)
     cv2.destroyAllWindows()

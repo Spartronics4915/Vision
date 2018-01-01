@@ -15,8 +15,14 @@ class Control:
 
 class Target:
     def __init__(self):
-        self.angleX = None
-        self.angleY = None
+        self.clock = time.clock()
+        self.angleX = 0
+        self.angleY = 0
+
+    def Send(self, targetTable):
+        targetTable.putNumber("clock", self.clock)
+        targetTable.putNumber("ax", self.angleX)
+        targetTable.putNumber("ay", self.angleY)
 
 theComm = None
 
@@ -24,7 +30,7 @@ class Comm:
     def __init__(self, receiverIP):
         try:
             # IPAddress can be static ip ("10.49.15.2" or name:"roboRIO-4915-FRC"/"localhost")
-            NetworkTable.setUpdateRate(.010)  # default is .05 (50ms/20Hz)
+            NetworkTable.setUpdateRate(.01)  # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
             NetworkTable.setIPAddress(receiverIP)
             NetworkTable.setClientMode()
             NetworkTable.initialize()
@@ -59,9 +65,8 @@ class Comm:
         self.visTable.removeConnectionListener(self.connectionListener)
 
     def SetTarget(self, t):
-        self.targetTable.putNumber("ax", t.angleX);
-        self.targetTable.putNumber("ay", t.angleY);
         self.target = t
+        self.target.Send(self.targetTable)
 
     def GetTarget(self):
         return self.target
