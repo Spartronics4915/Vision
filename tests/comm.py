@@ -60,9 +60,8 @@ class Comm:
             traceback.print_tb(xcpt[2])
 
     def Shutdown(self):
-        self.targetState.SetFPS(0)
-        self.visTable.removeTableListener(self.visValueChanged)
-        self.visTable.removeConnectionListener(self.connectionListener)
+        self.controlTable.removeConnectionListener(self.connectionListener)
+        self.controlTable.removeTableListener(self.visionControlEvent)
 
     def SetTarget(self, t):
         self.target = t
