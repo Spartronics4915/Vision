@@ -12,6 +12,7 @@ import picam
 import time
 import sys
 import argparse
+import os
 
 # import daemon
 
@@ -27,7 +28,7 @@ class PiVideoStream:
         self.target = comm.Target()
         self.commChan = None
         self.parseArgs()
-        print("Called with args:")
+        print("testPCam pid: %d args:" % os.getpid())
         print(self.args)
         print("OpenCV version: {}".format(cv2.__version__))
 
@@ -48,8 +49,8 @@ class PiVideoStream:
         """
         parser = argparse.ArgumentParser(description=
                              "Capture and display live camera video on raspi")
-        parser.add_argument("--threaded", dest="threaded",
-                            help="threaded: (0,1 ) [0]",
+        parser.add_argument("--threads", dest="threads",
+                            help="threads: (0-4) [0]",
                             default=0, type=int)
         parser.add_argument("--width", dest="iwidth",
                             help="image width [320]",
@@ -81,12 +82,13 @@ class PiVideoStream:
         self.args = parser.parse_args()
 
     def Run(self):
-        if self.args.threaded == 0:
+        if self.args.threads == 0:
             self.processVideo()
         else:
             try:
                 self.captureThread = picam.CaptureThread(self.picam, 
-                                                        self.processFrame, 2)
+                                                        self.processFrame, 
+                                                        self.args.threads)
                 while self.captureThread.running:
                     time.sleep(1)
             except KeyboardInterrupt:
@@ -121,7 +123,7 @@ class PiVideoStream:
             self.target.clock = time.clock()
             self.commChan.SetTarget(self.target)
 
-        frame = algo.processFrame(image, algo="empty")
+        frame = algo.processFrame(image, algo="default")
         if self.args.display:
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
