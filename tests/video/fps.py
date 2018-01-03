@@ -24,6 +24,9 @@ class FPS:
         else:
             return (datetime.datetime.now() - self._start).total_seconds()
 
+    def fps(self):
+        return self.getFPS()
+
     def getFPS(self):
         return self._numFrames / self.elapsed()
 

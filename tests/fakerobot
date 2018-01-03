@@ -18,12 +18,13 @@ def visValueChanged(table, key, value, isNew):
     global dirty
     visTable[key] = value
     dirty = True
+    print("%s:%s" % (key, value))
 
 sd = NetworkTable.getTable("SmartDashboard")
-visctl = sd.getSubTable("VisionControl")
-
 vis = sd.getSubTable("VisionTarget")
 vis.addTableListener(visValueChanged)
+
+visctl = sd.getSubTable("VisionControl")
 
 i = 0
 while True:
