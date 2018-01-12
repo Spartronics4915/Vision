@@ -5,7 +5,7 @@ range0 = np.array([40, 100, 30]) # min hsv
 range1 = np.array([80, 255, 255]) # max hsv
 
 def emptyAlgo(frame):
-    pass
+    return frame
 
 def defaultAlgo(frame):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
