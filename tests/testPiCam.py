@@ -52,6 +52,9 @@ class PiVideoStream:
         parser.add_argument("--threads", dest="threads",
                             help="threads: (0-4) [0]",
                             default=0, type=int)
+        parser.add_argument("--algo", dest="algo",
+                            help="(empty, default)",
+                            default="default")
         parser.add_argument("--width", dest="iwidth",
                             help="image width [320]",
                             default=320, type=int)
@@ -123,7 +126,7 @@ class PiVideoStream:
             self.target.clock = time.clock()
             self.commChan.SetTarget(self.target)
 
-        frame = algo.processFrame(image, algo="default")
+        frame = algo.processFrame(image, algo=self.args.algo)
         if self.args.display:
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF

@@ -20,7 +20,9 @@ class PiCam:
         self.cam.exposure_mode = "off"
         self.cam.exposure_compensation = -25 # [-25, 25]
         self.cam.shutter_speed = 10000 # set to 0 to go auto
-        self.cam.contrast = 80  # [-100, 100]
+        self.cam.contrast = 0  # [-100, 100]
+        self.cam.hflip = True
+        self.cam.vflip = True
 
         print("camera settings:")
         print("  analog_gain:%s" % self.cam.analog_gain)
