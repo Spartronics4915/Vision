@@ -3,7 +3,7 @@
 #   manages our connection to the robot
 #
 
-from networktables import NetworkTable
+from networktables import NetworkTables
 import sys, traceback, time
 import json
 import logging
@@ -24,26 +24,39 @@ class Target:
         targetTable.putNumber("ax", self.angleX)
         targetTable.putNumber("ay", self.angleY)
 
+VisionTableName = "Vision"
+VisionControlTableName = "VisionControl"
 theComm = None
 
+
+def getVisionTable():
+    return NetworkTables.getTable(VisionTableName)
+
+def getVisionControlTable():
+    return NetworkTables.getTable(VisionControlTableName)
+
 class Comm:
-    def __init__(self, receiverIP):
+    def __init__(self, serverIP):
         try:
-            # IPAddress can be static ip ("10.49.15.2" or name:"roboRIO-4915-FRC"/"localhost")
-            NetworkTable.setUpdateRate(.01)  # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
-            NetworkTable.setIPAddress(receiverIP)
-            NetworkTable.setClientMode()
-            NetworkTable.initialize()
+            # IPAddress can be 
+            #   - ip: "10.49.15.2" or 
+            #   - name: "roboRIO-4915-FRC", "localhost"
+            NetworkTables.initialize(server=serverIP)
+            NetworkTables.setUpdateRate(.01)  
+            # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
 
-            self.sd = NetworkTable.getTable("SmartDashboard")
+            #self.sd = NetworkTables.getTable("SmartDashboard")
 
-            # we communcate target to robot via VisionTarget table
-            self.targetTable = self.sd.getSubTable("VisionTarget")
+            # We communcate target to robot via Vision table,
+            # current thinking is that this should not be a subtable of
+            # SmartDashboard, since traffic is multiplied by the number
+            # of clients.
+            self.targetTable = getVisionTable()
             
-            # robot communicates to us via fields within the VisionControl SubTable
-            # we opt for a different table to ensure we to receive callbacks from our
-            # own writes.
-            self.controlTable = self.sd.getSubTable("VisionControl")
+            # robot communicates to us via fields within the Vision/Control 
+            #  SubTable we opt for a different table to ensure we 
+            #  receive callbacks from our own writes.
+            self.controlTable = getVisionControlTable()
             self.controlTable.addConnectionListener(self.connectionListener)
             self.controlTable.addTableListener(self.visionControlEvent)
 
