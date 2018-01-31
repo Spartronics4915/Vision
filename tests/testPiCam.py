@@ -37,11 +37,12 @@ class PiVideoStream:
                 ip = "10.49.15.2"
             else:
                 ip = "localhost"
-            print("starting comm on " + ip)
+            print("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
-        self.picam = picam.PiCam(resolution=(self.args.iwidth, self.args.iheight),
-                                framerate=(self.args.fps))
+        self.picam = picam.PiCam(resolution=(self.args.iwidth, 
+                                             self.args.iheight),
+                                 framerate=(self.args.fps))
 
     def parseArgs(self):
         """

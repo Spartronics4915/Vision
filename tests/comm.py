@@ -9,11 +9,19 @@ import json
 import logging
 
 class Control:
+    """
+        Control signals are sent by robot or driver station,
+        Received by vision processor to guide its behavior.
+    """
     def __init__(self):
         self.targeting = None
         self.imuHeading = None
 
 class Target:
+    """
+        Target represents the data vision passes to robot.
+        XXX: need a way to represent non-acquisition?
+    """
     def __init__(self):
         self.clock = time.clock()
         self.angleX = 0
@@ -24,61 +32,79 @@ class Target:
         targetTable.putNumber("ax", self.angleX)
         targetTable.putNumber("ay", self.angleY)
 
-VisionTableName = "Vision"
-VisionControlTableName = "VisionControl"
 theComm = None
 
-
-def getVisionTable():
-    return NetworkTables.getTable(VisionTableName)
-
-def getVisionControlTable():
-    return NetworkTables.getTable(VisionControlTableName)
-
 class Comm:
+    """
+        Comm abstracts our network-tables conventions.
+        Can be instantiated either by the vision processor or
+        by the fake robot server.  
+    """
     def __init__(self, serverIP):
         try:
             # IPAddress can be 
+            #   - None: means run as fake server
             #   - ip: "10.49.15.2" or 
             #   - name: "roboRIO-4915-FRC", "localhost"
-            NetworkTables.initialize(server=serverIP)
-            NetworkTables.setUpdateRate(.01)  
-            # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
+            if serverIP != None:
+                # we're a client
+                self.asServer = False
+                NetworkTables.initialize(server=serverIP)
+                NetworkTables.setUpdateRate(.01)  
+                # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
+            else:
+                # we're fake server
+                self.asServer = True
+                NetworkTables.initialize() 
 
-            #self.sd = NetworkTables.getTable("SmartDashboard")
+            theComm = self # for callback access
+
+            # so far we're not using SmartDashboard atm
+            self.sd = NetworkTables.getTable("SmartDashboard")
 
             # We communcate target to robot via Vision table,
             # current thinking is that this should not be a subtable of
             # SmartDashboard, since traffic is multiplied by the number
             # of clients.
-            self.targetTable = getVisionTable()
-            
-            # robot communicates to us via fields within the Vision/Control 
-            #  SubTable we opt for a different table to ensure we 
-            #  receive callbacks from our own writes.
-            self.controlTable = getVisionControlTable()
-            self.controlTable.addConnectionListener(self.connectionListener)
-            self.controlTable.addTableListener(self.visionControlEvent)
+            self.visionTable = NetworkTables.getTable("Vision")
+            self.controlTable = NetworkTables.getTable("VisionControl")
 
             self.control = Control()
             self.target = Target()
 
             self.fpsHistory = []
             self.lastUpdate = time.time()
-            theComm = self
+            
+            # Robot communicates to us via fields within the Vision/Control 
+            #  SubTable we opt for a different table to ensure we 
+            #  receive callbacks from our own writes.
+            if self.asServer:
+                # as server, we're interested in reporting connections
+                NetworkTables.addConnectionListener(self.connectionListener, 
+                                                    immediateNotify=True)
+            else:
+                # as vision controller, we're interested in acting upon
+                # vision control events.
+                self.controlTable.addEntryListener(self.visionControlEvent)
 
         except:
             xcpt = sys.exc_info()
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
 
+    def GetVisionTable(self):
+        return self.visionTable
+
+    def GetVisionControlTable(self):
+        return self.controlTable
+
     def Shutdown(self):
-        self.controlTable.removeConnectionListener(self.connectionListener)
-        self.controlTable.removeTableListener(self.visionControlEvent)
+        NetworkTables.removeConnection(self.connectionListener)
+        self.controlTable.removeEntryListener(self.visionControlEvent)
 
     def SetTarget(self, t):
         self.target = t
-        self.target.Send(self.targetTable)
+        self.target.Send(self.visionTable)
 
     def GetTarget(self):
         return self.target
@@ -94,6 +120,7 @@ class Comm:
             self.lastUpdate = time.time()
 
     def controlEvent(self, key, value, isNew):
+        print("control event received: " + key)
         if key == 'SetTarget':
         	self.control.targeting = value
         elif key == 'IMUHeading':

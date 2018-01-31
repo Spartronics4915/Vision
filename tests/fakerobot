@@ -4,10 +4,14 @@
 #
 
 import time, sys
-from networktables import NetworkTables
-import comm
+from comm import Comm
+import logging
 
-def visValueChanged(table, key, value, isNew):
+dirty = False
+visTable = {} 
+
+def visTargetChanged(table, key, value, isNew):
+    global visTable
     global dirty
     visTable[key] = value
     visTable["count"] += 1
@@ -17,12 +21,11 @@ def visValueChanged(table, key, value, isNew):
 
 def main():
     # To see messages from networktables, you must setup logging
-    import logging
+    global visTable
+    global dirty
     logging.basicConfig(level=logging.DEBUG)
-    NetworkTables.initialize() # we're the fake robot server
-    vis = comm.getVisionTable()
-    vis.addTableListener(visValueChanged)
-    visTable = {} 
+    comm = Comm(None)
+    comm.GetVisionTable().addEntryListener(visTargetChanged)
     dirty = False
     visTable["count"] = 0
     i = 0
