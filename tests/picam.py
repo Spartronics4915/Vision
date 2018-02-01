@@ -6,21 +6,32 @@ import sys
 
 # -------------------------------------------------------------------------
 class PiCam:
-    def __init__(self, resolution=(320,240), framerate=60):
+    def __init__(self, resolution=(320,240), framerate=60, auto=False):
         self.resolution = resolution
         self.framerate = framerate
+        if auto:
+            smode = 0
+        else:
+            smode = 7 # fast
         self.cam = PiCamera(resolution=resolution, framerate=framerate,
-                            sensor_mode=7) # for fastest rates, 0 is auto)
+                            sensor_mode=smode) # for fastest rates, 0 is auto)
 
         time.sleep(.1) # allow the camera to warm up
-        self.cam.awb_mode = "off"
-        self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
-        # for digital-gain and analog_gain. These values can't
-        # be set directly, rather "let them settle"...
-        self.cam.exposure_mode = "off"
+        if auto:
+            self.cam.awb_mode = "auto"
+            self.cam.exposure_mode = "auto"
+            self.cam.shutter_speed = 0 # set to 0 to go auto
+        else:
+            self.cam.awb_mode = "off"
+            # for digital-gain and analog_gain. These values can't
+            # be set directly, rather "let them settle"...
+            self.cam.exposure_mode = "off"
+            self.cam.shutter_speed = 10000 # set to 0 to go auto
+
         self.cam.exposure_compensation = -25 # [-25, 25]
         self.cam.shutter_speed = 0 #10000 # set to 0 to go auto
         self.cam.contrast = 70  # [-100, 100]
+        self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
         self.cam.hflip = True
         self.cam.vflip = True
 	self.cam.brightness = 70 # [0, 100]
@@ -59,7 +70,6 @@ class PiCam:
             self.stream.close()
         if self.rawCapture:
             self.rawCapture.close()
-
 
 # ------------------------------------------------------------------------
 class CaptureThread(threading.Thread):

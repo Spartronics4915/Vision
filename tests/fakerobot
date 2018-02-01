@@ -4,32 +4,38 @@
 #
 
 import time, sys
-from networktables import NetworkTable
-
-# To see messages from networktables, you must setup logging
+from comm import Comm
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
-
-visTable = {} 
 dirty = False
+visTable = {} 
 
-def visValueChanged(table, key, value, isNew):
+def visTargetChanged(table, key, value, isNew):
+    global visTable
     global dirty
     visTable[key] = value
+    visTable["count"] += 1
     dirty = True
-    print("%s:%s" % (key, value))
+    # for fast updates this print can slow things down:
+    # print("%s:%s" % (key, value))
 
-sd = NetworkTable.getTable("SmartDashboard")
-vis = sd.getSubTable("VisionTarget")
-vis.addTableListener(visValueChanged)
+def main():
+    # To see messages from networktables, you must setup logging
+    global visTable
+    global dirty
+    logging.basicConfig(level=logging.DEBUG)
+    comm = Comm(None)
+    comm.GetVisionTable().addEntryListener(visTargetChanged)
+    dirty = False
+    visTable["count"] = 0
+    i = 0
+    while True:
+        time.sleep(1)
+        i += 1
+        if dirty:
+            print(visTable)
+            visTable["count"] = 0
+            dirty = False
 
-visctl = sd.getSubTable("VisionControl")
-
-i = 0
-while True:
-    time.sleep(1)
-    i += 1
-    if dirty:
-        print(visTable)
-        dirty = False
+if __name__ == "__main__":
+    main() 
