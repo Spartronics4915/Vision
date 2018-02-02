@@ -125,6 +125,7 @@ class PiVideoStream:
         abort = False
         if self.commChan:
             self.target.clock = time.clock()
+	    self.target.angleX = algo.getTargetX()
             self.commChan.SetTarget(self.target)
 
         frame = algo.processFrame(image, algo=self.args.algo)
