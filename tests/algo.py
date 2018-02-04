@@ -5,7 +5,7 @@ range0 = np.array([25,220, 160]) # min hsv
 range1 = np.array([40, 255, 255]) # max hsv
 		  #THEOretical number is 30, but I'm compensating for the green light
 
-largeTargetC = (0,0)
+#largeTargetC = (160,0)
 # This is by design to keep a target in the works to transmit,
 # Also needed for testPiCam to work properly
 # TODO: Class
@@ -18,6 +18,7 @@ def defaultAlgo(frame):
     num_squares = 0
     global largeTargetC
     largeTargetA = 0
+    largeTargetC = (160,0)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     mask = cv2.inRange(frame, range0, range1)
@@ -66,7 +67,7 @@ def defaultAlgo(frame):
 	#print(box[0],box[1],box[2],box[3])
 
     print(num_squares)
-    return res
+    #return res
 
     # filter/reduce contours
     # convert nominated contour to target
