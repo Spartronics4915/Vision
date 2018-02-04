@@ -1,10 +1,10 @@
 import numpy as np
 import cv2
-		# I only care about hightly saturated images150
+        # I only care about hightly saturated images150
 range0 = np.array([25,220, 160]) # min hsv
 range1 = np.array([40, 255, 255]) # max hsv
 largeTargetC = [0,0]
-		  #THEOretical number is 30, but I'm compensating for the green light
+          #THEOretical number is 30, but I'm compensating for the green light
 
 #largeTargetC = (160,0)
 # This is by design to keep a target in the works to transmit,
@@ -34,38 +34,38 @@ def defaultAlgo(frame):
     rHeight, rWidth, chan = res.shape
     for cnt in contours:
 
-	#epsilon = 0.1*cv2.arcLength(cnt,True)
+    #epsilon = 0.1*cv2.arcLength(cnt,True)
 
-	#approx = cv2.approxPolyDP(cnt,epsilon,True)
+    #approx = cv2.approxPolyDP(cnt,epsilon,True)
 
-	rect = cv2.minAreaRect(cnt)
+    rect = cv2.minAreaRect(cnt)
 
-	box_h = rect[1][1]
-	box_w = rect[1][0]
-	box_center = rect[0]
-	box_area = box_h*box_w
-	box = cv2.boxPoints(rect)
+    box_h = rect[1][1]
+    box_w = rect[1][0]
+    box_center = rect[0]
+    box_area = box_h*box_w
+    box = cv2.boxPoints(rect)
 
-	box = np.int0(box)
+    box = np.int0(box)
 
-	if box_area > 3000:
-		cv2.drawContours(res, [box], 0,(0,0,255),2)
-		num_squares += 1 
+    if box_area > 3000:
+        cv2.drawContours(res, [box], 0,(0,0,255),2)
+        num_squares += 1 
 
-#		print("area is currently:",int(box_area))
-		print("center is currently:", int(box_center[0]),int(box_center[1]))		
-		#print("The screen is:",rWidth,rHeight)
+#       print("area is currently:",int(box_area))
+        print("center is currently:", int(box_center[0]),int(box_center[1]))        
+        #print("The screen is:",rWidth,rHeight)
 
-		if box_area > largeTargetA:
-		    largeTarget = box #set of poitns
-		    largeTargetA = box_area #Area of the box
-		    largeTargetC = box_center #Center of the box(what is transmitted)
-		    print("largeTargetC @:", largeTargetC)
-		    print(largeTargetC)
-		#cv2.circle(res,(box[0][0],box[0][1]),50,(0,0,0))
-	#Filter by size, will toss small rectangles out	
+        if box_area > largeTargetA:
+            largeTarget = box #set of poitns
+            largeTargetA = box_area #Area of the box
+            largeTargetC = box_center #Center of the box(what is transmitted)
+            print("largeTargetC @:", largeTargetC)
+            print(largeTargetC)
+        #cv2.circle(res,(box[0][0],box[0][1]),50,(0,0,0))
+    #Filter by size, will toss small rectangles out 
 
-	#print(box[0],box[1],box[2],box[3])
+    #print(box[0],box[1],box[2],box[3])
 
     print(num_squares)
     #return res
