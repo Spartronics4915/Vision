@@ -130,7 +130,7 @@ class PiVideoStream:
 
         frame = algo.processFrame(image, algo=self.args.algo)
         if self.args.display:
-            cv2.imshow("Frame", frame)
+#            cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q") or key == 27:
                 abort = True

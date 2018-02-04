@@ -59,9 +59,12 @@ class Comm:
 
             theComm = self # for callback access
 
-            # so far we're not using SmartDashboard atm
+            # update the dashboard with our state, NB: this is a different table
+            # that both the vision and control tables.
             self.sd = NetworkTables.getTable("SmartDashboard")
-
+            self.sd.putString("Vision/Status", "OK")
+            self.updateVisionState("Standby")
+            
             # We communcate target to robot via Vision table,
             # current thinking is that this should not be a subtable of
             # SmartDashboard, since traffic is multiplied by the number
@@ -91,6 +94,9 @@ class Comm:
             xcpt = sys.exc_info()
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
+
+    def updateVisionState(self, state):
+        self.sd.putString("Vision/State", state)
 
     def GetVisionTable(self):
         return self.visionTable
