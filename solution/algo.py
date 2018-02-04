@@ -3,6 +3,7 @@ import cv2
         # I only care about hightly saturated images150
 range0 = np.array([25,220, 160]) # min hsv
 range1 = np.array([40, 255, 255]) # max hsv
+
 largeTargetC = [0,0]
           #THEOretical number is 30, but I'm compensating for the green light
 
@@ -31,7 +32,9 @@ def defaultAlgo(frame):
                     cv2.RETR_EXTERNAL,  # external contours only
                     cv2.CHAIN_APPROX_TC89_KCOS # used by 254, cf:APPROX_SIMPLE
                         )
+    #Dimensions of the window, also deprecated
     rHeight, rWidth, chan = res.shape
+
     for cnt in contours:
 
     #epsilon = 0.1*cv2.arcLength(cnt,True)
@@ -48,6 +51,7 @@ def defaultAlgo(frame):
 
     box = np.int0(box)
 
+    #Filter by size
     if box_area > 3000:
         cv2.drawContours(res, [box], 0,(0,0,255),2)
         num_squares += 1 
@@ -62,29 +66,18 @@ def defaultAlgo(frame):
             largeTargetC = box_center #Center of the box(what is transmitted)
             print("largeTargetC @:", largeTargetC)
             print(largeTargetC)
-        #cv2.circle(res,(box[0][0],box[0][1]),50,(0,0,0))
-    #Filter by size, will toss small rectangles out 
 
-    #print(box[0],box[1],box[2],box[3])
-
-    print(num_squares)
-    #return res
-
-    # filter/reduce contours
-    # convert nominated contour to target
-    return res
-
-def getTargetX():
-    global largeTargetC
-
+    ### DX math ###
     ax = largeTargetC[0] #X value(0-320)
     #print("largeTargetC(0) @:", largeTargetC[0])
     ax = ax - 160 #Converting to the center o' the screen being 0(-160-160)
     dx = ax * 0.1375 # See: LearningVision.md (-22-22)
 
-    print("Value of DX sent is:", dx)
-    return dx
 
+    #print(num_squares) Leaving commented untill integration with debug mode
+    return res, dx
+
+#Deprecated
 def getTargetY():
     return largeTargetC[1]
 

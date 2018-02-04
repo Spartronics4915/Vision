@@ -123,12 +123,14 @@ class PiVideoStream:
 
     def processFrame(self, image):
         abort = False
+
+        frame, dx = algo.processFrame(image, algo=self.args.algo)
+        
         if self.commChan:
             self.target.clock = time.clock()
-	    self.target.angleX = algo.getTargetX()
+	        self.target.angleX = dx
             self.commChan.SetTarget(self.target)
 
-        frame = algo.processFrame(image, algo=self.args.algo)
         if self.args.display:
 #            cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF

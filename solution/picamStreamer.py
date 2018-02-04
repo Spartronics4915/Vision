@@ -7,6 +7,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import io
 import time
 import picam
+import algo
 
 s_picam=None
 
@@ -26,6 +27,8 @@ class CamHandler(BaseHTTPRequestHandler):
           self.send_header('Content-type','image/jpeg')
           self.send_header('Content-length',len(stream.getvalue()))
           self.end_headers()
+          frame, dx = algo.defaultAlgo(stream.getvalue())
+          #self.wfile.write(stream) # Sending the 'physcal' image.
           self.wfile.write(stream.getvalue())
           stream.seek(0)
           stream.truncate()
