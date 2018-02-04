@@ -41,31 +41,31 @@ def defaultAlgo(frame):
 
     #approx = cv2.approxPolyDP(cnt,epsilon,True)
 
-    rect = cv2.minAreaRect(cnt)
+        rect = cv2.minAreaRect(cnt)
 
-    box_h = rect[1][1]
-    box_w = rect[1][0]
-    box_center = rect[0]
-    box_area = box_h*box_w
-    box = cv2.boxPoints(rect)
+        box_h = rect[1][1]
+        box_w = rect[1][0]
+        box_center = rect[0]
+        box_area = box_h*box_w
+        box = cv2.boxPoints(rect)
 
-    box = np.int0(box)
+        box = np.int0(box)
 
-    #Filter by size
-    if box_area > 3000:
-        cv2.drawContours(res, [box], 0,(0,0,255),2)
-        num_squares += 1 
+        #Filter by size
+        if box_area > 3000:
+            cv2.drawContours(res, [box], 0,(0,0,255),2)
+            num_squares += 1 
 
-#       print("area is currently:",int(box_area))
-        print("center is currently:", int(box_center[0]),int(box_center[1]))        
-        #print("The screen is:",rWidth,rHeight)
+    #       print("area is currently:",int(box_area))
+            print("center is currently:", int(box_center[0]),int(box_center[1]))        
+            #print("The screen is:",rWidth,rHeight)
 
-        if box_area > largeTargetA:
-            largeTarget = box #set of poitns
-            largeTargetA = box_area #Area of the box
-            largeTargetC = box_center #Center of the box(what is transmitted)
-            print("largeTargetC @:", largeTargetC)
-            print(largeTargetC)
+            if box_area > largeTargetA:
+                largeTarget = box #set of poitns
+                largeTargetA = box_area #Area of the box
+                largeTargetC = box_center #Center of the box(what is transmitted)
+                print("largeTargetC @:", largeTargetC)
+                print(largeTargetC)
 
     ### DX math ###
     ax = largeTargetC[0] #X value(0-320)
