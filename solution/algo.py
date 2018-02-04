@@ -23,7 +23,7 @@ def defaultAlgo(frame):
     mask = cv2.inRange(frame, range0, range1)
 
     # Return bitwise and
-    res = cv2.bitwise_and(frame, frame, mask=mask)
+    res = cv2.bitwise_and(frame, frame, mask=mask) # In the real world, this would never be run, because this is only for visual
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
                     cv2.RETR_EXTERNAL,  # external contours only
