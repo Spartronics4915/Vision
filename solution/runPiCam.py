@@ -83,6 +83,10 @@ class PiVideoStream:
         parser.add_argument("--color", dest="color",
                             help="color: ([0,255],[0,255])",
                             default=None)
+        parser.add_argument("--debug", dest="debug",
+                            help="debug: [0,1] ",
+                            default=0)
+               
         self.args = parser.parse_args()
 
     def Run(self):
@@ -124,15 +128,16 @@ class PiVideoStream:
     def processFrame(self, image):
         abort = False
 
-        frame, dx = algo.processFrame(image, algo=self.args.algo)
+        dx, frame = algo.processFrame(image, algo=self.args.algo, display=self.args.display,debug=self.args.debug)
         
         if self.commChan:
             self.target.clock = time.clock()
 	        self.target.angleX = dx
+            # Not setting dy, because that may mess things up
             self.commChan.SetTarget(self.target)
 
         if self.args.display:
-#            cv2.imshow("Frame", frame)
+            cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q") or key == 27:
                 abort = True
