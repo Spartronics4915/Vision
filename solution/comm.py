@@ -95,7 +95,7 @@ class Comm:
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
 
-    def UpdateVisionState(self, state):
+    def updateVisionState(self, state):
         self.sd.putString("Vision/State", state)
 
     def GetVisionTable(self):

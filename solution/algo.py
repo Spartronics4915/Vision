@@ -3,6 +3,7 @@ import cv2
 		# I only care about hightly saturated images150
 range0 = np.array([25,220, 160]) # min hsv
 range1 = np.array([40, 255, 255]) # max hsv
+largeTargetC = [0,0]
 		  #THEOretical number is 30, but I'm compensating for the green light
 
 #largeTargetC = (160,0)
