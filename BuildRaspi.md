@@ -34,8 +34,7 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 
 #### build opencv with extensions
 
-* [https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi](pyimageesearch) (skip the steps on virtual envs)
-* [https://www.pyimagesearch.com/2017/10/09/optimizing-opencv-on-the-raspberry-pi](optimizing build)
+* [optimized build](https://www.pyimagesearch.com/2017/10/09/optimizing-opencv-on-the-raspberry-pi) (skip steps on virtual envs)
 
 > Note that building opencv on pi requires lots of time and disk space.  If
 > you wish to build it on a thumbdrive, it needs to be formatted to support
@@ -77,7 +76,7 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 ### Prepare for competition
 
 #### read-only-raspberry-pi
-* (https://learn.adafruit.com/read-only-raspberry-pi)
+* https://learn.adafruit.com/read-only-raspberry-pi
 
 #### install init scripts
 
@@ -85,11 +84,11 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 * add to /etc/modprobe.d/raspi-blacklist.config
 >  *blacklist brcmfmac*
 >  *blacklist brcmutil*
-> via [http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3](stackexchange)
+> via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3)
 
 #### duplicate working microSD card
 * a properly duplicated (up-to-date!) microsd is essential issurance
-  for a competition.  Here's a [https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card](link) 
+  for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd, 
   the longer this process will take.
 
