@@ -1,3 +1,4 @@
+
 ### make sure you have a raspi 3 with picam
 * [https://www.amazon.com/gp/product/B01CD5VC92](pi3)
 * [https://www.amazon.com/gp/product/B00FGKYHXA](camera)
@@ -38,7 +39,7 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 
 > Note that building opencv on pi requires lots of time and disk space.  If
 > you wish to build it on a thumbdrive, it needs to be formatted to support
-> symbolic links (ie: FAT32 won't work, ext4 is fine).  If you have a 16GB 
+> symbolic links (ie: FAT32 won't work, ext4 is fine).  If you have a 16GB
 > microsd you should be fine, but you will need a thumbdrive with a 8GB.
 
 
@@ -49,7 +50,7 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
     * `ifconfig`
     * when in dev mode, we may have two interfaces (eth0, wlan0), this may
       result in two default routes and result in unreachable host messages.
-     `sudo route del default` 
+     `sudo route del default`
 
 #### validate video
 
@@ -57,19 +58,17 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 * to use picam as opencv videostream (ie: without picamera module):
  `sudo modprobe bcm2835-v4l2`
 
-
 #### pull git repository
 * `mkdir -p src/spartronics`
 * `cd src/spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
 
-
 #### misc
 ##### mount usb thumbdrive
 * for FAT32 thumbdrives, the desktop environment can be used to
-  mount and eject.  In this case, the contents are found under 
+  mount and eject.  In this case, the contents are found under
   `/media/pi`.
-* if you have a ext4 thumbdrive, you may need to manually mount it: 
+* if you have a ext4 thumbdrive, you may need to manually mount it:
    `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
 * remember to eject/umount the thumbdrive!
 
@@ -79,16 +78,18 @@ sudo pip3 install pynetworktables pynetworktables2js daemon
 * https://learn.adafruit.com/read-only-raspberry-pi
 
 #### install init scripts
+(To Do)
 
 #### disable wireless (wifi and bluetooth)
-* add to /etc/modprobe.d/raspi-blacklist.config
->  *blacklist brcmfmac*
->  *blacklist brcmutil*
-> via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3)
+* add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
+
+```
+ *blacklist brcmfmac*
+ *blacklist brcmutil*
+```
 
 #### duplicate working microSD card
 * a properly duplicated (up-to-date!) microsd is essential issurance
   for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
-  to a variety of methods to accomplish this task.  The larger your microsd, 
+  to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.
-
