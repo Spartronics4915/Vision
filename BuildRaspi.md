@@ -4,37 +4,56 @@
 
 ### build microSD card (minimum 8GB)
 * download latest debian-stretch image
-* use etcher or similar to format/build the microSD card
+* use Etcher or similar to format/build the microSD card
 
-#### on first boot (requires network)
+#### on first boot (connect to wifi via desktop)
 * `sudo raspi-config`
-    * enable camera
-    * enable ssh
-    * set timezone and keyboard
+    * change user password
     * configure to not autologin and not start window system (faster startup)
-* `sudo apt get update`
-* `sudo apt get install`
+    * enable ssh
+    * enable camera
+    * set timezone and keyboard
+    * (reboot)
+* update and cleanup (recover diskspace)
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install
+sudo apt-get purge wolfram-engine
+sudo apt-get purge libreoffice*
+sudo apt-get clean
+sudo apt-get autoremove
+```
+
+#### install python extensions
+
+```
+sudo pip install pynetworktables pynetworktables2js daemon
+sudo pip3 install pynetworktables pynetworktables2js daemon
+```
+
+#### build opencv with extensions
+
+* [https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi](pyimageesearch) (skip the steps on virtual envs)
+* [https://www.pyimagesearch.com/2017/10/09/optimizing-opencv-on-the-raspberry-pi](optimizing build)
+
+> Note that building opencv on pi requires lots of time and disk space.  If
+> you wish to build it on a thumbdrive, it needs to be formatted to support
+> symbolic links (ie: FAT32 won't work, ext4 is fine).  If you have a 16GB 
+> microsd you should be fine, but you will need a thumbdrive with a 8GB.
+
 
 #### setup network
-* dynamic ip for wlan0
-    * /etc/wpa_supplicant/wpa_supplicant.conf (NB: we must disable wlan for competetion)
 
 * static ip for eth0
-    * /etc/dhcpd.conf (has example static):  we want 10.49.15.10/24 for vision
+    * /etc/dhcpd.conf (has example static): we want 10.49.15.10/24 for vision
     * `ifconfig`
     * when in dev mode, we may have two interfaces (eth0, wlan0), this may
       result in two default routes and result in unreachable host messages.
      `sudo route del default` 
 
-#### build opencv with extensions
-* [https://www.pyimagesearch.com/2017/09/04/raspbian-stretch-install-opencv-3-python-on-your-raspberry-pi](opencv-3 build)
-
-#### install python extensions
-* `python -m pip install pynetworktables`
-* `python -m pip install pynetworktables2js`
-* `python -m pip install daemon`
-
 #### validate video
+
 * `raspivid -p "0,0,640,480"`
 * to use picam as opencv videostream (ie: without picamera module):
  `sudo modprobe bcm2835-v4l2`
@@ -48,14 +67,29 @@
 
 #### misc
 ##### mount usb thumbdrive
-* `sudo mkdir -p /mnt/usb`  (once)
-* `sudo mount -o uid=pi,gid=pi -t vfat /dev/sda1 /mnt/usb`
+* for FAT32 thumbdrives, the desktop environment can be used to
+  mount and eject.  In this case, the contents are found under 
+  `/media/pi`.
+* if you have a ext4 thumbdrive, you may need to manually mount it: 
+   `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
+* remember to eject/umount the thumbdrive!
 
 ### Prepare for competition
 
-* read-only-raspberry-pi
-    * (https://learn.adafruit.com/read-only-raspberry-pi)
-* install init scripts
+#### read-only-raspberry-pi
+* (https://learn.adafruit.com/read-only-raspberry-pi)
+
+#### install init scripts
+
+#### disable wireless (wifi and bluetooth)
+* add to /etc/modprobe.d/raspi-blacklist.config
+>  *blacklist brcmfmac*
+>  *blacklist brcmutil*
+> via [http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3](stackexchange)
 
 #### duplicate working microSD card
+* a properly duplicated (up-to-date!) microsd is essential issurance
+  for a competition.  Here's a [https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card](link) 
+  to a variety of methods to accomplish this task.  The larger your microsd, 
+  the longer this process will take.
 
