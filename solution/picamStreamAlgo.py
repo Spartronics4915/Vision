@@ -14,6 +14,7 @@ import cv2
 import sys
 
 s_first = True
+s_proof = True  # delete when defaultAlgo is working
 s_picam=None
 s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 5]
 s_mainPage="""
@@ -36,33 +37,29 @@ class CamHandler(BaseHTTPRequestHandler):
             try:
                 while True:
                     camframe = s_picam.next()
-                    if 0:
+                    if s_proof:
+                        frame = algo.hsvAlgo(camframe)
+                    else:
                         dx, frame = algo.defaultAlgo(camframe, display=True, 
                                                 debug=False)
-                    else:
-                        frame = algo.hsvAlgo(camframe)
-
                     rc, jpg = cv2.imencode('.jpg', frame, s_jpgParam)
                     if not rc:
-                        sys.stderr.write('x')
                         continue
 
-                    data = jpg.tostring()
                     if s_first:
-                        print(jpg.size, len(data))
+                        print(jpg.size)
                         s_first = False
 
-                    if True:
-                        self.wfile.write("--jpgboundary")
-                        self.send_header('Content-type','image/jpeg')
-                        self.send_header('Content-length', len(data))
-                        self.end_headers()
-                        self.wfile.write(data)
+                    self.wfile.write("--jpgboundary")
+                    self.send_header('Content-type','image/jpeg')
+                    self.send_header('Content-length', jpg.size)
+                    self.end_headers()
+                    self.wfile.write(jpg.tostring())
 
             except KeyboardInterrupt:
                 print("Cam handler interrupted")
-            return
 
+            return
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -71,19 +68,24 @@ class CamHandler(BaseHTTPRequestHandler):
             return
 
 def main():
-  global s_picam
-  #s_picam = picam.PiCam(resolution=(320, 240), framerate=60);
-  s_picam = picam.PiCam(resolution=(320, 240), framerate=60,
-                        auto=True);
-  s_picam.start()
-  try:
-    server = HTTPServer(('',5080),CamHandler)
-    print "server started"
-    server.serve_forever()
-  except KeyboardInterrupt:
-    print("server stopped")
-    s_picam.stop()
-    server.socket.close()
+    global s_picam
+
+    if s_proof:
+        s_picam = picam.PiCam(resolution=(320, 240), framerate=60, auto=True);
+    else:
+        s_picam = picam.PiCam(resolution=(320, 240), framerate=60);
+
+    s_picam.start()
+
+    try:
+        server = HTTPServer(('',5080),CamHandler)
+        print "server started"
+        server.serve_forever()
+
+    except KeyboardInterrupt:
+        print("server stopped")
+        s_picam.stop()
+        server.socket.close()
 
 if __name__ == '__main__':
   main()
