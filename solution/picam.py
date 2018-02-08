@@ -9,13 +9,14 @@ class PiCam:
     def __init__(self, resolution=(320,240), framerate=60, auto=False):
         self.resolution = resolution
         self.framerate = framerate
+        self.stream = None
+        self.rawCapture = None
         if auto:
             smode = 0
         else:
             smode = 7 # fast
         self.cam = PiCamera(resolution=resolution, framerate=framerate,
                             sensor_mode=smode) # for fastest rates, 0 is auto)
-
         time.sleep(.1) # allow the camera to warm up
         if auto:
             self.cam.awb_mode = "auto"
@@ -34,8 +35,9 @@ class PiCam:
         self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
         self.cam.hflip = True
         self.cam.vflip = True
-	self.cam.brightness = 70 # [0, 100]
-	self.cam.sharpness = 0 # [-100, 100]
+        self.cam.brightness = 70 # [0, 100]
+        self.cam.sharpness = 0 # [-100, 100]
+        time.sleep(.1) # more settling
 
         print("camera settings:")
         print("  analog_gain:%s" % self.cam.analog_gain)

@@ -127,8 +127,9 @@ class PiVideoStream:
 
     def processFrame(self, image):
         abort = False
-
-        dx, frame = algo.processFrame(image, algo=self.args.algo, display=self.args.display,debug=self.args.debug)
+        dx, frame = algo.processFrame(image, algo=self.args.algo, 
+                                    display=self.args.display,
+                                    debug=self.args.debug)
         
         if self.commChan:
             self.target.clock = time.clock()

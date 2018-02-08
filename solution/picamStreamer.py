@@ -9,40 +9,53 @@ import time
 import picam
 import algo
 
+s_first=True
 s_picam=None
+s_mainPage="""
+<html><head>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+</head><body>
+<img src="/cam.mjpg"/>
+</body></html>"""
 
 class CamHandler(BaseHTTPRequestHandler):
-  def do_GET(self):
-    if self.path.endswith('.mjpg'):
-      self.send_response(200)
-      self.send_header('Content-type',
-            'multipart/x-mixed-replace; boundary=--jpgboundary')
-      self.end_headers()
-      stream = io.BytesIO()
-      try:
-        start=time.time()
-        for foo in s_picam.cam.capture_continuous(stream, "jpeg", quality=5,
+    def do_GET(self):
+        global s_first
+        if self.path.endswith('.mjpg'):
+            self.send_response(200)
+            self.send_header('Content-type',
+                 'multipart/x-mixed-replace; boundary=--jpgboundary')
+            self.end_headers()
+            stream = io.BytesIO()
+            try:
+                for i in s_picam.cam.capture_continuous(stream, "jpeg", 
+                                                quality=5,
                                                 use_video_port=True):
-          self.wfile.write("--jpgboundary")
-          self.send_header('Content-type','image/jpeg')
-          self.send_header('Content-length',len(stream.getvalue()))
-          self.end_headers()
-          frame, dx = algo.defaultAlgo(stream.getvalue())
-          #self.wfile.write(stream) # Sending the 'physcal' image.
-          self.wfile.write(stream.getvalue())
-          stream.seek(0)
-          stream.truncate()
-      except KeyboardInterrupt:
-        pass 
-      return
-    else:
-      self.send_response(200)
-      self.send_header('Content-type','text/html')
-      self.end_headers()
-      self.wfile.write("""<html><head></head><body>
-        <img src="/cam.mjpg"/>
-      </body></html>""")
-      return
+                    self.wfile.write("--jpgboundary")
+                    self.send_header('Content-type','image/jpeg')
+                    self.send_header('Content-length',len(stream.getvalue()))
+                    self.end_headers()
+                    val = stream.getvalue()
+                    if s_first:
+                        print(len(val))
+                        print(val)
+                        s_first = False
+
+                    self.wfile.write(val)
+                    stream.seek(0)
+                    stream.truncate()
+
+            except KeyboardInterrupt:
+               print "get interrupted" 
+
+            return
+        else:
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            self.wfile.write(s_mainPage)
+            return
 
 def main():
   global s_picam
@@ -53,7 +66,8 @@ def main():
     print "server started"
     server.serve_forever()
   except KeyboardInterrupt:
-    s_picam.close()
+    print "aborting server"
+    s_picam.stop()
     server.socket.close()
 
 if __name__ == '__main__':
