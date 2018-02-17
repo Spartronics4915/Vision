@@ -1,0 +1,17 @@
+[Unit]
+Description="Spartronics4915 Vision Service"
+After=multi-user.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/usr/bin/python \
+    /home/pi/src/spartronics/Vision/solution/runPiCam.py \
+    --daemonize --robot roborio  > \
+    /home/pi/runPiCam.log 2>&1
+Restart=always
+TimeoutStartSec=10
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
