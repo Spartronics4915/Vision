@@ -1,8 +1,8 @@
 import numpy as np
 import cv2
         # I only care about hightly saturated images150
-range0 = np.array([25,220, 160]) # min hsv
-range1 = np.array([40, 255, 255]) # max hsv
+range0 = np.array([30,120, 100]) # min hsv
+range1 = np.array([50, 255, 255]) # max hsv
 
 largeTargetC = [0,0]
           #THEOretical number is 30, but I'm compensating for the green light
@@ -50,7 +50,7 @@ def defaultAlgo(frame,display=0,debug=0):
         # Filter by size
         if box_area > 3000:
 
-            if display  # No need to do this math and computation if we are not running in dispay mode
+            if display:  # No need to do this math and computation if we are not running in dispay mode
                 cv2.drawContours(res, [box], 0,(0,0,255),2)
 
             if debug:   # This is helpful because I can glance at my computer, and see if it found a target or not.
@@ -68,7 +68,7 @@ def defaultAlgo(frame,display=0,debug=0):
     dx = ax * 0.1375        # See: LearningVision.md (-22-22)
 
     if debug:
-        print("largeTargetC is at: ", largeTargetC[0])
+        print("dx is at: ", dx)
 
     if display:
         return dx, res
@@ -78,7 +78,7 @@ def defaultAlgo(frame,display=0,debug=0):
 
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
-        return defaultAlgo(frame,display)
+        return defaultAlgo(frame,display,debug)
     elif algo == "empty":
         return emptyAlgo(frame)
     
