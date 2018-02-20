@@ -21,7 +21,7 @@ def hsvAlgo(frame):
 
 def defaultAlgo(frame,display=0,debug=0):
     largeTargetA = 0        # Need these vars to filter for large targets
-    largeTargetC = (160,0)
+    largeTargetC = (1600,0)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering

@@ -136,15 +136,24 @@ class PiVideoStream:
     def processFrame(self, image):
         abort = False
 
-        dx, frame = algo.processFrame(image, algo=self.args.algo, 
+        dirtyx, frame = algo.processFrame(image, algo=self.args.algo, 
                                     display=self.args.display,
                                     debug=self.args.debug)
-        
+
+	if (self.args.debug):
+	    print("Dirtyx is at: ", dirtyx)
+	    print("self.target.anglex is at: ", self.target.angleX)
         if self.commChan:
-            self.target.clock = time.clock()
-            self.target.angleX = dx
-            # Not setting dy, because that may mess things up
-            self.commChan.SetTarget(self.target)
+	    self.target.clock = time.clock()
+	    if (dirtyx > 25): #Largest angle we expect is 22 
+		self.commChan.updateVisionState("Searching")
+	    else:
+		self.commChan.updateVisionState("Aquired")	
+		# sending 'aquired' may be independent of the fact that we send a new target over	
+		if (dirtyx != self.target.angleX):
+		    self.target.angleX = dirtyx
+            	    # Not setting dy, because that may mess things up
+	            self.commChan.SetTarget(self.target)
 
         if self.args.display:
             cv2.imshow("Frame", frame)
