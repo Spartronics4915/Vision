@@ -24,11 +24,12 @@ import picam
 class PiVideoStream:
     def __init__(self):
         #I am not shure this is correct. According to docs, you do not instantate a logger.
-        logging.basicConfig(filename="runLogs.log",level=logging.DEBUG)
+        logging.basicConfig(filename="/home/pi/src/spartronics/Vision/solution/runLogs.log",level=logging.DEBUG)
 
-        logging.debug("--------------------New run------------------")
-        logging.debug("Run started at: ", datetime.datetime.now())
-        logging.debug("---------------------------------------------")
+        logging.debug("\n--------------------New run------------------")
+        logging.debug("Run started at: ")
+        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+        logging.debug("---------------------------------------------\n")
         self.windowName = "picamera"
         self.target = comm.Target()
         self.commChan = None
@@ -39,7 +40,8 @@ class PiVideoStream:
 
         if self.args.robot != "none":
             if self.args.robot == "roborio":
-                logging.debug(datetime.datetime.now(), "Connecting to robot at 10.49.15.2...")
+                logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+                logging.debug("Connecting to robot at 10.49.15.2...")
                 ip = "10.49.15.2"
             else:
                 ip = "localhost"
@@ -98,7 +100,8 @@ class PiVideoStream:
                
         self.args = parser.parse_args()
         #Logging
-        logging.debug(datetime.datetime.now(), "Parsed the following args:\n")
+        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+        logging.debug("Parsed the following args:")
         logging.debug(self.args)
 
     def Run(self):
@@ -139,7 +142,8 @@ class PiVideoStream:
         """
         print("  (single threaded)")
         self.picam.start()
-        logging.debug(datetime.datetime.now(), "Began debugging")
+        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+        logging.debug("Began processing images")
         while True:
             image = self.picam.next()
             if self.processFrame(image):
@@ -151,23 +155,26 @@ class PiVideoStream:
         dirtyx, frame = algo.processFrame(image, algo=self.args.algo, 
                                     display=self.args.display,
                                     debug=self.args.debug)
-    
         if (self.args.debug):
             print("Dirtyx is at: ", dirtyx)
             print("self.target.anglex is at: ", self.target.angleX)
-            if self.commChan:
-                self.target.clock = time.clock()
+        if self.commChan:
+            self.target.clock = time.clock()
             if (dirtyx > 25): #Largest angle we expect is 22
-                logging.debug(datetime.datetime.now(), "Sent a 'searching' to networktables\n") 
+                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+                #logging.debug("Sent a 'searching' to networktables\n") 
                 self.commChan.updateVisionState("Searching")
             else:
-                logging.debug(datetime.datetime.now(), "Sent a 'aquired' to networktables\n", )
+                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+                #logging.debug("Sent a 'aquired' to networktables\n", )
                 self.commChan.updateVisionState("Aquired")  
             # sending 'aquired' may be independent of the fact that we send a new target over   
             if (dirtyx != self.target.angleX):
+                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+                #logging.debug("DirtyX is currently at:", dirtyx)
                 self.target.angleX = dirtyx
-                    # Not setting dy, because that may mess things up
-                    self.commChan.SetTarget(self.target)
+                # Not setting dy, because that may mess things up
+                self.commChan.SetTarget(self.target)
 
             if self.args.display:
                 cv2.imshow("Frame", frame)
