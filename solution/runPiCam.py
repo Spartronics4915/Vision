@@ -34,6 +34,7 @@ class PiVideoStream:
         self.target = comm.Target()
         self.commChan = None
         self.parseArgs()
+        self.commChan.SetTarget(self.target)
         print("testPCam pid: %d args:" % os.getpid())
         print(self.args)
         print("OpenCV version: {}".format(cv2.__version__))
@@ -57,7 +58,7 @@ class PiVideoStream:
         Parse input arguments
         """
         parser = argparse.ArgumentParser(description=
-                             "Capture and display live camera video on raspi")
+                            "Capture and display live camera video on raspi")
         parser.add_argument("--threads", dest="threads",
                             help="threads: (0-4) [0]",
                             default=0, type=int)
@@ -151,7 +152,6 @@ class PiVideoStream:
 
     def processFrame(self, image):
         abort = False
-
         dirtyx, frame = algo.processFrame(image, algo=self.args.algo, 
                                     display=self.args.display,
                                     debug=self.args.debug)

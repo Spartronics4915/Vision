@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
         # I only care about hightly saturated images150
-range0 = np.array([30,120, 100]) # min hsv
+range0 = np.array([0,150,150]) # min hsv
 range1 = np.array([50, 255, 255]) # max hsv
 
 largeTargetC = [0,0]
@@ -50,7 +50,7 @@ def defaultAlgo(frame,display=0,debug=0):
         box = np.int0(box)         # convert to integers
 
         # Filter by size
-        if boxArea > 3000:
+        if boxArea > 1500:
 
 
             if display:  # No need to do this math and computation if we 
@@ -82,4 +82,5 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return defaultAlgo(frame,display,debug)
     elif algo == "empty":
         return emptyAlgo(frame)
-    
+    elif algo == "hsv_algo":
+        return hsvAlgo(frame)

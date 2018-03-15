@@ -14,7 +14,7 @@ import cv2
 import sys
 
 s_first = True
-s_proof = True  # delete when defaultAlgo is working
+s_proof = False  # delete when defaultAlgo is working
 s_picam=None
 s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 5]
 s_mainPage="""

@@ -24,8 +24,9 @@ class Target:
     """
     def __init__(self):
         self.clock = time.clock()
-        self.angleX = 0
-        self.angleY = 0
+        #Invalid, bogus targets, to be changed if something goes ary
+        self.angleX = 100
+        self.angleY = 100
 
     def Send(self, targetTable):
         targetTable.putNumber("clock", self.clock)
