@@ -24,6 +24,7 @@ import picam
 class PiVideoStream:
     def __init__(self):
         #I am not shure this is correct. According to docs, you do not instantate a logger.
+        os.system('sudo ifconfig wlan0 down') # Can't have this up at comp
         logging.basicConfig(filename="/home/pi/src/spartronics/Vision/solution/runLogs.log",level=logging.DEBUG)
 
         logging.debug("\n--------------------New run------------------")
