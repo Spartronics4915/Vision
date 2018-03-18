@@ -35,7 +35,6 @@ class PiVideoStream:
         self.target = comm.Target()
         self.commChan = None
         self.parseArgs()
-        self.commChan.SetTarget(self.target)
         print("testPCam pid: %d args:" % os.getpid())
         print(self.args)
         print("OpenCV version: {}".format(cv2.__version__))
@@ -53,6 +52,8 @@ class PiVideoStream:
         self.picam = picam.PiCam(resolution=(self.args.iwidth, 
                                              self.args.iheight),
                                  framerate=(self.args.fps))
+        # Push something down the pipe.
+        self.commChan.SetTarget(self.target)
 
     def parseArgs(self):
         """
@@ -171,6 +172,9 @@ class PiVideoStream:
                 self.commChan.updateVisionState("Aquired")  
             # sending 'aquired' may be independent of the fact that we send a new target over   
             if (dirtyx != self.target.angleX):
+                if (self.args.debug):
+                    print("self.target.angleX is being changed to...", dirtyx)
+                    # Fix 0 bug?
                 #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
                 #logging.debug("DirtyX is currently at:", dirtyx)
                 self.target.angleX = dirtyx
