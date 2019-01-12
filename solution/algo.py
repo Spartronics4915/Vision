@@ -1,17 +1,26 @@
+'''
+Solution/algo.py
+
+Script to hold OpenCV calls, in addition to all tuning values assoicated with the finding of the object of intrest in frame
+
+Used by:
+    - runPicam.py
+    - testPiCam.py
+TODO: Refactor some parts of the pipeline into classes
+TODO: Better Varible Names
+'''
+
 import numpy as np
 import cv2
-        # I only care about hightly saturated images150
-range0 = np.array([0,150,150]) # min hsv
-range1 = np.array([50, 255, 255]) # max hsv
+
+# Deprecated 2018 values:
+# range0 = np.array([0,150,150]) # min hsv
+# range1 = np.array([50, 255, 255]) # max hsv
+
+range0 = np.array([0,0,0])
+range1 = np.array([0,0,0])
 
 largeTargetC = [0,0]
-          #THEOretical number is 30, but I'm compensating for the green light
-
-#largeTargetC = (160,0)
-# This is by design to keep a target in the works to transmit,
-# Also needed for testPiCam to work properly
-# TODO: Class
-# TODO: Better Varible Names
 
 def emptyAlgo(frame):
     return frame
