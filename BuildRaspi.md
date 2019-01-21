@@ -69,9 +69,8 @@ In theory a raspi can support 2 pi cameras but we haven't tested
 that.
 
 * follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation)
-* note: the instructions regarding TC358743 you can ignore.
-* install demos
-* install webrtc
+    * note: the instructions regarding TC358743 you can ignore.
+
 * here are the packages required (note raspidisp not required)
 
     ```
