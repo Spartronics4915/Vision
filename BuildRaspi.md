@@ -153,3 +153,12 @@ that.
   for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.
+  
+### Modifing WPIlib Raspberry Pi image to work with picam 
+The default installation of the WPI image has some conflicts with using a Rasberry Pi Cam. When trying to run picamstill, or any of the Python scripts, there is an 'out of memory' error, which happens when multiple process are trying to access the camera.
+
+The service runCamera is responsible for executing the selected script on the dashboard, and is protected on multiple levels from being killed. By default it runs the Python scipt responsible for serving USB cameras to the dashboard. Said program access a json configuration file at /boot/frc.json. The default camera it points to is /dev/video0. When no cameras are connected, videdo0 references the picam, thus the problem.
+
+This problem can be avoided by simply modifiying the frc.json file to point to a different video feed. (such as /dev/video10)
+
+
