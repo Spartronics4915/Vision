@@ -79,7 +79,7 @@ def main():
 
     try:
         server = HTTPServer(('',5080),CamHandler)
-        print "server started"
+        print ("server started")
         server.serve_forever()
 
     except KeyboardInterrupt:
