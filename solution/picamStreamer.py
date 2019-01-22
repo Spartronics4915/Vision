@@ -3,7 +3,7 @@
   A Simple mjpg stream http server for the Raspberry Pi Camera
   inspired by https://gist.github.com/n3wtron/4624820
 '''
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import io
 import time
 import picam
@@ -32,7 +32,7 @@ class CamHandler(BaseHTTPRequestHandler):
                 for i in s_picam.cam.capture_continuous(stream, "jpeg", 
                                                 quality=5,
                                                 use_video_port=True):
-                    self.wfile.write("--jpgboundary")
+                    self.wfile.write(bytes("--jpgboundary\n",'utf-8'))
                     self.send_header('Content-type','image/jpeg')
                     self.send_header('Content-length',len(stream.getvalue()))
                     self.end_headers()
@@ -47,14 +47,14 @@ class CamHandler(BaseHTTPRequestHandler):
                     stream.truncate()
 
             except KeyboardInterrupt:
-               print "get interrupted" 
+               print ("get interrupted") 
 
             return
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            self.wfile.write(s_mainPage)
+            self.wfile.write(bytes(s_mainPage,'utf-8'))
             return
 
 def main():
@@ -63,10 +63,10 @@ def main():
                         auto=True);
   try:
     server = HTTPServer(('',5080),CamHandler)
-    print "server started"
+    print ("server started")
     server.serve_forever()
   except KeyboardInterrupt:
-    print "aborting server"
+    print ("aborting server")
     s_picam.stop()
     server.socket.close()
 

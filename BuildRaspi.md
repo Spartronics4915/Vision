@@ -25,6 +25,7 @@
     sudo apt-get install
     sudo apt-get purge wolfram-engine
     sudo apt-get purge libreoffice*
+    sudo apt-get install python3-pip
     sudo apt-get clean
     sudo apt-get autoremove
     ```
@@ -32,7 +33,6 @@
 ## install python extensions
 
 ```
-sudo pip install pynetworktables pynetworktables2js daemon
 sudo pip3 install pynetworktables pynetworktables2js daemon
 ```
 
@@ -69,6 +69,8 @@ In theory a raspi can support 2 pi cameras but we haven't tested
 that.
 
 * follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation)
+    * note: the instructions regarding TC358743 you can ignore.
+
 * here are the packages required (note raspidisp not required)
 
     ```
@@ -78,7 +80,7 @@ that.
     uv4l-encoder                                    install
     uv4l-raspicam                                   install
     uv4l-raspicam-extras                            install
-    uv4l-raspidisp-extras                           deinstall
+    uv4l-raspidisp-extras                           remove
     uv4l-renderer                                   install
     uv4l-server                                     install
     uv4l-webrtc                                     install
