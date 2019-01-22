@@ -283,6 +283,18 @@ systemd─┬─agetty
         └─thd
 ```
 
+Here's a subset of above with a custom python script (multiCameraServer
+replaced by python3).
+
+
+```
+        ├─svscanboot─┬─readproctitle
+        │            └─svscan─┬─supervise───python3
+        │                     ├─supervise───netconsoleTee
+        │                     └─supervise───configServer───5*[{configServer}]
+
+```
+
 The svscanboot process subtree is all about keeping your camera server process
 running.  The default cameraServer detects the installed cameras and writes
 a files to `/boot/frc.json`.  This file can be configured from the FRCVision
