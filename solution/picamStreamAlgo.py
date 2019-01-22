@@ -6,7 +6,7 @@
   runs a jpeg compressor on the result. This is sent over the
   wfile socket.
 '''
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import time
 import picam
 import algo
@@ -50,12 +50,12 @@ class CamHandler(BaseHTTPRequestHandler):
                         print(jpg.size)
                         s_first = False
 
-                    self.wfile.write("--jpgboundary")
+                    self.wfile.write(bytes("--jpgboundary\n","utf-8"))
                     self.send_header('Content-type','image/jpeg')
                     self.send_header('Content-length', jpg.size)
                     self.end_headers()
                     self.wfile.write(jpg.tostring())
-
+                    time.sleep(0.05)
             except KeyboardInterrupt:
                 print("Cam handler interrupted")
 
@@ -64,7 +64,7 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            self.wfile.write(s_mainPage)
+            self.wfile.write(bytes(s_mainPage,"utf-8"))
             return
 
 def main():

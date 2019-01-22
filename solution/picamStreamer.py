@@ -32,7 +32,7 @@ class CamHandler(BaseHTTPRequestHandler):
                 for i in s_picam.cam.capture_continuous(stream, "jpeg", 
                                                 quality=5,
                                                 use_video_port=True):
-                    self.wfile.write("--jpgboundary")
+                    self.wfile.write(bytes("--jpgboundary\n",'utf-8'))
                     self.send_header('Content-type','image/jpeg')
                     self.send_header('Content-length',len(stream.getvalue()))
                     self.end_headers()
@@ -54,7 +54,7 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
-            self.wfile.write(s_mainPage)
+            self.wfile.write(bytes(s_mainPage,'utf-8'))
             return
 
 def main():
