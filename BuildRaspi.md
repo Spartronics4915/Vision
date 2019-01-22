@@ -1,64 +1,99 @@
 
-# Building a Raspberry PI for FRC
+# Building a Raspberry PI for FRC - using FRCVision-rPi
+
+The Raspberry Pi (raspi) is an inexpensive and entirely adequate processor
+capable of both video capture and processing.  Outfitting a raspi to
+integrate well with FRC network tables and competition requirements is
+a non-trivial system-administration task and so the FRC folks have
+kindly provided the community with a canned raspi _image_ that can be
+installed onto a raspi and get you running in under 20 minutes.
+
+Aside from convenenience, the FRCVision-rPi image offers:
+
+* The wpi libraries for network tables and FRC interop utilities.
+* The opencv image processing library with bridges to java, c++ and python.
+* A disk partitioning scheme that can be configured for read-only or 
+  read-write access.  During competition, the read-only mode reduces the 
+  chance that the disk will be corrupted by during robot start & stop.
+* An easy-admin webapi that allows you to:
+    * configure IP addressing (DHCP vs static IP)
+    * configure team number
+    * establish which camera script runs on the robot
+    * configure camera ports and binding
+    * toggle between read-write and read-only mode
+    * to monitor the state of the raspi (cpu, network traffic, etc).
+* A service architecture that ensures that your camera/vision server
+  program is always running.
+* Clutter-reduction:  elimination of a variety of utilities on the default
+    raspi image that consume precious space or cycles including:
+    * wolfram mathematica
+    * x windows and associated desktop tools
+* WIFI disabling:  disallowed during FRC competition and disabled in
+  FRCVision-rPi (this is an inconvenience at first).
+  
+
+Following are details on how to buy, provision and operate a raspi based
+on the FRCVision-rPi image.  Additional customizations are offered to maximize
+utility in the context of Spatronics4915.
 
 ## make sure you have a raspi 3 with picam
 * [https://www.amazon.com/gp/product/B01CD5VC92](pi3)
 * [https://www.amazon.com/gp/product/B00FGKYHXA](camera)
 
 ## build microSD card (minimum 8GB)
-* download latest debian-stretch image
-* use Etcher or similar to format/build the microSD card
+* follow instructions [here](https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027241-using-the-raspberry-pi-for-frc)
 
-## on first boot (connect to wifi via desktop)
-* `sudo raspi-config`
-    * change user password
-    * configure to not autologin and not start window system (faster startup)
-    * enable ssh
-    * enable camera
-    * set timezone and keyboard
-    * (reboot)
+## on first boot
+
+* verify that the built-in webserver is operational by pointing
+  your browser to http://frcvision.local. Note that you must be
+  on the same network for this to work.  Typically its best to
+  plug your laptop into a network access point (wifi hub/bridge).
+* notice the Read-Only | Writable selector at the top of the page.  If 
+  you need to make any changes, the disk must be writable.
+* ssh into frcvision.local (user is 'pi', password is 'raspberry')
+    * `sudo raspi-config`  (use Tab, Esc and Arrow keys to navigate)
+        * `Localisation Options`
+            * set keyboard locale (US-UTF8...)
+            * time-zone (America/Los Angeles)
+            * enable camera (interfaces))
+        * `Interfacing Options`
+            * Enable connection to Raspberry Pi Camera
 * update and cleanup (recover diskspace)
 
     ```
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install
-    sudo apt-get purge wolfram-engine
-    sudo apt-get purge libreoffice*
-    sudo apt-get install python3-pip
-    sudo apt-get clean
+    sudo apt-get install python3-pip git
+    sudo apt-get clean 
     sudo apt-get autoremove
     ```
 
 ## install python extensions
 
 ```
-sudo pip3 install pynetworktables pynetworktables2js daemon
+sudo python3 -m pip install picamera python-daemon
 ```
 
-## build opencv with extensions
-
-* [optimized build](https://www.pyimagesearch.com/2017/10/09/optimizing-opencv-on-the-raspberry-pi) (skip steps on virtual envs)
-
-> Note that building opencv on pi requires lots of time and disk space.  If
-> you wish to build it on a thumbdrive, it needs to be formatted to support
-> symbolic links (ie: FAT32 won't work, ext4 is fine).  If you have a 16GB
-> microsd you should be fine.
-
-## setup network
-
-* static ip for eth0
-    * /etc/dhcpd.conf (has example static): we want 10.49.15.10/24 for vision
-    * `ifconfig`
-    * when in dev mode, we may have two interfaces (eth0, wlan0), this may
-      result in two default routes and result in unreachable host messages.
-     `sudo route del default`
+(python-daemon may not be needed (tbd))
 
 ## validate video
 
-* `raspivid -p "0,0,640,480"`
-* to use picam as opencv videostream (ie: without picamera module):
+* `raspivid -p "0,0,640,480"` (will only work if you remove the picamera
+  from the Connected Camera list on the Vision Settings tab
+* (deprecated) to use picam as opencv videostream (ie: without picamera module):
  `sudo modprobe bcm2835-v4l2`
+
+## verify opencv/python and picamera
+
+`% python3`
+
+```
+import cv2
+import picamera
+import daemon
+```
 
 ## optional - install uv4l (for streaming video via picamera)
 
@@ -126,7 +161,9 @@ that.
 * `git clone https://github.com/Spartronics4915/Vision`
 
 ## misc
+
 ### mount usb thumbdrive
+
 * for FAT32 thumbdrives, the desktop environment can be used to
   mount and eject.  In this case, the contents are found under
   `/media/pi`.
@@ -137,12 +174,12 @@ that.
 ## Prepare for competition
 
 ### read-only-raspberry-pi
-* https://learn.adafruit.com/read-only-raspberry-pi
 
-### install init scripts
-(To Do)
+* use the FRCVision-rPi dashboard to ensure you're operating in Read-Only mode.
 
 ### disable wireless (wifi and bluetooth)
+
+* following isn't necessary for FRCVision-rPi but left here for reference.
 * add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
 
 ```
@@ -151,16 +188,58 @@ that.
 ```
 
 ### duplicate working microSD card
+
 * a properly duplicated (up-to-date!) microsd is essential issurance
   for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.
   
-### Modifing WPIlib Raspberry Pi image to work with picam 
-The default installation of the WPI image has some conflicts with using a Rasberry Pi Cam. When trying to run picamstill, or any of the Python scripts, there is an 'out of memory' error, which happens when multiple process are trying to access the camera.
+### FRCVision-rPi services
 
-The service runCamera is responsible for executing the selected script on the dashboard, and is protected on multiple levels from being killed. By default it runs the Python scipt responsible for serving USB cameras to the dashboard. Said program access a json configuration file at /boot/frc.json. The default camera it points to is /dev/video0. When no cameras are connected, videdo0 references the picam, thus the problem.
+`pi@frcvision(rw):~$ pstree`
 
-This problem can be avoided by simply modifiying the frc.json file to point to a different video feed. (such as /dev/video10)
+```
+systemd─┬─agetty
+        ├─avahi-daemon───avahi-daemon
+        ├─cron
+        ├─dbus-daemon
+        ├─dhcpcd
+        ├─ntpd───{ntpd}
+        ├─sshd─┬─sshd───sshd───bash
+        │      └─sshd───sshd───bash───pstree
+        ├─svscanboot─┬─readproctitle
+        │            └─svscan─┬─supervise───multiCameraServ───3*[{multiCameraServ}]
+        │                     ├─supervise───netconsoleTee
+        │                     └─supervise───configServer───5*[{configServer}]
+        ├─syslogd
+        ├─systemd───(sd-pam)
+        ├─systemd-journal
+        ├─systemd-logind
+        ├─systemd-udevd
+        └─thd
+```
 
+The svscanboot process subtree is all about keeping your camera server process
+running.  The default cameraServer detects the installed cameras and writes
+a files to `/boot/frc.json`.  This file can be configured from the FRCVision
+dashboard under `Vision Settings`. If you don't want the built-in
+discoverable cameras (USB or raspicam) from being locked, you can remove
+them from the list of enabled cameras.  You can also configure settings
+like capture resolution, brightness and auto-exposure via this interface. 
+The results of your configuration activities trigger updates to /boot/frc.json
+but you can also manually edit this file (using vi, of course).
+
+Here's a list of services listing on the ports. The FRCVision dashboard
+is listening on the standard http port.  Port 1740 is the network tables
+service.  22 is ssh and 1181 is the mjpeg streaming port.
+
+`netstat -n -a | grep LIST`
+
+```
+tcp        0      0 0.0.0.0:1740            0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:1181            0.0.0.0:*               LISTEN
+tcp6       0      0 :::22                   :::*                    LISTEN
+```
 
