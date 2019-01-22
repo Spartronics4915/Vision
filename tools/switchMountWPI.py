@@ -4,7 +4,7 @@ import sys
 import os
 
 print("Utility to switch between rw or ro filesystem for WPI rasberry pi image")
-
+print("Note: you must be root for this for work properly")
 while(True):
     wanted_state = input("Which filesystem would you like? ro/rw \n")
 
