@@ -1,6 +1,8 @@
 
 # Building a Raspberry PI for FRC - using FRCVision-rPi
 
+## Introduction
+
 The Raspberry Pi (raspi) is an inexpensive and entirely adequate processor
 capable of both video capture and processing.  Outfitting a raspi to
 integrate well with FRC network tables and competition requirements is
@@ -30,20 +32,80 @@ Aside from convenenience, the FRCVision-rPi image offers:
     * x windows and associated desktop tools
 * WIFI disabling:  disallowed during FRC competition and disabled in
   FRCVision-rPi (this is an inconvenience at first).
-  
+
+## Theory of operation
+
+Basic idea:  use the web FRCVision dashboard to control and monitor your raspi.
+
+If you need to configure/reset any persistent value, you must make the raspi
+Read-Write.  After configuration is complete, make sure its in Read-Only mode.
+
+Establishing the team number makes is possible for the raspi to connect to 
+the robot's network tables.  Robot connections are only possible if the 
+raspi and the robot are _on the same network_.  In other words,  
+_in the 10.49.15.*_ address range.
+
+Establishing a static IP address is one way to ensure that the raspi is
+in the robot's address space. It's also a way for our DriverStation
+dashboard to identify each raspi reliably.  The standard name, frcvision.local,
+will not work reliably when multiple raspis are on the same network.
+
+You can upload your custom python "cameraService" via the web interface
+via the Application tab.  This will persist across reboot and is the 
+preferred/suggested way of managing custom vision code.   The script, 
+`~/runCamera`, is used to launch your program. Each time you upload a 
+new vision script, `runCamera`  is automatically updated to point to 
+your new script.  Your script is uploaded to the file ~/uploaded.pyj and
+here's what runCamera looks like to make it happen:
+
+```
+#!/bin/sh
+### TYPE: upload-python
+echo "Waiting 5 seconds..."
+sleep 5
+export PYTHONUNBUFFERED=1
+exec ./uploaded.py
+
+```
+
+This form of `runCamera` requires that your python script be written to include
+the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix) to python3. In
+other words, the first line of your script must be:
+
+```
+#!/usr/bin/env python3
+```
+
+Here's a trivial example whose output can be view in the `Vision Status`
+console when enabled.  Generally debugging output of vision scripts
+should be **disabled** during competition to prevent unnecessary network
+network traffic.
+
+```
+#!/usr/bin/env python3
+
+import time
+while 1:
+    time.sleep(5)
+    print("tick");
+    time.sleep(5)
+    print("tock");
+```
+
+## Config Details
 
 Following are details on how to buy, provision and operate a raspi based
 on the FRCVision-rPi image.  Additional customizations are offered to maximize
 utility in the context of Spatronics4915.
 
-## make sure you have a raspi 3 with picam
+### make sure you have a raspi 3 with picam
 * [https://www.amazon.com/gp/product/B01CD5VC92](pi3)
 * [https://www.amazon.com/gp/product/B00FGKYHXA](camera)
 
-## build microSD card (minimum 8GB)
+### build microSD card (minimum 8GB)
 * follow instructions [here](https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027241-using-the-raspberry-pi-for-frc)
 
-## on first boot
+### on first boot
 
 * verify that the built-in webserver is operational by pointing
   your browser to http://frcvision.local. Note that you must be
@@ -70,7 +132,7 @@ utility in the context of Spatronics4915.
     sudo apt-get autoremove
     ```
 
-## install python extensions
+### install python extensions
 
 ```
 sudo python3 -m pip install picamera python-daemon
@@ -78,14 +140,14 @@ sudo python3 -m pip install picamera python-daemon
 
 (python-daemon may not be needed (tbd))
 
-## validate video
+### validate video
 
 * `raspivid -p "0,0,640,480"` (will only work if you remove the picamera
   from the Connected Camera list on the Vision Settings tab
 * (deprecated) to use picam as opencv videostream (ie: without picamera module):
  `sudo modprobe bcm2835-v4l2`
 
-## verify opencv/python and picamera
+### verify opencv/python and picamera
 
 `% python3`
 
@@ -95,7 +157,7 @@ import picamera
 import daemon
 ```
 
-## optional - install uv4l (for streaming video via picamera)
+### optional - install uv4l (for streaming video via picamera)
 
 The sub-$25 pi camera can operate at up to 90 fps and includes a
 native H264 encoder.  This is far superior to most usb2 webcams
@@ -155,14 +217,14 @@ that.
 * restart service `sudo systemctl restart uv4l_raspicam.service`
 * point Dashboard's layout file to the IP address+port.
 
-## pull git repository
+### pull git repository
 * `mkdir -p src/spartronics`
 * `cd src/spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
 
-## misc
+### misc
 
-### mount usb thumbdrive
+#### mount usb thumbdrive
 
 * for FAT32 thumbdrives, the desktop environment can be used to
   mount and eject.  In this case, the contents are found under
@@ -171,13 +233,13 @@ that.
    `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
 * remember to eject/umount the thumbdrive!
 
-## Prepare for competition
+### Prepare for competition
 
-### read-only-raspberry-pi
+#### read-only-raspberry-pi
 
 * use the FRCVision-rPi dashboard to ensure you're operating in Read-Only mode.
 
-### disable wireless (wifi and bluetooth)
+#### disable wireless (wifi and bluetooth)
 
 * following isn't necessary for FRCVision-rPi but left here for reference.
 * add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
@@ -187,14 +249,14 @@ that.
  *blacklist brcmutil*
 ```
 
-### duplicate working microSD card
+#### duplicate working microSD card
 
 * a properly duplicated (up-to-date!) microsd is essential issurance
   for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.
   
-### FRCVision-rPi services
+#### FRCVision-rPi services
 
 `pi@frcvision(rw):~$ pstree`
 
