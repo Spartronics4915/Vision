@@ -25,7 +25,7 @@ class PiVideoStream:
     def __init__(self):
         #I am not shure this is correct. According to docs, you do not instantate a logger.
         os.system('sudo ifconfig wlan0 down') # Can't have this up at comp
-        logging.basicConfig(filename="/home/pi/src/spartronics/Vision/solution/runLogs.log",level=logging.DEBUG)
+        logging.basicConfig(filename="../logs/runLogs.log",level=logging.DEBUG)
 
         logging.debug("\n--------------------New run------------------")
         logging.debug("Run started at: ")
@@ -148,6 +148,7 @@ class PiVideoStream:
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Began processing images")
         while True:
+            # The image here is directly passed to cv2. 
             image = self.picam.next()
             if self.processFrame(image):
                 break
