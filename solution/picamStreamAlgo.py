@@ -16,7 +16,7 @@ import sys
 s_first = True
 s_proof = False  # delete when defaultAlgo is working
 s_picam=None
-s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 5]
+s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 100]
 s_mainPage="""
 <html><head>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
