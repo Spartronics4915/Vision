@@ -72,6 +72,7 @@ class PiCam:
             self.stream.close()
         if self.rawCapture:
             self.rawCapture.close()
+        self.cam.close()
 
 # ------------------------------------------------------------------------
 class CaptureThread(threading.Thread):
