@@ -1,5 +1,29 @@
-
 # Building a Raspberry PI for FRC - using FRCVision-rPi
+
+<!-- TOC -->
+
+- [Building a Raspberry PI for FRC - using FRCVision-rPi](#building-a-raspberry-pi-for-frc---using-frcvision-rpi)
+    - [Introduction](#introduction)
+    - [Theory of operation](#theory-of-operation)
+    - [Prepare for Competition](#prepare-for-competition)
+        - [read-only-raspberry-pi](#read-only-raspberry-pi)
+        - [disable wireless (wifi and bluetooth)](#disable-wireless-wifi-and-bluetooth)
+        - [duplicate working microSD card](#duplicate-working-microsd-card)
+    - [Config Details](#config-details)
+        - [make sure you have a raspi 3 with picam](#make-sure-you-have-a-raspi-3-with-picam)
+        - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
+        - [on first boot](#on-first-boot)
+        - [install python extensions](#install-python-extensions)
+        - [validate video](#validate-video)
+        - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
+        - [optional - install uv4l (for streaming video via picamera)](#optional---install-uv4l-for-streaming-video-via-picamera)
+        - [pull git repository](#pull-git-repository)
+        - [misc](#misc)
+            - [mount usb thumbdrive](#mount-usb-thumbdrive)
+            - [FRCVision-rPi services](#frcvision-rpi-services)
+            - [OpenCV+python3 build details](#opencvpython3-build-details)
+
+<!-- /TOC -->
 
 ## Introduction
 
@@ -92,6 +116,30 @@ while 1:
     time.sleep(5)
     print("tock");
 ```
+
+## Prepare for Competition
+
+### read-only-raspberry-pi
+
+* use the FRCVision-rPi dashboard to ensure you're operating in Read-Only mode.
+
+### disable wireless (wifi and bluetooth)
+
+* following isn't necessary for FRCVision-rPi but left here for reference.
+* add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
+
+```
+ *blacklist brcmfmac*
+ *blacklist brcmutil*
+```
+
+### duplicate working microSD card
+
+* a properly duplicated (up-to-date!) microsd is essential issurance
+  for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
+  to a variety of methods to accomplish this task.  The larger your microsd,
+  the longer this process will take.
+  
 
 ## Config Details
 
@@ -245,34 +293,11 @@ that.
    `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
 * remember to eject/umount the thumbdrive!
 
-### Prepare for competition
-
-#### read-only-raspberry-pi
-
-* use the FRCVision-rPi dashboard to ensure you're operating in Read-Only mode.
-
-#### disable wireless (wifi and bluetooth)
-
-* following isn't necessary for FRCVision-rPi but left here for reference.
-* add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
-
-```
- *blacklist brcmfmac*
- *blacklist brcmutil*
-```
-
-#### duplicate working microSD card
-
-* a properly duplicated (up-to-date!) microsd is essential issurance
-  for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
-  to a variety of methods to accomplish this task.  The larger your microsd,
-  the longer this process will take.
-  
 #### FRCVision-rPi services
 
 `pi@frcvision(rw):~$ pstree`
 
-```
+``` text
 systemd─┬─agetty
         ├─avahi-daemon───avahi-daemon
         ├─cron
@@ -297,7 +322,7 @@ Here's a subset of above with a custom python script (multiCameraServer
 replaced by python3).
 
 
-```
+``` text
         ├─svscanboot─┬─readproctitle
         │            └─svscan─┬─supervise───python3
         │                     ├─supervise───netconsoleTee
@@ -321,7 +346,7 @@ service.  22 is ssh and 1181 is the mjpeg streaming port.
 
 `netstat -n -a | grep LIST`
 
-```
+``` text
 tcp        0      0 0.0.0.0:1740            0.0.0.0:*               LISTEN
 tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
 tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
@@ -329,3 +354,88 @@ tcp        0      0 0.0.0.0:1181            0.0.0.0:*               LISTEN
 tcp6       0      0 :::22                   :::*                    LISTEN
 ```
 
+#### OpenCV+python3 build details
+
+``` text
+>>> print(cv2.getBuildInformation())
+
+General configuration for OpenCV 3.4.4 =====================================
+  Version control:               08163c0
+
+  Platform:
+    Timestamp:                   2019-01-14T05:26:19Z
+    Host:                        Linux 4.15.0-1035-azure x86_64
+    Target:                      Linux 1 arm
+    CMake:                       3.7.2
+    CMake generator:             Unix Makefiles
+    CMake build tool:            make
+    Configuration:               RelWithDebugInfo
+
+  CPU/HW features:
+    Baseline:                    VFPV3 NEON
+      requested:                 DETECT
+      required:                  VFPV3 NEON
+
+  C/C++:
+    Built as dynamic libs?:      YES
+    C++11:                       YES
+    C++ Compiler:                /__w/1/s/deps/02-extract/raspbian9/bin/arm-raspbian9-linux-gnueabihf-g++  (ver 6.3.0)
+    C++ flags (Release):         -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-narrowing -Wno-delete-non-virtual-dtor -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -fvisibility-inlines-hidden -O3 -DNDEBUG  -DNDEBUG
+    C++ flags (Debug):           -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-narrowing -Wno-delete-non-virtual-dtor -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -fvisibility-inlines-hidden -g -Og -DDEBUG -D_DEBUG
+    C Compiler:                  /__w/1/s/deps/02-extract/raspbian9/bin/arm-raspbian9-linux-gnueabihf-gcc
+    C flags (Release):           -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-narrowing -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -O3 -DNDEBUG  -DNDEBUG
+    C flags (Debug):             -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-narrowing -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -g -Og -DDEBUG -D_DEBUG
+    Linker flags (Release):      -rdynamic
+    Linker flags (Debug):        -rdynamic
+    ccache:                      NO
+    Precompiled headers:         NO
+    Extra dependencies:          dl m pthread rt
+    3rdparty dependencies:
+
+  OpenCV modules:
+    To be built:                 calib3d core features2d flann highgui imgcodecs imgproc java java_bindings_generator ml objdetect photo python3 python_bindings_generator shape stitching superres ts video videoio videostab
+    Disabled:                    world
+    Disabled by dependency:      -
+    Unavailable:                 cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev dnn js python2 viz
+    Applications:                perf_tests apps
+    Documentation:               NO
+    Non-free algorithms:         NO
+
+  GUI:
+    GTK+:                        NO
+
+  Media I/O:
+    ZLib:                        build (ver 1.2.11)
+    JPEG:                        build-libjpeg-turbo (ver 1.5.3-62)
+    PNG:                         build (ver 1.6.35)
+    HDR:                         YES
+    SUNRASTER:                   YES
+    PXM:                         YES
+
+  Video I/O:
+    libv4l/libv4l2:              NO
+    v4l/v4l2:                    linux/videodev2.h
+
+  Parallel framework:            pthreads
+
+  Trace:                         YES (built-in)
+
+  Other third-party libraries:
+    Custom HAL:                  YES (carotene (ver 0.0.1))
+
+  Python 3:
+    Interpreter:                 /usr/bin/python3 (ver 3.5.3)
+    Libraries:
+    numpy:                       /__w/1/s/deps/02-extract/raspbian9/arm-raspbian9-linux-gnueabihf/usr/include/python3.5m/numpy (ver undefined - cannot be probed because of the cross-compilation)
+    packages path:               lib/python3.5/dist-packages
+
+  Python (for build):            /usr/bin/python3
+
+  Java:
+    ant:                         /usr/bin/ant (ver 1.9.9)
+    JNI:                         /__w/1/s/deps/02-extract/jdk/include /__w/1/s/deps/02-extract/jdk/include/linux
+    Java wrappers:               YES
+    Java tests:                  NO
+
+  Install to:                    /__w/1/s/deps/03-build/opencv-build/install
+```

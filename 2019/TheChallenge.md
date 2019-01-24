@@ -137,3 +137,5 @@
   - [discussion of latency & gyro](https://youtu.be/d9WSAfzA6fc?t=2835)
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
 - [Raspi Build Notes](../BuildRaspi.md)
+- [picamera docs](https://picamera.readthedocs.io)
+- [opencv docs](https://docs.opencv.org/3.4.5)
