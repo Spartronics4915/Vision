@@ -1,0 +1,22 @@
+# Vision4915/solution
+
+## applications
+
+* `runPiCam.py` - primary entrypoint when running in competition (no server currently).
+  To get the highest framerate, we run the frame-capture in a separate thread from the
+  algorithm.
+* `picamStreamer.py` - mjpg streaming on port 5080
+* `picamStreamerAlgo.py` - mjpg streaming on port 5080 with vision algorithm
+
+## library
+
+* `algo.py` - abstraction for current vision algorithm
+* `picam.py` - thin vaneer atop PiCamera 
+* `comm.py` - manage communication with robot via networktables
+
+## support
+
+* vision4915.service - installing a python script as a service requires
+    _daemonization_, which is part of the support in runPiCam.
+* in 2019, we can likely install our script via the FRCVision bootstrapping
+  process.
