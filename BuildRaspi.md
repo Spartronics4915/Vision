@@ -10,26 +10,26 @@ a non-trivial system-administration task and so the FRC folks have
 kindly provided the community with a canned raspi _image_ that can be
 installed onto a raspi and get you running in under 20 minutes.
 
-Aside from convenenience, the FRCVision-rPi image offers:
+Among the built-in conveneniences offered by the FRCVision-rPi image:
 
-* The wpi libraries for network tables and FRC interop utilities.
+* WPI libraries for network tables and FRC interop utilities.
 * The opencv image processing library with bridges to java, c++ and python.
 * A disk partitioning scheme that can be configured for read-only or 
   read-write access.  During competition, the read-only mode reduces the 
   chance that the disk will be corrupted by during robot start & stop.
 * An easy-admin webapi that allows you to:
-    * configure IP addressing (DHCP vs static IP)
-    * configure team number
-    * establish which camera script runs on the robot
-    * configure camera ports and binding
-    * toggle between read-write and read-only mode
-    * to monitor the state of the raspi (cpu, network traffic, etc).
+  * configure IP addressing (DHCP vs static IP)
+  * configure team number
+  * establish which camera script runs on the robot
+  * configure camera ports and binding
+  * toggle between read-write and read-only mode
+  * to monitor the state of the raspi (cpu, network traffic, etc).
 * A service architecture that ensures that your camera/vision server
   program is always running.
 * Clutter-reduction:  elimination of a variety of utilities on the default
-    raspi image that consume precious space or cycles including:
-    * wolfram mathematica
-    * x windows and associated desktop tools
+  raspi image that consume precious space or cycles including:
+  * wolfram mathematica
+  * x windows and associated desktop tools
 * WIFI disabling:  disallowed during FRC competition and disabled in
   FRCVision-rPi (this is an inconvenience at first).
 
@@ -38,27 +38,28 @@ Aside from convenenience, the FRCVision-rPi image offers:
 Basic idea:  use the web FRCVision dashboard to control and monitor your raspi.
 
 If you need to configure/reset any persistent value, you must make the raspi
-Read-Write.  After configuration is complete, make sure its in Read-Only mode.
+Read-Write.  After configuration is complete, make sure it's in Read-Only mode.
+A reboot with cause filesystem to be reset to read-only mode.
 
-Establishing the team number makes is possible for the raspi to connect to 
-the robot's network tables.  Robot connections are only possible if the 
-raspi and the robot are _on the same network_.  In other words,
+Establishing the team number makes is possible for the raspi to connect to
+the robot's network tables.  Robot connections are only possible if the
+raspi and the robot are _on the same network_.  In other words
 _in the 10.49.15.*_ address range.
 
 Establishing a static IP address is one way to ensure that the raspi is
 in the robot's address space. It's also a way for our DriverStation
-dashboard to identify each raspi reliably.  The standard name, frcvision.local,
+dashboard to identify each raspi reliably.  The standard name, `frcvision.local`,
 will not work reliably when multiple raspis are on the same network.
 
 You can upload your custom python "cameraService" via the web interface
-via the Application tab.  This will persist across reboot and is the 
-preferred/suggested way of managing custom vision code.   The script, 
-`~/runCamera`, is used to launch your program. Each time you upload a 
-new vision script, `runCamera`  is automatically updated to point to 
+via the Application tab.  This will persist across reboot and is the
+preferred/suggested way of managing custom vision code.   The script,
+`~/runCamera`, is used to launch your program. Each time you upload a
+new vision script, `runCamera`  is automatically updated to point to
 your new script.  Your script is uploaded to the file `~/uploaded.py` and
 here's what runCamera looks like to make it happen:
 
-```
+``` bash
 #!/bin/sh
 ### TYPE: upload-python
 echo "Waiting 5 seconds..."
@@ -72,7 +73,7 @@ This form of `runCamera` requires that your python script be written to include
 the [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix)) to python3. In
 other words, the first line of your script must be:
 
-```
+``` bash
 #!/usr/bin/env python3
 ```
 
@@ -81,7 +82,7 @@ console when enabled.  Generally debugging output of vision scripts
 should be **disabled** during competition to prevent unnecessary network
 network traffic.
 
-```
+``` bash
 #!/usr/bin/env python3
 
 import time
@@ -100,8 +101,12 @@ utility in the context of Spatronics4915.
 
 ### make sure you have a raspi 3 with picam
 
-* [https://www.amazon.com/gp/product/B01CD5VC92](pi3)
-* [https://www.amazon.com/gp/product/B00FGKYHXA](camera)
+You can buy raspis and raspi cameras at a number of sites, here are
+a few examples:
+
+* [pi3](https://www.amazon.com/gp/product/B01CD5VC92)
+* [camera](https://www.amazon.com/gp/product/B00FGKYHXA)
+* [night-vision camera](https://www.amazon.com/dp/B06XYDCN5N)
 
 ### build microSD card (minimum 8GB)
 
@@ -123,6 +128,8 @@ utility in the context of Spatronics4915.
             * enable camera (interfaces))
         * `Interfacing Options`
             * Enable connection to Raspberry Pi Camera
+        * `Advanced`
+            * Consider raising GPU memory to 256MB
 * update and cleanup (recover diskspace)
 
     ```
@@ -133,6 +140,9 @@ utility in the context of Spatronics4915.
     sudo apt-get clean 
     sudo apt-get autoremove
     ```
+* consider updating firmware (this may be prohibited by file permissions)
+
+See also: https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027798-the-raspberry-pi-frc-console
 
 ### install python extensions
 
