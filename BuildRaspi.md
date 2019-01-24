@@ -1,29 +1,29 @@
 # Building a Raspberry PI for FRC - using FRCVision-rPi
 
-<!-- TOC -->
+<!-- TOC depthFrom:2 -->
 
-- [Building a Raspberry PI for FRC - using FRCVision-rPi](#building-a-raspberry-pi-for-frc---using-frcvision-rpi)
-    - [Introduction](#introduction)
-    - [Theory of operation](#theory-of-operation)
-    - [Prepare for Competition](#prepare-for-competition)
-        - [read-only-raspberry-pi](#read-only-raspberry-pi)
-        - [disable wireless (wifi and bluetooth)](#disable-wireless-wifi-and-bluetooth)
-        - [duplicate working microSD card](#duplicate-working-microsd-card)
-    - [Config Details](#config-details)
-        - [make sure you have a raspi 3 with picam](#make-sure-you-have-a-raspi-3-with-picam)
-        - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
-        - [on first boot](#on-first-boot)
-        - [install python extensions](#install-python-extensions)
-        - [validate video](#validate-video)
-        - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
-        - [optional - install uv4l (for streaming video via picamera)](#optional---install-uv4l-for-streaming-video-via-picamera)
-        - [pull git repository](#pull-git-repository)
-        - [misc](#misc)
-            - [mount usb thumbdrive](#mount-usb-thumbdrive)
-            - [FRCVision-rPi services](#frcvision-rpi-services)
-            - [OpenCV+python3 build details](#opencvpython3-build-details)
+- [Introduction](#introduction)
+- [Theory of operation](#theory-of-operation)
+- [Prepare for Competition](#prepare-for-competition)
+    - [read-only-raspberry-pi](#read-only-raspberry-pi)
+    - [disable wireless (wifi and bluetooth)](#disable-wireless-wifi-and-bluetooth)
+    - [duplicate working microSD card](#duplicate-working-microsd-card)
+- [Config Details](#config-details)
+    - [make sure you have a raspi 3 with picam](#make-sure-you-have-a-raspi-3-with-picam)
+    - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
+    - [on first boot](#on-first-boot)
+    - [install python extensions](#install-python-extensions)
+    - [validate video](#validate-video)
+    - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
+    - [optional - install uv4l (for streaming video via picamera)](#optional---install-uv4l-for-streaming-video-via-picamera)
+    - [pull git repository](#pull-git-repository)
+    - [misc](#misc)
+        - [mount usb thumbdrive](#mount-usb-thumbdrive)
+        - [FRCVision-rPi services](#frcvision-rpi-services)
+        - [OpenCV+python3 build details](#opencvpython3-build-details)
 
 <!-- /TOC -->
+
 
 ## Introduction
 
