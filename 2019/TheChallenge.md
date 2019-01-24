@@ -1,22 +1,21 @@
 # 2019 FRC Vision Challenge
 
-<!-- TOC -->
+<!-- TOC depthFrom:2 -->
 
-- [2019 FRC Vision Challenge](#2019-frc-vision-challenge)
-    - [Deliverables](#deliverables)
-        - [A fast video feed for drivers](#a-fast-video-feed-for-drivers)
-        - [Vision analysis for automatic driver assist](#vision-analysis-for-automatic-driver-assist)
-    - [Open questions](#open-questions)
-    - [Delivery schedule](#delivery-schedule)
-        - [Week 3](#week-3)
-        - [Week 4](#week-4)
-        - [Week 5](#week-5)
-        - [Week 6](#week-6)
-    - [Configuring](#configuring)
-    - [The field elements](#the-field-elements)
-        - [On Field Retro-Reflective Tape](#on-field-retro-reflective-tape)
-        - [On Ground Gaffers Tape](#on-ground-gaffers-tape)
-    - [Resources](#resources)
+- [Deliverables](#deliverables)
+    - [A fast video feed for drivers](#a-fast-video-feed-for-drivers)
+    - [Vision analysis for automatic driver assist](#vision-analysis-for-automatic-driver-assist)
+- [Open questions](#open-questions)
+- [Delivery schedule](#delivery-schedule)
+    - [Week 3](#week-3)
+    - [Week 4](#week-4)
+    - [Week 5](#week-5)
+    - [Week 6](#week-6)
+- [Configuring](#configuring)
+- [The field elements](#the-field-elements)
+    - [On Field Retro-Reflective Tape](#on-field-retro-reflective-tape)
+    - [On Ground Gaffers Tape](#on-ground-gaffers-tape)
+- [Resources](#resources)
 
 <!-- /TOC -->
 
