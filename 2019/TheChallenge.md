@@ -139,3 +139,4 @@
 - [Raspi Build Notes](../BuildRaspi.md)
 - [picamera docs](https://picamera.readthedocs.io)
 - [opencv docs](https://docs.opencv.org/3.4.5)
+- [distance to known object](https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/)
