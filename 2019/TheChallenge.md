@@ -13,9 +13,6 @@
         - [Week 5](#week-5)
         - [Week 6](#week-6)
     - [Configuring](#configuring)
-        - [how to setup/install uv4l](#how-to-setupinstall-uv4l)
-        - [how to setup/install custom vision scripts](#how-to-setupinstall-custom-vision-scripts)
-        - [FAQ](#faq)
     - [The field elements](#the-field-elements)
         - [On Field Retro-Reflective Tape](#on-field-retro-reflective-tape)
         - [On Ground Gaffers Tape](#on-ground-gaffers-tape)
@@ -38,13 +35,14 @@
   1. target relative heading (yaw)
   1. target x,y (in _field_ or _robot_ coordinates?)
   1. target x,y + perpendicular
+  1. target/track floor lines?
   1. something else?
 
 - _required software + hardware_
-  1. raspis?
-  1. leds?
-  1. power requirements? 
-  1. python? opencv? opencv modules?
+  1. raspis? camera?
+  1. leds? infrared?
+  1. power requirements?
+  1. python, opencv, opencv modules?
 
 - _choose techniques_
   1. distance:  area vs height
@@ -56,6 +54,9 @@
   1. driver-control over vision target and LEDs
 
 ## Open questions
+
+The answers to some of these questions will allow us to fill in sections
+above.
 
 - how many cameras, how many raspis?  
   - 4? (front+back,vision+driver)
@@ -87,7 +88,11 @@
 
 - how does operator specify target? enter targeting mode?
 
-- can we do vision on the driver station?
+- can we do vision on the driver station? What are the tradeoffs
+  with this option?
+
+- should we worry about field lines/gaffer tape? What is their
+  relative priority and return on investment?
 
 ## Delivery schedule
 
@@ -101,25 +106,16 @@
 
 ## Configuring
 
-### how to setup/install uv4l
-
-- choice of framerate, codec, bitrate, port, etc.
-
-### how to setup/install custom vision scripts
-
-- recipe for uploading scripts from where, which port
-  are services operating on, how to test/validate networktables.
+- [Raspi Build Notes](../BuildRaspi.md)
+- how to setup/install uv4l
+  - choice of framerate, codec, bitrate, port, etc.
+- how to setup/install custom vision scripts
+  - recipe for uploading scripts from where, which port
+    are services operating on, how to test/validate networktables.
   
-### FAQ
-
-- can we run vision on the same raspi as driver-video?
-  - plumbing issues?  (two consumers, one camera)
-  - two cameras?
-  - disagreement on camera positioning?
-
-- can the lines on the field be used to assist?
-
 ## The field elements
+
+[2019VisionImages.zip](https://github.com/wpilibsuite/allwpilib/releases/download/v2019.1.1/2019VisionImages.zip)
 
 ### On Field Retro-Reflective Tape
 
@@ -133,11 +129,9 @@
 
 ## Resources
 
-- [2019VisionImages.zip](https://github.com/wpilibsuite/allwpilib/releases/download/v2019.1.1/2019VisionImages.zip)
 - [Jaci's vision video](https://youtu.be/d9WSAfzA6fc)
   - [discussion of latency & gyro](https://youtu.be/d9WSAfzA6fc?t=2835)
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
-- [Raspi Build Notes](../BuildRaspi.md)
 - [picamera docs](https://picamera.readthedocs.io)
 - [opencv docs](https://docs.opencv.org/3.4.5)
 - [frc distance to known object](https://wpilib.screenstepslive.com/s/currentCS/m/vision/l/682952-2017-vision-examples)
