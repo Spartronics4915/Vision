@@ -133,10 +133,19 @@
 
 ## Resources
 
+- [2019VisionImages.zip](https://github.com/wpilibsuite/allwpilib/releases/download/v2019.1.1/2019VisionImages.zip)
 - [Jaci's vision video](https://youtu.be/d9WSAfzA6fc)
   - [discussion of latency & gyro](https://youtu.be/d9WSAfzA6fc?t=2835)
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
 - [Raspi Build Notes](../BuildRaspi.md)
 - [picamera docs](https://picamera.readthedocs.io)
 - [opencv docs](https://docs.opencv.org/3.4.5)
-- [distance to known object](https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/)
+- [frc distance to known object](https://wpilib.screenstepslive.com/s/currentCS/m/vision/l/682952-2017-vision-examples)
+  - does this work for off-axis views? Consider: known height of object/shape
+    doesn't suffer as much from off-axis since robot is stuck on the ground.
+  ``` java
+    distance = targetHeight * YRes / (2*PixelHeight*tan(viewAngle of camera))
+  ```
+- [pyimagesearch distance to known object](https://www.pyimagesearch.com/2015/01/19/find-distance-camera-objectmarker-using-python-opencv/)
+  - some formulations use arctan... how does this one avoid that?
+- [camera calibration](https://hackaday.io/project/12384-autofan-automated-control-of-air-flow/log/41862-correcting-for-lens-distortions)
