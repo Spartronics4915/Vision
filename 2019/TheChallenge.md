@@ -128,6 +128,7 @@ above.
 
 ## Resources
 
+- [DeepSpace Vision Target Video](https://www.youtube.com/watch?v=BSihm6xzbWA)
 - [Jaci's vision video](https://youtu.be/d9WSAfzA6fc)
   - [discussion of latency & gyro](https://youtu.be/d9WSAfzA6fc?t=2835)
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
