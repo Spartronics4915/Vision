@@ -5,8 +5,15 @@
 * `runPiCam.py` - primary entrypoint when running in competition (no server currently).
   To get the highest framerate, we run the frame-capture in a separate thread from the
   algorithm.
-* `picamStreamer.py` - mjpg streaming on port 5080
-* `picamStreamerAlgo.py` - mjpg streaming on port 5080 with vision algorithm
+* `picamStreamer.py` - mjpg streaming on port 5080... URL controls whether we stream
+  the results of an algorithm or direct stream.  http://{host}:{port}/{algo}.mjpg (or mjpeg).
+
+  * algo: "direct" - direct/fast video streaming
+  * algo: "empty" - per-frame streaming, no processing
+  * algo: "hsv" - show hsv of camera view
+  * algo: anythingelse - the "default" algo 
+  # add more named algos as desired
+
 
 ## library
 

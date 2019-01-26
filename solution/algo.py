@@ -33,10 +33,21 @@ range1 = np.array([115,255,255])
     # We want colors as far away from black as possible, thus the high range.
 
 def emptyAlgo(frame):
-    return frame
+    return (0,frame)
 
 def hsvAlgo(frame):
-    return cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
+    return (0,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+
+def processFrame(frame, algo=None, display=0,debug=0):
+    if algo == None or algo == "default":
+        return defaultAlgo(frame, display, debug)
+    elif algo == "empty" or algo == "bypass":
+        return emptyAlgo(frame)
+    elif algo == "hsv":
+        return hsvAlgo(frame)
+    else:
+        print("algo: unexpected name " + algo)
+        return emptyAlgo(frame)
 
 def defaultAlgo(frame,display=0,debug=0):
     # TODO: Implement some form of threading / process optimisation
@@ -84,14 +95,6 @@ def defaultAlgo(frame,display=0,debug=0):
     dx = 0 
 
     return dx, visImg # visImg only valid if display
-
-def processFrame(frame, algo=None, display=0,debug=0):
-    if algo == None or algo == "default":
-        return defaultAlgo(frame,display,debug)
-    elif algo == "empty":
-        return emptyAlgo(frame)
-    elif algo == "hsv_algo":
-        return hsvAlgo(frame)
 
 
 # ax = ax - 160           # center o' the screen being 0(-160-160)
