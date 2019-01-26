@@ -17,10 +17,20 @@ import cv2
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
 
-range0 = np.array([0,0,0])
-range1 = np.array([0,0,0])
+range0 = np.array([10,50,200])
+range1 = np.array([115,255,255])
 
-largeTargetC = [0,0]
+# Reasoning behind Current range values:
+    # After changes to exposure of camera (Ridiculously low ISO),
+    # retro-reflective tape stands out more than it ever has,
+    # thus, type of color, and the saturation of color has less importance,
+    # which explains the wide range on the first two numbers. 10-115 represents an 
+    # (approximate) range of blue to green in the HSV colorspace
+    # 50-255 represents a wide range of the saturation of any given color 
+    # (This value is fluid, as we arn't searching for any particular 'color',
+    #  [read: 2018], it can be very open)
+    # Finially, the tightest value needs to be the value, representing how close the color is to black.
+    # We want colors as far away from black as possible, thus the high range.
 
 def emptyAlgo(frame):
     return frame
@@ -29,8 +39,10 @@ def hsvAlgo(frame):
     return cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
 
 def defaultAlgo(frame,display=0,debug=0):
-    largeTargetA = 0        # Need these vars to filter for large targets
-    largeTargetC = (1600,0)
+    # TODO: Implement some form of threading / process optimisation
+    rects = []
+    #largeTargetA = 0        # Need these vars to filter for large targets
+    #largeTargetC = (1600,0)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
@@ -44,22 +56,49 @@ def defaultAlgo(frame,display=0,debug=0):
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
                     cv2.RETR_EXTERNAL,          # external contours only
-                    cv2.CHAIN_APPROX_TC89_KCOS  # used by 254, cf:APPROX_SIMPLE
+                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
+                                                # Less CPU intensive
                         )
 
     for cnt in contours:
-        # XXX: contour approxomation?
-        rect = cv2.minAreaRect(cnt)
+        rect = cv2.minAreaRect(cnt)# Search for rectangles in the countour
 
         boxH = rect[1][1]          # Width of the box
         boxW = rect[1][0]          # Height of the box
         boxCenter = rect[0]        # (x,y) center of the box
         boxArea = boxH*boxW        # Area of the box
+
         box = cv2.boxPoints(rect)  # Turning the rect into 4 points to draw
         box = np.int0(box)         # convert to integers
 
-        # Filter by size
-        if boxArea > 1500:
+        if display:     # No need to do this math and computation if we 
+                        # are not running in dispay mode
+            cv2.drawContours(visImg, [box], 0,(0,0,255),2)
+
+        rects.append(rect) # Add the found rectangle to a list of rectangles in the frame
+    
+    #XXX:   This is where all respective trig will go.
+    #       Box varibles from above would be moved down here. (Currently being kept for documentation)
+    #       Trig + Geometry is going to be done by an outside script.
+
+    dx = 0 
+
+    return dx, visImg # visImg only valid if display
+
+def processFrame(frame, algo=None, display=0,debug=0):
+    if algo == None or algo == "default":
+        return defaultAlgo(frame,display,debug)
+    elif algo == "empty":
+        return emptyAlgo(frame)
+    elif algo == "hsv_algo":
+        return hsvAlgo(frame)
+
+
+# ax = ax - 160           # center o' the screen being 0(-160-160)
+# dx = ax * 0.1375        # See: LearningVision.md (-22-22)
+
+'''
+if boxArea > 1500:
 
 
             if display:  # No need to do this math and computation if we 
@@ -81,15 +120,4 @@ def defaultAlgo(frame,display=0,debug=0):
     ax = largeTargetC[0]    # X value(0-320)
     ax = ax - 160           # center o' the screen being 0(-160-160)
     dx = ax * 0.1375        # See: LearningVision.md (-22-22)
-
-    if debug:
-        print("dx is at: ", dx)
-    return dx, visImg # visImg only valid if display
-
-def processFrame(frame, algo=None, display=0,debug=0):
-    if algo == None or algo == "default":
-        return defaultAlgo(frame,display,debug)
-    elif algo == "empty":
-        return emptyAlgo(frame)
-    elif algo == "hsv_algo":
-        return hsvAlgo(frame)
+'''
