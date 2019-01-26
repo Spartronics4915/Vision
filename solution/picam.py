@@ -26,7 +26,7 @@ class PiCam:
             self.cam.awb_mode = "off"
             # for digital-gain and analog_gain. These values can't
             # be set directly, rather "let them settle"...
-            self.cam.exposure_mode = "off"
+            self.cam.exposure_mode = "fireworks"
             self.cam.shutter_speed = 10000 # set to 0 to go auto
 
         self.cam.exposure_compensation = -25 # [-25, 25]
@@ -37,6 +37,7 @@ class PiCam:
         self.cam.vflip = True
         self.cam.brightness = 70 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
+        self.cam.ISO = 100 # 100-800
         time.sleep(.1) # more settling
 
         print("camera settings:")
@@ -53,6 +54,7 @@ class PiCam:
         print("  exposure_speed:%d us" % self.cam.exposure_speed)
         print("  shutter_speed:%d us" % self.cam.shutter_speed)
         print("  framerate:%s" % self.cam.framerate)
+        print("  ISO:%s" % self.cam.ISO)
 
     def start(self):
         self.rawCapture = PiRGBArray(self.cam, size=self.resolution)

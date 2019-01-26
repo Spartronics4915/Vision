@@ -71,7 +71,7 @@ def main():
     global s_picam
 
     if s_proof:
-        s_picam = picam.PiCam(resolution=(320, 240), framerate=60, auto=True);
+        s_picam = picam.PiCam(resolution=(320, 240), framerate=60, auto=False);
     else:
         s_picam = picam.PiCam(resolution=(320, 240), framerate=60);
 
