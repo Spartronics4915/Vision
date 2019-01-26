@@ -134,6 +134,7 @@ above.
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
 - [picamera docs](https://picamera.readthedocs.io)
 - [opencv docs](https://docs.opencv.org/3.4.5)
+- [opencv pose estimation](https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib)
 - [frc distance to known object](https://wpilib.screenstepslive.com/s/currentCS/m/vision/l/682952-2017-vision-examples)
   - does this work for off-axis views? Consider: known height of object/shape
     doesn't suffer as much from off-axis since robot is stuck on the ground.
