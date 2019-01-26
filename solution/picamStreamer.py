@@ -9,8 +9,13 @@ import io
 import time
 import picam
 import algo
+import os
+import sys
+import cv2
 
 s_first=True
+s_jpgQuality = 5 # used by direct streaming, quality differs from opencv
+s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 20] # used by opencv
 s_mainPage="""
 <html><head>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
@@ -21,55 +26,81 @@ s_mainPage="""
 
 class CamHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        global s_first
-        print(self.path)
-        if self.path.endswith('.mjpg'):
+        # we respond with a stream if the url ends in either .mjpg or .mjpeg
+        # we select between direct or algorithm-filtered streams based
+        # on the filename.  If the algostr (below) is "direct.mjpeg", we
+        # get fast/raw/direct streaming. Otherwise the algostr is passed
+        # to the algo entrypoint.
+        if self.path.endswith('.mjpg') or self.path.endswith('.mjpeg'):
+            algostr = os.path.basename(self.path).split(".")[0]
             self.send_response(200)
             self.send_header('Content-type',
                  'multipart/x-mixed-replace; boundary=--jpgboundary')
             self.end_headers()
-            stream = io.BytesIO()
             cam = None
             try:
                 time.sleep(2) # wait for shutdown of alt stream
-                cam = picam.PiCam(resolution=(320, 240), framerate=60, auto=True)
-                for i in cam.cam.capture_continuous(stream, "jpeg", 
-                                                quality=5,
-                                                use_video_port=True):
-                    self.wfile.write(bytes("--jpgboundary\n",'utf-8'))
-                    self.send_header('Content-type','image/jpeg')
-                    self.send_header('Content-length',len(stream.getvalue()))
-                    self.end_headers()
-                    val = stream.getvalue()
-                    if s_first:
-                        #print(len(val))
-                        #print(val)
-                        s_first = False
+                cam = picam.PiCam(resolution=(320, 240), framerate=60, auto=False)
+                if not cam:
+                    raise Exception("Hey no camera!")
+                if algostr == "direct":
+                    self.streamDirect(cam)
+                else:
+                    self.streamAlgo(cam, algostr)
 
-                    self.wfile.write(val)
-                    stream.seek(0)
-                    stream.truncate()
+            except Exception as e:
+                print(e)
 
-            except Exception as e: print(e)
-
-            print("done streaming")
-
+            print("done streaming ----------------------")
             if cam:
                 cam.stop() # triggers PiCamera.close()
             else:
                 print("(cam init problem)")
-
-            stream.seek(0)
-            stream.truncate()
-
-            return
-
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
             self.end_headers()
             self.wfile.write(bytes(s_mainPage,'utf-8'))
             return
+
+    def streamDirect(self, cam):
+        print("direct streaming")
+        stream = io.BytesIO()
+        try:
+            for i in cam.cam.capture_continuous(stream, "jpeg", 
+                                            quality=s_jpgQuality, 
+                                            use_video_port=True):
+                self.wfile.write(bytes("--jpgboundary\n",'utf-8'))
+                self.send_header('Content-type','image/jpeg')
+                self.send_header('Content-length',len(stream.getvalue()))
+                self.end_headers()
+                val = stream.getvalue()
+                self.wfile.write(val)
+                stream.seek(0)
+                stream.truncate()
+        finally:
+            stream.seek(0)
+            stream.truncate()
+
+    def streamAlgo(self, cam, algoselector):
+        global s_first
+        print(algoselector + " streaming")
+        cam.start()
+        while True:
+            camframe = cam.next()
+            dx, frame = algo.processFrame(camframe, algoselector, display=True, debug=False)
+            rc, jpg = cv2.imencode('.jpg', frame, s_jpgParam)
+            if not rc:
+                continue
+            if s_first:
+                print(jpg.size)
+                s_first = False
+            self.wfile.write(bytes("--jpgboundary\n","utf-8"))
+            self.send_header('Content-type','image/jpeg')
+            self.send_header('Content-length', jpg.size)
+            self.end_headers()
+            self.wfile.write(jpg.tostring())
+            time.sleep(0.05)            
 
 def main():
   try:
