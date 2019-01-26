@@ -96,12 +96,32 @@ above.
 ## Delivery schedule
 
 ### Week 3
+ - Work on geometry math
+ - End of week three:
+    - Spend time working through required trig math to calculate perpindicular bisector
+    - Given data(rectangle points) input, have full trig operations completed with correct outputs
 
 ### Week 4
+ - Receive light test system from Riyadth
+ - Spend time working on rectangle extraction from frame input
+ - End of week four:
+    - Isolate  a rectangle from a frame input
+    - Deliver theta, dx, and dy of the perpindicular point between the two rectangles over networktables
 
 ### Week 5
+  - Test 3d printed / plastic mount of raspicam on test chassis 
+  - End of week five:
+    - Be able to drive to perpindicular bisector point on test chassis
+    - Get robot at end of week 5
 
-### Week 6
+### Week 6 (Length of 1.5 weeks)
+  - In event of dead time (highly likely):
+    - Spend time analyzing other team's code
+    - Documentation
+  - Integration with final robot chassis
+  - Plug in correct offset values for final camera placement
+  - End of week six:
+    - Be able to drive to perpindicular bisector between targets on main chassis
 
 ## Configuring
 
