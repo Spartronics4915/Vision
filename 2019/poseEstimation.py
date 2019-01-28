@@ -71,16 +71,15 @@ def estimatePose(im, imgPts):
     #print "Rotation Vector:\n {0}".format(rotation_vector)
     #print "Translation Vector:\n {0}".format(translation_vector)
  
- 
-    # Project a 3D point (0, 0, 100.0) onto the image plane.
-    # We use this to draw a line sticking out of origin of coordsys
- 
-    (projPts, jacobian) = cv2.projectPoints(np.array([(0.0, 0.0, 100.0)]), 
-                                    rotVec, xlateVec, camMat, distCoeffs)
- 
+    # draw circles around our target points
     for p in imgPts:
         cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
-
+ 
+    # Project a 3D point (-100, 0, 0.0) onto the image plane.
+    # We use this to draw a line sticking out of origin of coordsys
+    (projPts, jacobian) = cv2.projectPoints(np.array([(-100.0, 0.0, 0.0)]), 
+                                    rotVec, xlateVec, camMat, distCoeffs)
+ 
     # let imgOrigin be the midpoint between b and f
     imgOrigin = (int(.5 * (imgPts[1][0]+imgPts[3][0])),
                  int(.5 * (imgPts[1][1]+imgPts[3][1])))  
