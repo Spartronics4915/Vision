@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+#
+# this is a fake robot, network table server..
+#
+
+import time, sys
+from comm import Comm
+import logging
+
+dirty = False
+visTable = {} 
+
+def visTargetChanged(table, key, value, isNew):
+    global visTable
+    global dirty
+    visTable[key] = value
+    visTable["count"] += 1
+    dirty = True
+    # for fast updates this print can slow things down:
+    # print("%s:%s" % (key, value))
+
+def main():
+    # To see messages from networktables, you must setup logging
+    global visTable
+    global dirty
+    logging.basicConfig(level=logging.DEBUG)
+    comm = Comm(None)
+    comm.GetVisionTable().addEntryListener(visTargetChanged)
+    dirty = False
+    visTable["count"] = 0
+    i = 0
+    while True:
+        time.sleep(1)
+        i += 1
+        if dirty:
+            print(visTable)
+            visTable["count"] = 0
+            dirty = False
+
+if __name__ == "__main__":
+    main() 
