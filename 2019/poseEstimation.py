@@ -41,20 +41,33 @@ c = (0, b[1]+sinAlpha*5.5, b[2]-cosAlpha*5.5)
 g = (0, f[1]-sinAlpha*5.5, f[2]-cosAlpha*5.5)
 a = (0, b[1]+cosAlpha*2, b[2]+sinAlpha*2)
 e = (0, f[1]-cosAlpha*2, f[2]+sinAlpha*2)
-s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
-# produces this:
+s_modelPts = np.array([a, b, c, f, e, g], dtype="double") # produces this:
+#
 # array([[ 0.       ,  5.93629528,  0.50076001],
 #       [ 0.        ,  4.        ,  0.        ],
 #       [ 0.        ,  5.37709002, -5.32481202],
-#       [ 0.        , -4.        ,  0.        ],
-#       [ 0.        , -5.93629528,  0.50076001],
-#       [ 0.        , -5.37709002, -5.32481202]])
-
-def estimatePose(im, imgPts):
+#
+#
+#
+# estimatePose ----------------------------------------------------
+#
+# inputs:
+#   image: can opencv image (Mat)
+#   imgPts:
+# 	an numpy array imgPts as 
+# 	numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")
+#   focalLen: an optional parameter that characterizes the camera fov.
+#    	should be provided in order to obtain accurate distances.
+#
+# return: None if we fail or (dx,dy,dtheta) required to move a robot at 
+# the origin # to the target.
+def estimatePose(im, imgPts, focalLen=None):
+    ret = None
     size = im.shape
  
     # Camera internals
-    focalLen = size[1]
+    if not focalLen:
+        focalLen = size[1]
     center = (size[1]/2, size[0]/2)
     camMat = np.array(
                     [[focalLen, 0, center[0]],
@@ -65,8 +78,11 @@ def estimatePose(im, imgPts):
     # print "Camera Matrix :\n {0}".format(camera_matrix)
  
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
+
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat, 
-                                        distCoeffs, flags=cv2.CV_ITERATIVE)
+                                        distCoeffs, flags=cv2.SOLVEPNP_ITERATIVE) # Changed from cv2.ITERATIVE
+    if success:
+        ret = (xlateVec[0], xlateVec[1], rotVec[0])
  
     #print "Rotation Vector:\n {0}".format(rotation_vector)
     #print "Translation Vector:\n {0}".format(translation_vector)
@@ -85,4 +101,6 @@ def estimatePose(im, imgPts):
                  int(.5 * (imgPts[1][1]+imgPts[3][1])))  
     perpPt2 = (int(projPts[0][0][0]), int(projPts[0][0][1]))
     cv2.line(im, imgOrigin, perpPt2, (255,0,0), 2)
+
+    return ret
  
