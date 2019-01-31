@@ -9,10 +9,10 @@
   the results of an algorithm or direct stream.  http://{host}:{port}/{algo}.mjpg (or mjpeg).
 
   * algo: "direct" - direct/fast video streaming
-  * algo: "empty" - per-frame streaming, no processing
+  * algo: "bypass" | "empty" - per-frame streaming, no processing
   * algo: "hsv" - show hsv of camera view
   * algo: anythingelse - the "default" algo 
-  # add more named algos as desired
+  * (add more named algos as desired)
 
 
 ## library
