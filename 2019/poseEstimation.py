@@ -91,7 +91,6 @@ def estimatePose(im, imgPts):
                     [0, 0, 1]], dtype = "double"
                     )
 
-<<<<<<< HEAD
     print("Camera Matrix :\n {0}".format(camera_matrix))
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
@@ -119,30 +118,3 @@ def estimatePose(im, imgPts):
     cv2.line(im, imgOrigin, perpPt2, (255,0,0), 2)
 
     return ret
-
-=======
-    # print "Camera Matrix :\n {0}".format(camera_matrix)
- 
-    distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
-    (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat, 
-                                        distCoeffs, flags=cv2.CV_ITERATIVE)
- 
-    #print "Rotation Vector:\n {0}".format(rotation_vector)
-    #print "Translation Vector:\n {0}".format(translation_vector)
- 
-    # draw circles around our target points
-    for p in imgPts:
-        cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
- 
-    # Project a 3D point (-100, 0, 0.0) onto the image plane.
-    # We use this to draw a line sticking out of origin of coordsys
-    (projPts, jacobian) = cv2.projectPoints(np.array([(-100.0, 0.0, 0.0)]), 
-                                    rotVec, xlateVec, camMat, distCoeffs)
- 
-    # let imgOrigin be the midpoint between b and f
-    imgOrigin = (int(.5 * (imgPts[1][0]+imgPts[3][0])),
-                 int(.5 * (imgPts[1][1]+imgPts[3][1])))  
-    perpPt2 = (int(projPts[0][0][0]), int(projPts[0][0][1]))
-    cv2.line(im, imgOrigin, perpPt2, (255,0,0), 2)
- 
->>>>>>> 9c7509524146547b7d51da3c580303eec9ed22bb
