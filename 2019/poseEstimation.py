@@ -73,16 +73,17 @@ def estimatePose(im, imgPts, focalLen=None):
                     [0, focalLen, center[1]],
                     [0, 0, 1]], dtype = "double"
                     )
-    print("Camera Matrix :\n {0}".format(camera_matrix))
+    print("Camera Matrix :\n {0}".format(camMat))
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
                                         flags=cv2.SOLVEPNP_ITERATIVE)
     if success:
         ret = (xlateVec[0], xlateVec[1], rotVec[0])
-
-    print("Rotation Vector:\n {0}".format(rotation_vector))
-    print("Translation Vector:\n {0}".format(translation_vector))
+        print("Rotation Vector:\n {0}".format(rotVec))
+        print("Translation Vector:\n {0}".format(xlateVec))
+    else:
+        print("solvePnP fail")
 
     # draw circles around our target points
     for p in imgPts:
