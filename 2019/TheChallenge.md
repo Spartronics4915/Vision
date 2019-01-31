@@ -10,7 +10,7 @@
     - [Week 3](#week-3)
     - [Week 4](#week-4)
     - [Week 5](#week-5)
-    - [Week 6](#week-6)
+    - [Week 6 (Length of 1.5 weeks)](#week-6-length-of-15-weeks)
 - [Configuring](#configuring)
 - [The field elements](#the-field-elements)
     - [On Field Retro-Reflective Tape](#on-field-retro-reflective-tape)
@@ -138,7 +138,29 @@ above.
 
 ### On Field Retro-Reflective Tape
 
-- sizes and position of targets, area?
+From section 4.10 of the game manual:
+
+A vision target is a pair of 5½ in. (~14 cm) long by 2 in. (~5 cm) wide strips
+of 3M 8830 Scotchlite Reflective Material. Strips are angled toward each
+other at ~14.5° and such that there’s an 8-in. (~20 cm) gap at their closest
+points.
+
+Vision targets on the "front" face of the ROCKET highlight the top of the lowest
+PORT and are 39 1/8" above the carpet at their highest point.
+
+Vision targets on the "side" facess of the ROCKET highlight the location of the 
+top of the lowest HATCH and are 2'7.5" (31.5") above the carpet at their highest point.
+This the SAME height as the top of the HATCH opening.
+
+Vision targets also highlight the locations of the tops of each CARGO SHIP HATCH
+and the tops of each LOADING STATION HATCH - and at the SAME height as the
+ROCKET HATCH targets. (31.5" above the carpet).
+
+HATCH/FUEL delivery stations are separated by 22".  A side of the the cargo ship
+contains 3 stations while the "front" has 2 stations.  As stated above, vision
+tape is separated by an 8" gap at their closest points at the top.  A very
+similar gap occurs between adjacent stations but at the bottom and relative
+to the opposite/outside corners.
 
 ### On Ground Gaffers Tape
 
@@ -154,6 +176,7 @@ above.
 - [ChickenVision](https://github.com/team3997/ChickenVision/blob/master/ChickenVision.py)
 - [picamera docs](https://picamera.readthedocs.io)
 - [opencv docs](https://docs.opencv.org/3.4.5)
+- [opencv pose estimation](https://www.learnopencv.com/head-pose-estimation-using-opencv-and-dlib)
 - [frc distance to known object](https://wpilib.screenstepslive.com/s/currentCS/m/vision/l/682952-2017-vision-examples)
   - does this work for off-axis views? Consider: known height of object/shape
     doesn't suffer as much from off-axis since robot is stuck on the ground.
