@@ -41,17 +41,17 @@ c = (0, b[1]+sinAlpha*5.5, b[2]-cosAlpha*5.5)
 g = (0, f[1]-sinAlpha*5.5, f[2]-cosAlpha*5.5)
 a = (0, b[1]+cosAlpha*2, b[2]+sinAlpha*2)
 e = (0, f[1]-cosAlpha*2, f[2]+sinAlpha*2)
-<<<<<<< HEAD
-s_modelPts = np.array([a, b, c, f, e, g], dtype="double") # produces this:
-#
+s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
+
+# s_modelPts:
 # array([[ 0.       ,  5.93629528,  0.50076001],
 #       [ 0.        ,  4.        ,  0.        ],
 #       [ 0.        ,  5.37709002, -5.32481202],
-#
-#
+#       [ 0.        , -4.        ,  0.        ],
+#       [ 0.        , -5.93629528,  0.50076001],
+#       [ 0.        , -5.37709002, -5.32481202]])
 #
 # estimatePose ----------------------------------------------------
-#
 # inputs:
 #   image: can opencv image (Mat)
 #   imgPts:	an numpy array imgPts as
@@ -64,38 +64,20 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double") # produces this:
 def estimatePose(im, imgPts, focalLen=None):
     ret = None
     size = im.shape
-
     # Camera internals
     if not focalLen:
         focalLen = size[1]
-=======
-s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
-# produces this:
-# array([[ 0.       ,  5.93629528,  0.50076001],
-#       [ 0.        ,  4.        ,  0.        ],
-#       [ 0.        ,  5.37709002, -5.32481202],
-#       [ 0.        , -4.        ,  0.        ],
-#       [ 0.        , -5.93629528,  0.50076001],
-#       [ 0.        , -5.37709002, -5.32481202]])
-
-def estimatePose(im, imgPts):
-    size = im.shape
- 
-    # Camera internals
-    focalLen = size[1]
->>>>>>> 9c7509524146547b7d51da3c580303eec9ed22bb
     center = (size[1]/2, size[0]/2)
     camMat = np.array(
                     [[focalLen, 0, center[0]],
                     [0, focalLen, center[1]],
                     [0, 0, 1]], dtype = "double"
                     )
-
     print("Camera Matrix :\n {0}".format(camera_matrix))
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
-                                        distCoeffs, 
-                                        flags=cv2.SOLVEPNP_ITERATIVE) 
+                                        distCoeffs,
+                                        flags=cv2.SOLVEPNP_ITERATIVE)
     if success:
         ret = (xlateVec[0], xlateVec[1], rotVec[0])
 
