@@ -21,16 +21,20 @@ range0 = np.array([10,50,200])
 range1 = np.array([115,255,255])
 
 # Reasoning behind Current range values:
-    # After changes to exposure of camera (Ridiculously low ISO),
-    # retro-reflective tape stands out more than it ever has,
-    # thus, type of color, and the saturation of color has less importance,
-    # which explains the wide range on the first two numbers. 10-115 represents an
-    # (approximate) range of blue to green in the HSV colorspace
-    # 50-255 represents a wide range of the saturation of any given color
-    # (This value is fluid, as we arn't searching for any particular 'color',
-    #  [read: 2018], it can be very open)
-    # Finially, the tightest value needs to be the value, representing how close the color is to black.
-    # We want colors as far away from black as possible, thus the high range.
+#   After changes to exposure of camera (Ridiculously low ISO),
+#   retro-reflective tape stands out more than it ever has,
+#   thus, hue and the saturation have less importance,
+#   which explains the wide range on the first two numbers. 
+#   10-115 represents an (approximate) range of blue to green 
+#   in the HSV colorspace 50-255 represents a wide range of the 
+#   saturation of any given color 
+#
+#   (This value is fluid, as we aren't searching for any particular 'color',
+#   [read: 2018], it can be very open)
+#
+#   Finally, the tightest value needs to be the value, representing how 
+#   close the color is to black.  We want colors as far away from black 
+#   as possible, thus the high range.
 
 def emptyAlgo(frame):
     return (0,frame)
@@ -46,7 +50,7 @@ def processFrame(frame, algo=None, display=0,debug=0):
     elif algo == "empty" or algo == "bypass":
         return emptyAlgo(frame)
     elif algo == "mask":
-        return hsvAlgo(frame)
+        return maskAlgo(frame)
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:

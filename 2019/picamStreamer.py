@@ -14,8 +14,8 @@ import sys
 import cv2
 
 s_first=True
-s_jpgQuality = 20 # used by direct streaming, quality differs from opencv
-s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 20] # used by opencv
+s_jpgQuality = 80 # used by direct streaming, quality differs from opencv
+s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 50] # used by opencv
 s_mainPage="""
 <html><head>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
@@ -39,8 +39,9 @@ class CamHandler(BaseHTTPRequestHandler):
             self.end_headers()
             cam = None
             try:
-                time.sleep(2) # wait for shutdown of alt stream
-                cam = picam.PiCam(resolution=(320, 240), framerate=60, auto=False)
+                time.sleep(1) # wait for shutdown of alt stream
+                cam = picam.PiCam(resolution=(640, 480), 
+                                  framerate=60, auto=False)
                 if not cam:
                     raise Exception("Hey no camera!")
                 if algostr == "direct":
