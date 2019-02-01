@@ -112,7 +112,7 @@ class CaptureThread(threading.Thread):
                     procThread.nextFrame = frame # XXX: frame.copy()?
                     procThread.event.set()
                 else:
-                    # pool is empty, what for work to complete
+                    # pool is empty, wait for work to complete
                     sys.stderr.write('z')
                     time.sleep(0.01)
         self.picam.stop()

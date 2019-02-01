@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 import math
+import logging
 
 #
 # imgPts as numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")
@@ -61,7 +62,7 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 #
 # return: None if we fail or (dx,dy,dtheta) required to move a robot at
 # the origin # to the target.
-def estimatePose(im, imgPts, focalLen=None):
+def estimatePose(im, imgPts, focalLen=None, display=False):
     ret = None
     size = im.shape
     # Camera internals
@@ -73,31 +74,32 @@ def estimatePose(im, imgPts, focalLen=None):
                     [0, focalLen, center[1]],
                     [0, 0, 1]], dtype = "double"
                     )
-    print("Camera Matrix :\n {0}".format(camMat))
+    logging.debug("Camera Matrix :\n {0}".format(camMat))
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
                                         flags=cv2.SOLVEPNP_ITERATIVE)
     if success:
-        ret = (xlateVec[0], xlateVec[1], rotVec[0])
-        print("Rotation Vector:\n {0}".format(rotVec))
-        print("Translation Vector:\n {0}".format(xlateVec))
+        ret = (xlateVec[0][0], xlateVec[1][0], rotVec[0][0])
+        #logging.debug("Rotation Vector:\n {0}".format(rotVec))
+        #logging.debug("Translation Vector:\n {0}".format(xlateVec))
     else:
-        print("solvePnP fail")
+        logging.warning("solvePnP fail")
 
     # draw circles around our target points
-    for p in imgPts:
-        cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
+    if display:
+        for p in imgPts:
+            cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
 
-    # Project a 3D point (-100, 0, 0.0) onto the image plane.
-    # We use this to draw a line sticking out of origin of coordsys
-    (projPts, jacobian) = cv2.projectPoints(np.array([(-100.0, 0.0, 0.0)]),
+        # Project a 3D point (-100, 0, 0.0) onto the image plane.
+        # We use this to draw a line sticking out of origin of coordsys
+        (projPts, jacobian) = cv2.projectPoints(np.array([(-100.0, 0.0, 0.0)]),
                                     rotVec, xlateVec, camMat, distCoeffs)
 
-    # let imgOrigin be the midpoint between b and f
-    imgOrigin = (int(.5 * (imgPts[1][0]+imgPts[3][0])),
-                 int(.5 * (imgPts[1][1]+imgPts[3][1])))
-    perpPt2 = (int(projPts[0][0][0]), int(projPts[0][0][1]))
-    cv2.line(im, imgOrigin, perpPt2, (255,0,0), 2)
+        # let imgOrigin be the midpoint between b and f
+        imgOrigin = (int(.5 * (imgPts[1][0]+imgPts[3][0])),
+                     int(.5 * (imgPts[1][1]+imgPts[3][1])))
+        perpPt2 = (int(projPts[0][0][0]), int(projPts[0][0][1]))
+        cv2.line(im, imgOrigin, perpPt2, (255,0,0), 2)
 
     return ret

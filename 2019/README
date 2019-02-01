@@ -2,28 +2,31 @@
 
 ## applications
 
-* `runPiCam.py` - primary entrypoint when running in competition (no server currently).
-  To get the highest framerate, we run the frame-capture in a separate thread from the
-  algorithm.
-* `picamStreamer.py` - mjpg streaming on port 5080... URL controls whether we stream
-  the results of an algorithm or direct stream.  http://{host}:{port}/{algo}.mjpg (or mjpeg).
+* `runPiCam.py` - primary entrypoint when running in competition 
+  (no server currently).  To get the highest framerate, we run 
+  the frame-capture in a separate thread from the algorithm.
+
+* `picamStreamer.py` - mjpg streaming on port 5080... URL controls 
+   whether we stream the results of an algorithm or direct stream.  
+   http://{host}:{port}/{algo}.mjpg (or mjpeg).
 
   * algo: "direct" - direct/fast video streaming
   * algo: "empty" - per-frame streaming, no processing
   * algo: "hsv" - show hsv of camera view
+  * algo: "mask" - show hsv of camera view
+  * algo: "default" - default algo
+  * algo: "realPNP" - 
+  * algo: "fakePNP" - 
   * algo: anythingelse - the "default" algo 
-  # add more named algos as desired
-
 
 ## library
 
-* `algo.py` - abstraction for current vision algorithm
-* `picam.py` - thin vaneer atop PiCamera 
+* `algo.py` - collection of various vision pipelines
+* `picam.py` - thin vaneer atop PiCamera, support for threaded streaming
 * `comm.py` - manage communication with robot via networktables
+* 'fakerobot' - start this script to validate target communication.
 
 ## support
 
-* vision4915.service - installing a python script as a service requires
-    _daemonization_, which is part of the support in runPiCam.
-* in 2019, we can likely install our script via the FRCVision bootstrapping
-  process.
+* we either launch picamStreamer.py manually or launch runPiCam.py
+  via frcvision's uploaded.py mechanism.

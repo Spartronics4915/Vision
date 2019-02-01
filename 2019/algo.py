@@ -116,7 +116,7 @@ def fakePNP(frame, display, debug):
         [180, 110], [195, 100], [200, 195] ]
     imgPtsNP = np.array(imgPts, dtype="double")
     dx,dy,theta = poseEstimation.estimatePose(frame, imgPtsNP, 0)
-    return dx,dy,theta
+    return (dx,dy,theta),frame
 
 def realPNP(frame, display, debug):
     # nb: caller is responsible for threading (see runPiCam.py)

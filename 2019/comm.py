@@ -20,18 +20,38 @@ class Control:
 class Target:
     """
         Target represents the data vision passes to robot.
+        We take no opinion on the shape/type of value
         XXX: need a way to represent non-acquisition?
     """
-    def __init__(self):
+    def __init__(self, v=None):
         self.clock = time.clock()
+        self.value = v  # value can be a tuple, a list, a string
         #Invalid, bogus targets, to be changed if something goes ary
-        self.angleX = 100
-        self.angleY = 100
 
-    def Send(self, targetTable):
-        targetTable.putNumber("clock", self.clock)
-        targetTable.putNumber("ax", self.angleX)
-        targetTable.putNumber("ay", self.angleY)
+    def setValue(self, value, forceupdate=True):
+        if forceupdate or value != self.value:
+            self.clock = time.clock()
+            self.value = value  # can be a tuple, a list, a string
+            return True
+        else:
+            return False
+
+    def send(self, targetTable):
+        # convert the value and the clock to a comma-separated list of numbers
+        #  value can be scalar, a tuple or an array, result will be flattened
+        #  examples:
+        #       value: 1 -> "1,.3566" 
+        #       value: (1,2) -> "1,2,.3566" 
+        #       value: [1,2,"hello world"] -> "1,2,hello world,.3566" 
+        val = []
+        try:
+            val.extend(self.value) # fails if value is not iterable
+        except TypeError:
+            val.append(self.value)  # handle the single-number case
+        val.append(self.clock)
+        vstr = ",".join(str(x) for x in val)
+        #print("send: " + vstr)
+        targetTable.putString("target", vstr)
 
 theComm = None
 
@@ -70,7 +90,7 @@ class Comm:
             # current thinking is that this should not be a subtable of
             # SmartDashboard, since traffic is multiplied by the number
             # of clients.
-            self.visionTable = NetworkTables.getTable("Vision")
+            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision")
             self.controlTable = NetworkTables.getTable("VisionControl")
 
             self.control = Control()
@@ -99,22 +119,13 @@ class Comm:
     def updateVisionState(self, state):
         self.sd.putString("Vision/State", state)
 
-    def GetVisionTable(self):
-        return self.visionTable
-
-    def GetVisionControlTable(self):
-        return self.controlTable
-
     def Shutdown(self):
         NetworkTables.removeConnection(self.connectionListener)
         self.controlTable.removeEntryListener(self.visionControlEvent)
 
-    def SetTarget(self, t):
+    def SendTarget(self, t):
         self.target = t
-        self.target.Send(self.visionTable)
-
-    def GetTarget(self):
-        return self.target
+        self.target.send(self.visionTable)
 
     def GetIMUHeading(self):
         return self.control.imuHeading

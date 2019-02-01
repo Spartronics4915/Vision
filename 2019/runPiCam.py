@@ -1,9 +1,7 @@
 #!/usr/bin/env python3 
 #
-# picamera test & processing rig
-
-# TODO:
-#   wire-in (or eliminate) more of the args controlling, eg brightness
+# runPiCam.py runs the imaging algorithm in algo.py on a stream
+# of video frames.
 #
 
 import cv2
@@ -13,7 +11,6 @@ import time, datetime
 import sys
 import argparse
 import os
-import daemon
 import logging
 
 # local imports
@@ -23,47 +20,46 @@ import picam
 
 class PiVideoStream:
     def __init__(self):
-        #I am not shure this is correct. According to docs, you do not instantate a logger.
-        os.system('sudo ifconfig wlan0 down') # Can't have this up at comp
-        logging.basicConfig(filename="../logs/runLogs.log",level=logging.DEBUG)
-
+        # no longer needed:
+        #   os.system('sudo ifconfig wlan0 down')
+        logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+        dateFmt = "%H:%M"
+        logging.basicConfig(filename="/tmp/runPiCam.log",level=logging.DEBUG,
+                            format=logFmt, datefmt=dateFmt)
         logging.debug("\n--------------------New run------------------")
         logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("---------------------------------------------\n")
-        self.windowName = "picamera"
         self.target = comm.Target()
         self.commChan = None
         self.parseArgs()
-        print("testPCam pid: %d args:" % os.getpid())
-        print(self.args)
-        print("OpenCV version: {}".format(cv2.__version__))
-
+        logging.info("pid: %d" % os.getpid())
+        logging.info("args: " + str(self.args))
+        logging.info("opencv version: {}".format(cv2.__version__))
         if self.args.robot != "none":
             if self.args.robot == "roborio":
-                logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+                fmt = "%Y/%m/%d %H:%M:%S"
+                logging.debug(datetime.datetime.now().strftime(fmt))
                 logging.debug("Connecting to robot at 10.49.15.2...")
                 ip = "10.49.15.2"
             else:
                 ip = "localhost"
-            print("starting comm to " + ip)
+            logging.info("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
         self.picam = picam.PiCam(resolution=(self.args.iwidth, 
                                              self.args.iheight),
                                  framerate=(self.args.fps))
-        # Push something down the pipe.
-        self.commChan.SetTarget(self.target)
 
     def parseArgs(self):
         """
         Parse input arguments
         """
         parser = argparse.ArgumentParser(description=
-                            "Capture and display live camera video on raspi")
+                            "Capture and process picamera stream")
         parser.add_argument("--threads", dest="threads",
-                            help="threads: (0-4) [0]",
-                            default=0, type=int)
+                            help="threads: (0-4) [2]",
+                            default=2, type=int)
         parser.add_argument("--algo", dest="algo",
                             help="(empty, default)",
                             default="default")
@@ -80,9 +76,9 @@ class PiVideoStream:
                             help="display [0]",
                             default=0, type=int)
         parser.add_argument("--robot", dest="robot",
-                            help="robot (off, localhost, roborio) [robot]",
+                            help="robot (localhost, roborio) [localhost]",
                             default="localhost")
-        parser.add_argument("--brightness", dest="brightness [50]",
+        parser.add_argument("--brightness", dest="brightness",
                             help="brightness: [0, 100]",
                             default=50, type=int)
         parser.add_argument("--exposure", dest="exposure",
@@ -97,10 +93,7 @@ class PiVideoStream:
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
-        parser.add_argument("--daemonize",
-                            help="run app in background",
-                            action="store_true")
-               
+ 
         self.args = parser.parse_args()
         #Logging
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
@@ -108,11 +101,7 @@ class PiVideoStream:
         logging.debug(self.args)
 
     def Run(self):
-        if self.args.daemonize:
-            with daemon.DaemonContext():
-                self.go();
-        else:
-            self.go();
+        self.go();
 
     def go(self):
         if self.args.threads == 0:
@@ -141,7 +130,6 @@ class PiVideoStream:
 
     def processVideo(self):
         """ create a camera, continually read frames and process them.
-            In display mode, we run til 'q' or 'ESC' key is hit.
         """
         print("  (single threaded)")
         self.picam.start()
@@ -154,46 +142,21 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        abort = False
-        dirtyx, frame = algo.processFrame(image, algo=self.args.algo, 
-                                    display=self.args.display,
-                                    debug=self.args.debug)
+        value, frame = algo.processFrame(image, algo=self.args.algo, 
+                                        display=self.args.display,
+                                        debug=self.args.debug)
         if (self.args.debug):
-            print("Dirtyx is at: ", dirtyx)
-            print("self.target.anglex is at: ", self.target.angleX)
+            logging.info("Target value is: ", value)
+
         if self.commChan:
-            self.target.clock = time.clock()
-            if (dirtyx > 25): #Largest angle we expect is 22
-                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-                #logging.debug("Sent a 'searching' to networktables\n") 
+            if (value == None):
                 self.commChan.updateVisionState("Searching")
             else:
-                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-                #logging.debug("Sent a 'aquired' to networktables\n", )
-                self.commChan.updateVisionState("Aquired")  
-            # sending 'aquired' may be independent of the fact that we send a new target over   
-            if (dirtyx != self.target.angleX):
-                if (self.args.debug):
-                    print("self.target.angleX is being changed to...", dirtyx)
-                    # Fix 0 bug?
-                #logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-                #logging.debug("DirtyX is currently at:", dirtyx)
-                self.target.angleX = dirtyx
-                # Not setting dy, because that may mess things up
-                self.commChan.SetTarget(self.target)
-
-            if self.args.display:
-                cv2.imshow("Frame", frame)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("q") or key == 27:
-                    abort = True
-                elif key == 255:
-                    pass
-                elif key == 22:
-                   print("22 --");
-                else:
-                    print(key)
-            return abort
+                self.commChan.updateVisionState("Acquired")  
+                if self.target.setValue(value):
+                    self.commChan.SendTarget(self.target)
+        else:
+            print("Target value is: {}".format(value))
         
     def Shutdown(self):
         self.picam.stop()

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 #
-# this is a fake robot, network table server..
+# This is a fake robot, network table server.
+#
+# We monitor /SmartDashboard/Vision for activity and 
+# print it if any change occurred in the last second.
 #
 
 import time, sys
@@ -24,9 +27,9 @@ def main():
     global visTable
     global dirty
     nettab = networktables.NetworkTables
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO) # DEBUG to diagnose nettab
     visTable["count"] = 0
-    nettab.initialize()
+    nettab.initialize() # as server
     nettab.getTable("/SmartDashboard/Vision").addEntryListener(visTargetChanged)
     dirty = False
     i = 0
