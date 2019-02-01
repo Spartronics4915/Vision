@@ -51,6 +51,10 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return emptyAlgo(frame)
     elif algo == "mask":
         return maskAlgo(frame)
+    elif algo == "fakePNP":
+        return fakePNP(frame,display,debug)
+    elif algo == "realPNP":
+        return realPNP(frame,display,debug)
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:
@@ -104,6 +108,15 @@ def getCorrectedAngle(sz, angle):
         return angle + 180
     else:
         return angle + 90
+
+def fakePNP(frame, display, debug):
+    # here we pass in plausible points to the pose estimator 
+    imgPts = [
+        [50, 90], [60, 100], [58, 200],
+        [180, 110], [195, 100], [200, 195] ]
+    imgPtsNP = np.array(imgPts, dtype="double")
+    dx,dy,theta = poseEstimation.estimatePose(frame, imgPtsNP, 0)
+    return dx,dy,theta
 
 def realPNP(frame, display, debug):
     # nb: caller is responsible for threading (see runPiCam.py)
