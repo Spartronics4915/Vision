@@ -4,8 +4,8 @@
 #
 
 import time, sys
-from comm import Comm
 import logging
+import networktables
 
 dirty = False
 visTable = {} 
@@ -23,18 +23,18 @@ def main():
     # To see messages from networktables, you must setup logging
     global visTable
     global dirty
+    nettab = networktables.NetworkTables
     logging.basicConfig(level=logging.DEBUG)
-    comm = Comm(None)
-    comm.GetVisionTable().addEntryListener(visTargetChanged)
-    dirty = False
     visTable["count"] = 0
+    nettab.initialize()
+    nettab.getTable("/SmartDashboard/Vision").addEntryListener(visTargetChanged)
+    dirty = False
     i = 0
     while True:
         time.sleep(1)
         i += 1
         if dirty:
             print(visTable)
-            visTable["count"] = 0
             dirty = False
 
 if __name__ == "__main__":

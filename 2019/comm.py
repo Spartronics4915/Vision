@@ -66,7 +66,7 @@ class Comm:
             self.sd.putString("Vision/Status", "OK")
             self.updateVisionState("Standby")
 
-            # We communcate target to robot via Vision table,
+            # We communicate target to robot via Vision table,
             # current thinking is that this should not be a subtable of
             # SmartDashboard, since traffic is multiplied by the number
             # of clients.

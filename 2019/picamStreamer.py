@@ -14,7 +14,7 @@ import sys
 import cv2
 
 s_first=True
-s_jpgQuality = 5 # used by direct streaming, quality differs from opencv
+s_jpgQuality = 20 # used by direct streaming, quality differs from opencv
 s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 20] # used by opencv
 s_mainPage="""
 <html><head>

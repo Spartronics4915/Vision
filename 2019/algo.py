@@ -41,15 +41,22 @@ def hsvAlgo(frame):
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
         return defaultAlgo(frame, display, debug)
+    elif algo == "rect":
+        return rectAlgo(frame, display, debug)
     elif algo == "empty" or algo == "bypass":
         return emptyAlgo(frame)
+    elif algo == "mask":
+        return hsvAlgo(frame)
     elif algo == "hsv":
         return hsvAlgo(frame)
-    elif algo == "rect":
-        return rectAlgo(frame)
     else:
         print("algo: unexpected name " + algo)
         return emptyAlgo(frame)
+
+def maskAlgo(frame):
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
+    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+    return 0, mask
 
 def rectAlgo(frame,display=1,debug=0):
     # TODO: Implement some form of threading / process optimisation
@@ -86,9 +93,6 @@ def rectAlgo(frame,display=1,debug=0):
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
-
-def testPNP(frame, display, debug):
-    return 0,frame
 
 # cribbed from team492
 def getCorrectedAngle(sz, angle):
