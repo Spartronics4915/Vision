@@ -163,8 +163,11 @@ class PiVideoStream:
         if self.commChan:
             self.commChan.Shutdown()
             
-if __name__ == "__main__":
+def main():
     pistream = PiVideoStream()
     pistream.Run()
     pistream.Shutdown()
+
+if __name__ == "__main__":
+    main()
 
