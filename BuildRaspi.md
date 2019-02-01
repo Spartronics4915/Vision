@@ -72,8 +72,9 @@ _in the 10.49.15.*_ address range.
 
 Establishing a static IP address is one way to ensure that the raspi is
 in the robot's address space. It's also a way for our DriverStation
-dashboard to identify each raspi reliably.  The standard name, `frcvision.local`,
-will not work reliably when multiple raspis are on the same network.
+dashboard to identify each raspi reliably.  The standard name, 
+`frcvision.local`, will not work reliably when multiple raspis are 
+on the same network.
 
 You can upload your custom python "cameraService" via the web interface
 via the Application tab.  This will persist across reboot and is the
@@ -115,6 +116,17 @@ while 1:
     print("tick");
     time.sleep(5)
     print("tock");
+```
+
+Here's a way to load a standard git-based Vision solution.
+
+``` bash
+#!/usr/bin/env python3
+
+import os
+os.chdir("Vision/2019")
+import runPiCam
+runPiCam.main()
 ```
 
 ## Prepare for Competition
