@@ -207,11 +207,8 @@ See also: https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027798-the-r
 ### install python extensions
 
 ```
-sudo python3 -m pip install picamera python-daemon
+sudo python3 -m pip install picamera
 ```
-
-(python-daemon may not be needed (tbd))
-
 ### validate video
 
 * `raspivid -p "0,0,640,480"` (will only work if you remove the picamera
@@ -238,7 +235,7 @@ In theory a raspi can support 2 pi cameras but we haven't tested
 that.
 
 * follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation)
-    * note: the instructions regarding TC358743 you can ignore.
+    * note: you can ignore instructions regarding TC358743.
 
 * here are the packages required (note raspidisp not required)
 
