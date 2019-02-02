@@ -133,9 +133,15 @@ Here's a way to run uv4l via a shell script:
 
 ``` bash
 #!/bin/bash -f
-
-uv4l --driver raspicam --auto-video_nr  -- more parameters here --
-
+uv4l -f \
+--driver raspicam \
+--auto-video_nr \
+--enable-server \
+--server-option '--enable-webrtc-audio=0' \
+--server-option '--webrtc-receive-audio=0' \
+--server-option '--webrtc-preferred-vcodec=3' \
+--server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
+--server-option '--webrtc-enable-hw-codec'
 ```
 
 
