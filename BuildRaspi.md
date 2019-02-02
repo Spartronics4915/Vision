@@ -118,7 +118,7 @@ while 1:
     print("tock");
 ```
 
-Here's a way to load a standard git-based Vision solution.
+Here's a way to load a standard git-based Vision solution:
 
 ``` bash
 #!/usr/bin/env python3
@@ -128,6 +128,16 @@ os.chdir("Vision/2019")
 import runPiCam
 runPiCam.main()
 ```
+
+Here's a way to run uv4l via a shell script:
+
+``` bash
+#!/bin/bash -f
+
+uv4l --driver raspicam --auto-video_nr  -- more parameters here --
+
+```
+
 
 ## Prepare for Competition
 
@@ -271,8 +281,7 @@ that.
     exposure = auto
 
     # -------------------
-    # FRC rules contrain the range of allowed ports
-    server-option = --port=5080
+    server-option = --port=8080
 
     # -------------------
     # WebRTC options govern h264 streaming, we wish to obtain maximum
@@ -284,6 +293,8 @@ that.
     ```
 
 * restart service `sudo systemctl restart uv4l_raspicam.service`
+* to use frcvision for auto-starting you can disable the service:
+  `sudo systemctl disable uv4l_raspicam.service`
 * point Dashboard's layout file to the IP address+port.
 
 ### pull git repository
