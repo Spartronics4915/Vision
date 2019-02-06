@@ -27,7 +27,8 @@
 - _what is fast?_
 - _required software + hardware_
 - _where to mount for optimum driver experience?_
-
+- _what is the required sensing distance?_
+-    As a start, 15 ft is a reasonable distance, however the longer the distance is, the more reliable and successful the implementation would be.
 ### Vision analysis for automatic driver assist
 
 - _choose one or more deliverables_
