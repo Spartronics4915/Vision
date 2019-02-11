@@ -57,7 +57,7 @@
 The answers to some of these questions will allow us to fill in sections
 above.
 
-- how many cameras, how many raspis?  
+- how many cameras, how many raspis?
   - 4? (front+back,vision+driver)
   - 2? (shared vision)
   - _conflict between vision and driver requirements?_
@@ -80,7 +80,7 @@ above.
 
 - how will the targeting data be used by robot code?
   - can we operate in robot-relative mode?
-  - use path planner?  
+  - use path planner?
   - lower-level access to spline and motion-profiles?
   - custom wanted-states with limelight-like control?
   - custom gyro-based pid-loop to rapidly acquire heading?
@@ -109,7 +109,7 @@ above.
     - Deliver theta, dx, and dy of the perpindicular point between the two rectangles over networktables
 
 ### Week 5
-  - Test 3d printed / plastic mount of raspicam on test chassis 
+  - Test 3d printed / plastic mount of raspicam on test chassis
   - End of week five:
     - Be able to drive to perpindicular bisector point on test chassis
     - Get robot at end of week 5
@@ -131,7 +131,7 @@ above.
 - how to setup/install custom vision scripts
   - recipe for uploading scripts from where, which port
     are services operating on, how to test/validate networktables.
-  
+
 ## The field elements
 
 [2019VisionImages.zip](https://github.com/wpilibsuite/allwpilib/releases/download/v2019.1.1/2019VisionImages.zip)
@@ -148,7 +148,7 @@ points.
 Vision targets on the "front" face of the ROCKET highlight the top of the lowest
 PORT and are 39 1/8" above the carpet at their highest point.
 
-Vision targets on the "side" facess of the ROCKET highlight the location of the 
+Vision targets on the "side" facess of the ROCKET highlight the location of the
 top of the lowest HATCH and are 2'7.5" (31.5") above the carpet at their highest point.
 This the SAME height as the top of the HATCH opening.
 
@@ -164,7 +164,7 @@ to the opposite/outside corners.
 
 ### On Ground Gaffers Tape
 
-- length, positioning, 
+- length, positioning,
 - _how close to target before we can acquire line?_
 - _what sensors would we need?_
 

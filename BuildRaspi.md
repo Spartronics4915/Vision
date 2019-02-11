@@ -12,6 +12,7 @@
     - [make sure you have a raspi 3 with picam](#make-sure-you-have-a-raspi-3-with-picam)
     - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
     - [on first boot](#on-first-boot)
+    - [rename/renumber your raspi](#renamerenumber-your-raspi)
     - [install python extensions](#install-python-extensions)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
@@ -66,7 +67,10 @@ Among the built-in conveneniences offered by the FRCVision-rPi image:
 
 ## Theory of operation
 
-Basic idea:  use the web FRCVision dashboard to control and monitor your raspi.
+Basic idea:  use the web FRCVision [dashboard](http://frcvision.local) to
+control and monitor your raspi. If you change your raspi's name, this link
+won't work, but you can either enter the new hostname or its static ip
+address like [this](http://10.49.15.11).
 
 If you need to configure/reset any persistent value, you must make the raspi
 Read-Write.  After configuration is complete, make sure it's in Read-Only mode.
@@ -80,8 +84,10 @@ _in the 10.49.15.*_ address range.
 Establishing a static IP address is one way to ensure that the raspi is
 in the robot's address space. It's also a way for our DriverStation
 dashboard to identify each raspi reliably.  The standard name,
-`frcvision.local`, will not work reliably when multiple raspis are
-on the same network.
+`frcvision.local`, will __not__ work reliably when multiple raspis are
+on the same network. You can also change the hostname of your raspi.
+Now, a static IP would still be of potential use, but not absolutely
+necessary to disambiguate multiple raspis.
 
 You can upload your custom python "cameraService" via the web interface
 via the Application tab.  This will persist across reboot and is the
@@ -194,7 +200,25 @@ sudo /bin/mount -o remount,rw / && sudo /bin/mount -o remount,rw /boot
 * a properly duplicated (up-to-date!) microsd is essential issurance
   for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
-  the longer this process will take.
+  the longer this process will take.  On Linux and MacOS you can use this:
+
+  ```sh
+  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
+  # where N is your microSD, you can findit either via:
+  #  `mount` or `diskutil list`
+
+  # to monitor its progress, you can periodically send it a signal
+  # (either background the dd process or perform this in another shell)
+  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
+  ```
+
+  And to create a duplicate, reverse the process:
+
+  ```sh
+  # make sure the /dev/diskN is unmounted either via:
+  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
+  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
+  ```
 
 ## Config Details
 
@@ -236,7 +260,7 @@ a few examples:
         * `Advanced`
             * Consider raising GPU memory to 256MB
 * update and cleanup (recover diskspace)
-    ```
+    ```sh
     sudo apt-get update
     sudo apt-get upgrade
     sudo apt-get install
@@ -244,9 +268,34 @@ a few examples:
     sudo apt-get clean
     sudo apt-get autoremove
     ```
-* consider updating firmware (this may be prohibited by file permissions)
 
 See also: https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027798-the-raspberry-pi-frc-console
+
+### rename/renumber your raspi
+
+You can establish DHCP addressing with a static IP fallback via the
+[frcvision dashboard](http://frcvision.local).
+
+To change your raspi name, you must log-in manually.  Note that using
+the raspi-config tool is __insufficient__ for this task due to frc
+conventions.
+
+```sh
+# first the usual step
+sudo hostnamectl set-hostname drivecamfront
+
+# next, the frc fixup:
+# sudo edit /etc/hosts with nano or vi to look like this:
+
+27.0.0.1       localhost
+::1            localhost ip6-localhost ip6-loopback
+ff02::1        ip6-allnodes
+ff02::2        ip6-allrouters
+
+127.0.1.1      drivecamfront
+
+# after editing this file, reboot the machine and potentially the router
+```
 
 ### install python extensions
 
@@ -256,7 +305,11 @@ sudo python3 -m pip install picamera
 
 ### validate camera
 
-* `raspistill -p "0,0,640,480"`. This will only work if you remove the picamera
+* `vcgencmd get_camera` should report this:
+    ```sh
+    supported=1 detected=1
+    ```
+* `raspistill -v -o test.jpg`. This will only work if you remove the picamera
   from the Connected Camera list on the Vision Settings tab. See
   [troubleshooting](#troubleshooting) if you have problems.
 * (deprecated) to use picam as opencv videostream (ie: without picamera module):
@@ -279,12 +332,13 @@ and offers a number of controls not usually present in a webcam.
 A raspi has two CSI connection points, but can apparently support
 only a single picam connected at the point nearest the HDMI.
 
-* follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation). You can ignore
-instructions regarding TC358743, but make sure that you install these:
+* follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation).
+You can ignore instructions regarding TC358743, but make sure that you
+install these:
 
-    ```
-    sudo apt-get install uv4l uv4l-raspicam uv4l-server uv4l-webrtc
-    ```
+```sh
+sudo apt-get install uv4l uv4l-raspicam uv4l-server uv4l-webrtc
+```
 
 Here are the packages required (note raspidisp not required). You
 can discover packages installed on the raspi via: `dpkg -l | grep uv4l`.
@@ -312,7 +366,7 @@ This makes it less prone to startup conflicts with frcvision's services.
 
 * edit `/etc/uv4l/uv4l-raspicam.conf`
 
-```
+``` bash
 # -------------------
 # there are a variety of raspicam driver settings
 driver = raspicam
@@ -340,9 +394,8 @@ server-option = --webrtc-receive-audio=no
 server-option = --webrtc-hw-vcodec-maxbitrate=3000
 ```
 
-
-
 ### pull git repository
+
 * `mkdir -p src/spartronics`
 * `cd src/spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
