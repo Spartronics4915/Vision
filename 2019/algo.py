@@ -14,6 +14,7 @@ import numpy as np
 import cv2
 import poseEstimation
 import pnpSorting
+import time
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
@@ -136,6 +137,7 @@ def fakePNP(frame, display, debug):
 
 def realPNP(frame, display, debug):
     # nb: caller is responsible for threading (see runPiCam.py)
+    startAlgo = time.time()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
     if display:
@@ -208,8 +210,13 @@ def realPNP(frame, display, debug):
         orderedPoints = pnpSorting.sortPoints(rleftPts,rrightPts)
         print("Passing an orderedPoints of: " + str(orderedPoints))
 
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints, 0)
+        # TODO: change hardcoded focalLength
+        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,focalLen=306.3829787, 0)
+
+        endAlgo = time.time()
+        deltaTime = startAlgo - endAlgo
         
+        print("A succcessful run of pnp algo took(sec): " + str(deltaTime))        
         return (dx,dy,theta), visImg
 
     else:
