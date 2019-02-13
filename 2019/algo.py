@@ -210,7 +210,8 @@ def realPNP(frame, display, debug):
         orderedPoints = pnpSorting.sortPoints(rleftPts,rrightPts)
         print("Passing an orderedPoints of: " + str(orderedPoints))
 
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints, 0)
+        # TODO: change hardcoded focalLength
+        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,focalLen=306.3829787, 0)
 
         endAlgo = time.time()
         deltaTime = startAlgo - endAlgo
