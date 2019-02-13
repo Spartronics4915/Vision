@@ -1,15 +1,21 @@
 #!/usr/bin/python3
 # Deriving camera characteristics based on chessboard identification
 # nb: 
-#       Currently the only values from this script that are being implemented is the principal point, which (according to callibrateCamera()) is not at the center of the screen
+#       Currently the only values from this script that are being implemented is the principal point, which (according to cv2.calibrateCamera()) is not at the center of the screen
 #       Focal length is calculated according to some math found online
 # Focal length:
+
+# https://raspberrypi.stackexchange.com/questions/81964/calculating-focal-length-of-raspberry-pi-camera
 # Focal math (using ‘swnsor width’ and ‘focal length’ in spec sheet)
+# 
 #       Focal_width_px =  (camera_focal_length / camera_sensor_size) * window size
-#       TODO: Implement this to change based on camera frame, instead of hardcoding it
 # 
 #       Focal_width_px  = ( 3.6 / 3.76) * 320
 #       = 306.3829787
+#
+# When plugging in the calculated value for fx and fy, the distance estimation was much, much closer than
+# when using the fx and fy returned by cv2.calibrateCamera, however currently the principal point given by
+# calibrateCamera() is still in effect.
 
 import numpy as np
 import cv2
