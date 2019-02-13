@@ -62,6 +62,16 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 #
 # return: None if we fail or (dx,dy,dtheta) required to move a robot at
 # the origin # to the target.
+
+
+# Camera Callibration results
+# fx = 441.201212
+# fy = 428.9449
+
+# Principal point calculation
+# SEE: cameraCallibrate.py
+princPoint = (96.05094069, 108.39858878)
+
 def estimatePose(im, imgPts, focalLen=None, display=False):
     ret = None
     size = im.shape
@@ -70,8 +80,8 @@ def estimatePose(im, imgPts, focalLen=None, display=False):
         focalLen = size[1]
     center = (size[1]/2, size[0]/2)
     camMat = np.array(
-                    [[focalLen, 0, center[0]],
-                    [0, focalLen, center[1]],
+                    [[focalLen, 0, princPoint[0]],
+                    [0, focalLen, princPoint[1]],
                     [0, 0, 1]], dtype = "double"
                     )
     logging.debug("Camera Matrix :\n {0}".format(camMat))
