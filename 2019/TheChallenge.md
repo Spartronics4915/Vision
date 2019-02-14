@@ -24,9 +24,16 @@
 ### A fast video feed for drivers
 
 - _how many?_
+ 1 camera that can be rotated, with a wide field of view.
 - _what is fast?_
+ A low latency stream (under 150ms lag), with a decent framerate (likely 30fps)
 - _required software + hardware_
+ Rotation on button press for the servo mounting the camera, changing which way the feed is displaying (vflip)
+ Hardware is required for mouting, a moter routed to the top of the robot, where you can rotate to see both the intake and the output. 
 - _where to mount for optimum driver experience?_
+ Previously mentioned. 
+
+NOTE: We have encounted issues with getting a display while running Mozilla Firefox as the browser hosting the driver dashboard. Chrome seems to work reliably.
 
 ### Vision analysis for automatic driver assist
 
