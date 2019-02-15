@@ -154,7 +154,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             (0.0, 0.0, 0.0), # origin
             (1.0, 0.0, 0.0), # point "into" wall from pov of robot
             (0.0, 0.0, 1.0)  # point up
-        ]
+        ])
         (rotmat,_) = cv2.Rodriques(rotVec) # produces 3x3 rotation matrix
         camPts = []
         xlateVec = xlateVec.reshape(3,) # so we can add to rotpt below
