@@ -128,7 +128,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
                                         flags=cv2.SOLVEPNP_ITERATIVE)
     if not success:
         logging.warning("solvePnP fail")
-        return (0,0,0,0)
+        return (0,0,0)
     else:
         # here's the shapes and sizes of matrices for reference
         # Camera Matrix :
@@ -147,6 +147,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         # [[ -113.84452688]
         #  [ -297.88517426]
         #  [-1340.13762528]]
+        #logging.debug("Rotation Vector:\n {0}".format(rotVec))
+        #logging.debug("Translation Vector:\n {0}".format(xlateVec))
 
         # First transform target world points to camera coordinates.
         # In opencv x is to the right, y is down and z is fwd.
@@ -181,11 +183,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         perpVec = robotPts[1] - robotPts[0] # origin to perp point vector
         perpVec[2] = 0 # don't care about height
         perpUnit = perpVec / np.linalg.norm(perpVec, 2, -1)
-        theta = math.acos(perpUnit.dot([1.,0.,0.])) # dot of 2 unit-vectors is cos of angle
-        ret = (robotPts[0], theta)
-
-        #logging.debug("Rotation Vector:\n {0}".format(rotVec))
-        #logging.debug("Translation Vector:\n {0}".format(xlateVec))
+        # dot of 2 unit-vectors is cos of angle
+        theta = math.acos(perpUnit.dot([1.,0.,0.])) 
 
         if display:
             # draw red circles around our target (image) points
@@ -202,4 +201,4 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cv2.circle(im, org, 3, (255,0,0), -1)
             cv2.line(im, org, perp, (255,0,0), 2) # blue line
 
-        return ret
+        return (robotPts[0][0], robotPts[0][1], theta)
