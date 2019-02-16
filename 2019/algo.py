@@ -211,7 +211,10 @@ def realPNP(frame, display, debug):
         print("Passing an orderedPoints of: " + str(orderedPoints))
 
         # TODO: change hardcoded focalLength
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,focalLen=306.3829787, 0)
+        # focalLen was 306.3829787
+        # now estimatePose accepts optional camera matrix
+        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,
+                                            camerMatrix=None, display=False)
 
         endAlgo = time.time()
         deltaTime = startAlgo - endAlgo
