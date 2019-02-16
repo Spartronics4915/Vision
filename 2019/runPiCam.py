@@ -154,11 +154,11 @@ class PiVideoStream:
             logging.info("Target value is: " + value)
 
         if self.commChan:
-            if (target == None):
+            if (value == None):
                 self.commChan.updateVisionState("Searching")
             else:
                 self.commChan.updateVisionState("Acquired")
-                if self.target.setValue(target):
+                if self.target.setValue(value):
                     # Can a NoneType be sent as a valid target?
                     self.commChan.SendTarget(self.target)
 
