@@ -111,9 +111,9 @@ def realPNP(frame, display, debug):
         # Avoid a NoneType error
         visImg = frame
         
-    logger.debug("All valid rectangles are: " + str(sizedRects))   
+    logging.debug("All valid rectangles are: " + str(rects))   
 
-    success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects,debug=1)
 
     if success == False:
         # Logger debugs happened in pairRectangles
@@ -148,10 +148,7 @@ def realPNP(frame, display, debug):
         dx = target[0]
         dy = target[1]
         theta = target[2]
-        endAlgo = time.time()
-        deltaTime = startAlgo - endAlgo
-        
-        print("A succcessful run of pnp algo took(sec): "+str(deltaTime))
+
         print("Returning a target is: " + str(target))
         return target,frame
     else:
