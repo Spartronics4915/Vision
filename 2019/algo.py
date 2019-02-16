@@ -95,7 +95,7 @@ def rectAlgo(frame,display=1,debug=0):
         # combine original image with mask, for visualization
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = None
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
 
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
@@ -134,7 +134,7 @@ def realPNP(frame, display, debug):
         # combine original image with mask, for visualization
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = None
+        visImg = frame
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
                     cv2.RETR_EXTERNAL,          # external contours only
