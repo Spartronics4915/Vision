@@ -97,7 +97,7 @@ def rectAlgo(frame,display=1,debug=0):
         # combine original image with mask, for visualization
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = None
+        visImg = frame
 
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
@@ -140,7 +140,7 @@ def realPNP(frame, display, debug):
         # combine original image with mask, for visualization
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = None
+        visImg = frame
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
                     cv2.RETR_EXTERNAL,          # external contours only
@@ -200,7 +200,7 @@ def realPNP(frame, display, debug):
         # TODO: change hardcoded focalLength
         # focalLen was 306.3829787
         # now estimatePose accepts optional camera matrix
-        value,frame = poseEstimation.estimatePose(visImg, orderedPoints,
+        target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
                                             cameraMatrix=None, display=False)
 
         dx = target[0]
@@ -210,7 +210,8 @@ def realPNP(frame, display, debug):
         deltaTime = startAlgo - endAlgo
         
         print("A succcessful run of pnp algo took(sec): "+str(deltaTime))
-        return value,frame
+        print("Returning a target is: " + str(target))
+        return target,frame
     else:
         print("couldn't find two rects")
         return None,frame
