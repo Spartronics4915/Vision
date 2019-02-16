@@ -124,6 +124,7 @@ class CamHandler(BaseHTTPRequestHandler):
 
 def main():
   global s_args
+  global s_comm
   try:
     parser = argparse.ArgumentParser(description="Start the picam streamer")
     parser.add_argument("--robot", dest="robot",
