@@ -118,7 +118,7 @@ class CaptureThread(threading.Thread):
         self.picam.stop()
         print("Capture thread terminated")
 
-    def cleanup():
+    def cleanup(self):
         self.running = False
         if self.procThreads:
             for proc in self.procThreads:

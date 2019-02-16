@@ -142,11 +142,15 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        value, frame = algo.processFrame(image, algo=self.args.algo, 
+        if image == None:
+            logging.warning("runPicCam::processFrame received empty image")
+            return
+
+        value, _ = algo.processFrame(image, algo=self.args.algo, 
                                         display=self.args.display,
                                         debug=self.args.debug)
         if (self.args.debug):
-            logging.info("Target value is: ", value)
+            logging.info("Target value is: " + value)
 
         if self.commChan:
             if (value == None):
