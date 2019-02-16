@@ -39,10 +39,10 @@ range1 = np.array([90,255,255])
 #   as possible, thus the high range.
 
 def emptyAlgo(frame):
-    return (0,frame)
+    return (None,frame)
 
 def hsvAlgo(frame):
-    return (0,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+    return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
 TARGETCENTER = (200,200)
 
@@ -59,6 +59,7 @@ def checkCenter(point,currentCenter):
         return True
     else:
         return False
+
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
         return defaultAlgo(frame, display, debug)
@@ -68,8 +69,6 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return emptyAlgo(frame)
     elif algo == "mask":
         return maskAlgo(frame)
-    elif algo == "fakePNP":
-        return fakePNP(frame,display,debug)
     elif algo == "realPNP":
         return realPNP(frame,display,debug)
     elif algo == "hsv":
@@ -81,7 +80,7 @@ def processFrame(frame, algo=None, display=0,debug=0):
 def maskAlgo(frame):
     # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))       # Our HSV filtering
-    return 0, mask
+    return None,mask
 
 def rectAlgo(frame,display=1,debug=0):
     # TODO: Implement some form of threading / process optimisation
@@ -110,11 +109,11 @@ def rectAlgo(frame,display=1,debug=0):
         box = cv2.boxPoints(rect)  # Turning the rect into 4 points to draw
         box = np.int0(box)
 
-        print(type(box.astype(np.uint8)[0][0]))
+        # print(type(box.astype(np.uint8)[0][0]))
         if display:
             cv2.drawContours(visImg, [box], 0,(0,0,255),2)
 
-    return (0, visImg)
+    return (None, visImg)
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
@@ -125,15 +124,6 @@ def getCorrectedAngle(sz, angle):
         return angle + 180
     else:
         return angle + 90
-
-def fakePNP(frame, display, debug):
-    # here we pass in plausible points to the pose estimator 
-    imgPts = [
-        [50, 90], [60, 100], [58, 200],
-        [180, 110], [195, 100], [200, 195] ]
-    imgPtsNP = np.array(imgPts, dtype="double")
-    dx,dy,theta = poseEstimation.estimatePose(frame, imgPtsNP, 0)
-    return dx,dy,theta
 
 def realPNP(frame, display, debug):
     # nb: caller is responsible for threading (see runPiCam.py)
@@ -213,18 +203,17 @@ def realPNP(frame, display, debug):
         # TODO: change hardcoded focalLength
         # focalLen was 306.3829787
         # now estimatePose accepts optional camera matrix
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,
-                                            camerMatrix=None, display=False)
+        value,frame = poseEstimation.estimatePose(visImg, orderedPoints,
+                                            cameraMatrix=None, display=False)
 
         endAlgo = time.time()
         deltaTime = startAlgo - endAlgo
         
-        print("A succcessful run of pnp algo took(sec): " + str(deltaTime))        
-        return (dx,dy,theta), visImg
-
+        print("A succcessful run of pnp algo took(sec): "+str(deltaTime))
+        return value,frame
     else:
         print("couldn't find two rects")
-        return None, visImg
+        return None,frame
 
 
 # ax = ax - 160           # center o' the screen being 0(-160-160)

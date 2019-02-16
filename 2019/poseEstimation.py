@@ -128,7 +128,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
                                         flags=cv2.SOLVEPNP_ITERATIVE)
     if not success:
         logging.warning("solvePnP fail")
-        return (0,0,0)
+        return None
     else:
         # here's the shapes and sizes of matrices for reference
         # Camera Matrix :
