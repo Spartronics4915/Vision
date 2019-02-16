@@ -182,10 +182,13 @@ def realPNP(frame, display, debug):
 
     success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
     print("All valid rectangles are: " + str(sizedRects))   
+
     if success == False:
         # Logger debugs happened in pairRectangles
         return None, visImg
+
     elif leftPair != None:
+        # XXX: No right pair support (yet)
         rleft = leftPair[0]
         rright = leftPair[1]
         
@@ -223,43 +226,4 @@ def realPNP(frame, display, debug):
         print("couldn't find two rects")
         return None, visImg
 
-
-# ax = ax - 160           # center o' the screen being 0(-160-160)
-# dx = ax * 0.1375        # See: LearningVision.md (-22-22)
-
-'''
-if boxArea > 1500:
-
-
-            if display:  # No need to do this math and computation if we
-                         # are not running in dispay mode
-                cv2.drawContours(visImg, [box], 0,(0,0,255),2)
-
-
-            if debug:   # This is helpful because I can glance at my computer,
-                        # and see if it found a target or not.
-                print("center is currently: %d, %d" %
-                        (int(boxCenter[0]), int(boxCenter[1])))
-
-            if boxArea > largeTargetA:
-                largeTarget = box           # Set of poitns
-                largeTargetA = boxArea     # Area of the box
-                largeTargetC = boxCenter   # Center of the box (sent)
-
-    ### DX math ###
-    ax = largeTargetC[0]    # X value(0-320)
-    ax = ax - 160           # center o' the screen being 0(-160-160)
-    dx = ax * 0.1375        # See: LearningVision.md (-22-22)
-'''
-
-'''
-        box_index = 0
-        for point in box:
-            foo = []
-            foo.append(point[0])
-            foo.append(point[1])
-            bar = (foo[0],foo[1])
-            cv2.putText(visImg,str(box_index),bar,cv2.FONT_HERSHEY_SIMPLEX,2,255)
-            box_index += 1
-        '''
 
