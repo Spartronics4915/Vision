@@ -142,25 +142,16 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-<<<<<<< HEAD
-        # Target is of the form (dx,dy,theta)
-        target, frame = algo.processFrame(image, algo=self.args.algo, 
-=======
         if image == None:
             logging.warning("runPicCam::processFrame received empty image")
             return
 
         value, _ = algo.processFrame(image, algo=self.args.algo, 
->>>>>>> d67d9ae203434e370e40001936d9c8f6f51346c7
                                         display=self.args.display,
                                         debug=self.args.debug)
 
         if (self.args.debug):
-<<<<<<< HEAD
-            logging.info("Target value is: ", target)
-=======
             logging.info("Target value is: " + value)
->>>>>>> d67d9ae203434e370e40001936d9c8f6f51346c7
 
         if self.commChan:
             if (target == None):

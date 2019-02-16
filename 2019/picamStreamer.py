@@ -12,7 +12,12 @@ import algo
 import os
 import sys
 import cv2
+import logging
+import argparse
+import comm
 
+s_args=None
+s_comm=None
 s_first=True
 s_jpgQuality = 80 # used by direct streaming, quality differs from opencv
 s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 50] # used by opencv
@@ -90,9 +95,16 @@ class CamHandler(BaseHTTPRequestHandler):
         while True:
             camframe = cam.next()
             try:
-                dx, frame = algo.processFrame(camframe, algoselector,
+                value,frame = algo.processFrame(camframe, algoselector,
                                             display=True, debug=False)
-                rc, jpg = cv2.imencode('.jpg', frame, s_jpgParam)
+                if s_comm != None:
+                    if value != None:
+                        s_comm.updateVisionStatus("Acquired")
+                        s_comm.setTarget(value)
+                    else:
+                        s_comm.updateVisionStatus("Searching")
+                    
+                rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
                 if not rc:
                     continue
                 if s_first:
@@ -111,7 +123,18 @@ class CamHandler(BaseHTTPRequestHandler):
 
 
 def main():
+  global s_args
   try:
+    parser.add_argument("--robot", dest="robot",
+                        help="robot (none, localhost, roborio) [none]",
+                        default="none")
+    s_args = parser.parse_args()
+    if s_args.robot != "none":
+        if s_args.robot == "roborio":
+            ip = "10.49.15.2"
+        else:
+            ip = s_args.robot
+        s_comm = comm.Comm(ip)
     server = HTTPServer(('',5080),CamHandler)
     print ("server started")
     server.serve_forever()

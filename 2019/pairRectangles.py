@@ -38,7 +38,6 @@ def pairRectangles(rectArray,debug=0):
     One-Rect Case 
     >>> pairRectangles([((279.47998046875, 259.8599853515625), (38.325191497802734, 73.11483764648438), -8.130102157592773)])
     (False, [], [])
-
     """
 
     # nb:
