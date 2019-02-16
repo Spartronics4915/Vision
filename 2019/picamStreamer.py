@@ -99,10 +99,10 @@ class CamHandler(BaseHTTPRequestHandler):
                                             display=True, debug=False)
                 if s_comm != None:
                     if value != None:
-                        s_comm.updateVisionStatus("Acquired")
-                        s_comm.setTarget(value)
+                        s_comm.updateVisionState("Acquired")
+                        s_comm.UpdateTarget(value)
                     else:
-                        s_comm.updateVisionStatus("Searching")
+                        s_comm.updateVisionState("Searching")
                     
                 rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
                 if not rc:
