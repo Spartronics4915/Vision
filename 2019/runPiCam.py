@@ -43,7 +43,7 @@ class PiVideoStream:
                 logging.debug("Connecting to robot at 10.49.15.2...")
                 ip = "10.49.15.2"
             else:
-                ip = "localhost"
+                ip = self.args.robot
             logging.info("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
