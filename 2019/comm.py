@@ -134,7 +134,7 @@ class Comm:
         self.fpsHistory.append(fps)
         self.fpsHistory = self.fpsHistory[-15*4:]
         if time.time() - self.lastUpdate > 5:
-            self.targetState.SetFPS(sum(self.fpsHistory)/len(self.fpsHistory))
+            self.target.SetFPS(sum(self.fpsHistory)/len(self.fpsHistory))
             self.lastUpdate = time.time()
 
     def controlEvent(self, key, value, isNew):
