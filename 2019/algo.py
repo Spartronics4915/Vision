@@ -174,41 +174,21 @@ def realPNP(frame, display, debug):
     rright = None
     sizedRects = []
 
-    centerR = (0,0)
-    centerL = (0,0)
     for r in rects:
         sz = r[1]
         area = sz[0] * sz[1]
-        if area > 200:  # XXX: is this a good size contraint?
+        if area > 200:
             sizedRects.append(r)
-            center = r[0]
-            angle = getCorrectedAngle(sz, r[2])
-            # Sorting by center
-            # For every left rectangle
-            if angle <= 90:
-                if checkCenter(center,centerR):
-                    rleft = r
-                    centerR = center
-                # if not rleft: # currently we do first-one-wins, (XXX: improve)
-                #     rleft = r
-            else:
-                if checkCenter(center,centerL):
-                    rright = r
-                    centerL = center
-                # if not rright: # currently we do first-one-wins, (XXX: improve)
-                #     rright = r
-    #for r in rects:
-    #    sz = r[1]
-    #    area = sz[0] * sz[1]
-    #    if area > 200:
-    #        sizedRects.append(r)
 
-    # success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
+    success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
     print("All valid rectangles are: " + str(sizedRects))   
-    #if success == False:
-        # Print already happened in pairRectangles
-        #return None, visImg
-
+    if success == False:
+        # Logger debugs happened in pairRectangles
+        return None, visImg
+    elif leftPair != None:
+        rleft = leftPair[0]
+        rright = leftPair[1]
+        
     # TODO: Remove this if statment
     if rleft != None and rright != None:
 

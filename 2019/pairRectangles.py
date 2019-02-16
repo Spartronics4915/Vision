@@ -5,7 +5,13 @@
 # Helpful link explaining how cv2 generates angles:
 # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
 
-
+# Philosophy:
+# How should bad cases be handled?
+#   I.E : When we don't get enough rects to generate a pair ; there isn't enough for a pair
+# Current solutions
+#     Ideal case (Input in the order of L, then R)
+#    >>> pairRectangles([((20,5),(10,5),-89),((40,5),(10,5), -21)])
+#    ([((40, 5), (10, 5), -15), ((20, 5), (10, 5), 15)], [])
 def pairRectangles(rectArray,debug=0):   
     """
     Given an input of rectangles, classify them into pairs and return the pairs
@@ -16,8 +22,10 @@ def pairRectangles(rectArray,debug=0):
     :rtype: two tuples
     -----
     Doctest
-    >>> pairRectangles([((20,5),(10,5),15),((40,5),(10,5), -15)])
-    ([((40, 5), (10, 5), -15), ((20, 5), (10, 5), 15)], [])
+
+    Case B
+    >>> pairRectangles([((544.0203857421875, 256.99468994140625), (29.743717193603516, 83.71994018554688), -14.620874404907227),((376.6615295410156, 250.90771484375), (81.04014587402344, 30.872438430786133), -74.74488067626953),((221.1119842529297, 246.6160125732422), (30.231643676757812, 80.67733764648438), -10.304845809936523),((61.249996185302734, 241.25003051757812), (81.27052307128906, 28.460494995117188), -71.56504821777344)])
+
     """
     # nb:
     # Currently the two-list 'lambda' method is implemented 
@@ -36,6 +44,82 @@ def pairRectangles(rectArray,debug=0):
     # Creating right-facing rectangles
     rightRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) > 90,rectArray))
 
+    # Check for size of xsorted rects
+    if len(xSortedRects) < 2:
+        logging.debug("Not enough rects to generate a pair")    
+        return False,pair1,pair2
+
+    # Doing this by index allows us to access the next rect in the list
+    for i in range(len(xSortedRects)):
+        # check for end of list
+        # This will ensure we don't get a list index error
+        if i == len(xSortedRects) - 1:
+            break
+        # If left rectangle
+        if getCorrectedAngle(xSortedRects[i][1],xSortedRects[i][2]) <= 90:
+            # If the next rectangle is right
+            logging.debug("Found a left rectangle at index " + str(i))
+            logging.debug("The rectangle at that index has an angle of: " + str(getCorrectedAngle(xSortedRects[i][0],xSortedRects[i][2])))
+            logging.debug("The following rectangle has an angle of: " + str(getCorrectedAngle(xSortedRects[i+1][0],xSortedRects[i+1][2])))
+
+            if getCorrectedAngle(xSortedRects[i+1][1],xSortedRects[i+1][2]) > 90:
+                logging.debug("Found a valid rectangle pair at index: " + str(i) + "\n")
+                pair1.append(xSortedRects[i])
+                pair1.append(xSortedRects[i+1])
+            # Slap down a debug message
+            else:
+                logging.debug("The rect following the left rect at index " + str(i) + " is not a right rect")
+        # If right rectangle
+        else:
+            # XXX: Do something?
+            
+            continue
+
+    # Check the validity of pair1 and pair2
+    if not pair1:
+        # We know pair2 is going to be blank
+        return False,pair1,pair2
+    elif pair1 != None:
+        # XXX: True may be returned even if pair2 is an empty array
+        return True,pair1,pair2
+    
+
+# XXX: Should be a cleaner way of sharing this across files
+def getCorrectedAngle(sz, angle):
+    """
+    Corrects an angle returned by minAreaRect()
+ 
+    :param sz: Width x height of rectangle
+    :param angle: Angle of rectangle 
+    :type sz: Tuple of np.int0
+    :type angle: np.int0
+    :return: the corrected angle
+    :rtype: np.int0
+    -----
+    """
+    if sz[0] < sz[1]:
+        return angle + 180
+    else:
+        return angle + 90
+
+if __name__ == "__main__":
+    import doctest
+    import logging
+
+    # Debug logging
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+
+    logging.info("Began logger")
+
+    doctest.testmod()
+
+
+
+
+'''
+Majority of old logic
     # Iterating a over a range the size of the left rectangles
     # See: ASCI art
     # len() returns how many elements are in a list
@@ -75,33 +159,4 @@ def pairRectangles(rectArray,debug=0):
         return False,None,None
     else:
         return True,pair1,pair2
-
-# XXX: Should be a cleaner way of sharing this across files
-def getCorrectedAngle(sz, angle):
-    """
-    Corrects an angle returned by minAreaRect()
- 
-    :param sz: Width x height of rectangle
-    :param angle: Angle of rectangle 
-    :type sz: Tuple of np.int0
-    :type angle: np.int0
-    :return: the corrected angle
-    :rtype: np.int0
-    -----
-    """
-    if sz[0] < sz[1]:
-        return angle + 180
-    else:
-        return angle + 90
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-
-
-
-
-'''
-:raises ValueError: if the message_body exceeds 160 characters
-:raises TypeError: if the message_body is not a basestring
 '''

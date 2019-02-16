@@ -156,8 +156,8 @@ class PiVideoStream:
             else:
                 self.commChan.updateVisionState("Acquired")
                 if self.target.setValue(target):
+                    # Can a NoneType be sent as a valid target?
                     self.commChan.SendTarget(self.target)
-
 
         else:
             print("Target value is: {}".format(value))
