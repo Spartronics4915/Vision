@@ -19,15 +19,18 @@ def pairRectangles(rectArray,debug=0):
     >>> pairRectangles([((20,5),(10,5),15),((40,5),(10,5), -15)])
     ([((40, 5), (10, 5), -15), ((20, 5), (10, 5), 15)], [])
     """
+    # nb:
+    # Currently the two-list 'lambda' method is implemented 
+    # A one-list iteration L-R pattern method can be implemtned
+
     # For readability; define the two pairs
     # XXX: return pairs based on a property? (size, best estimate?)
-    pair1 = []  
-    pair2 = []  
+    pair1 = []
+    pair2 = []
 
     # Sorted() defaults to low-high
     # Sorting the rectangles by X
     xSortedRects = sorted(rectArray,key=lambda r:r[0][0])
-    
     # Creating left-facing rectangles
     leftRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) <= 90,rectArray))
     # Creating right-facing rectangles
@@ -35,17 +38,29 @@ def pairRectangles(rectArray,debug=0):
 
     # Iterating a over a range the size of the left rectangles
     # See: ASCI art
+    # len() returns how many elements are in a list
+    if (len(leftRects) < 0) or (len(rightRects) < 0):
+        # XXX: Begin to transfer prints to logger
+        print("Not enough valid L and R rects")
+        return False,None,None
+
+
     for i in range(len(leftRects)):
+        print("Length of leftRects is: " + str(len(leftRects)))
+        print("Length of rightRects is: " + str(len(rightRects)))
+        print("Trying to access index: ",str(i))
         # If the next right rectangle is closer than the next left rectangle
- 
+        
         rightRectX = rightRects[i][0][0]
         leftRectX = leftRects[i][0][0]
+
         try:
             nextLeftRectX = leftRects[i+1][0][0]
         except:
             # XXX: Technical debt
             nextLeftRectX = -1000
 
+        # If the next right rect is closer than the next left rect
         if (rightRectX - leftRectX) < (leftRectX - nextLeftRectX):
             # If pair1 is empty
             if not pair1:
@@ -57,9 +72,9 @@ def pairRectangles(rectArray,debug=0):
 
     if not pair1:
         print("Could not find a valid pair")
-        return None,None
+        return False,None,None
     else:
-        return pair1,pair2
+        return True,pair1,pair2
 
 # XXX: Should be a cleaner way of sharing this across files
 def getCorrectedAngle(sz, angle):

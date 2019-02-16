@@ -15,6 +15,8 @@ import cv2
 import poseEstimation
 import pnpSorting
 import time
+import traceback
+import pairRectangles
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
@@ -137,6 +139,10 @@ def fakePNP(frame, display, debug):
 
 def realPNP(frame, display, debug):
     # nb: caller is responsible for threading (see runPiCam.py)
+    # Spew
+    if debug:
+        print("The frame type is: " + str(type(frame)))
+
     startAlgo = time.time()
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
@@ -157,10 +163,6 @@ def realPNP(frame, display, debug):
         rects.append(cv2.minAreaRect(cnt))
         # a rect is ((cx,cy), (sx,sy), degrees)
 
-    print("I see " + str(len(rects)) + " rects")
-    if len(rects) < 6:
-        print(" " + str(rects))
-    
     if display: # draw boxes in blue
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
@@ -170,12 +172,15 @@ def realPNP(frame, display, debug):
     # select two "opposing rects"
     rleft = None
     rright = None
+    sizedRects = []
+
     centerR = (0,0)
     centerL = (0,0)
     for r in rects:
         sz = r[1]
         area = sz[0] * sz[1]
         if area > 200:  # XXX: is this a good size contraint?
+            sizedRects.append(r)
             center = r[0]
             angle = getCorrectedAngle(sz, r[2])
             # Sorting by center
@@ -192,18 +197,27 @@ def realPNP(frame, display, debug):
                     centerL = center
                 # if not rright: # currently we do first-one-wins, (XXX: improve)
                 #     rright = r
+    #for r in rects:
+    #    sz = r[1]
+    #    area = sz[0] * sz[1]
+    #    if area > 200:
+    #        sizedRects.append(r)
 
+    # success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
+    print("All valid rectangles are: " + str(sizedRects))   
+    #if success == False:
+        # Print already happened in pairRectangles
+        #return None, visImg
+
+    # TODO: Remove this if statment
     if rleft != None and rright != None:
-        # orderedPoints = []  # build a list of 6 pairs (pts)
-        # boxPts = cv2.boxPoints(rleft) # an array of 4 pairs
-        # for i in range(0,3):
-        #     orderedPoints.append(boxPts[i])
-        # boxPts = cv2.boxPoints(rright) # an array of 4 pairs
-        # for i in range(0,3):
-        #     orderedPoints.append(boxPts[i])
+
+        # Creating lists of points
+        # Left points
         rleftPts = cv2.boxPoints(rleft)
-        rrightPts = cv2.boxPoints(rright)
         rleftPts = np.int0(rleftPts)
+        # Right points
+        rrightPts = cv2.boxPoints(rright)
         rrightPts = np.int0(rrightPts)
 
         print("sending a point list of: " + str(rleftPts))
@@ -213,9 +227,12 @@ def realPNP(frame, display, debug):
         # TODO: change hardcoded focalLength
         # focalLen was 306.3829787
         # now estimatePose accepts optional camera matrix
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,
-                                            camerMatrix=None, display=False)
+        target, viImg  = poseEstimation.estimatePose(visImg, orderedPoints,
+                                            cameraMatrix=None, display=False)
 
+        dx = target[0]
+        dy = target[1]
+        theta = target[2]
         endAlgo = time.time()
         deltaTime = startAlgo - endAlgo
         
