@@ -97,7 +97,7 @@ def rectAlgo(frame,display=1,debug=0):
         # combine original image with mask, for visualization
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = frame
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
 
     # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
     im2, contours, hierarchy = cv2.findContours(mask,
