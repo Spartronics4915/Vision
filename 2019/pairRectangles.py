@@ -52,10 +52,6 @@ def pairRectangles(rectArray,debug=0):
     # Sorted() defaults to low-high
     # Sorting the rectangles by X
     xSortedRects = sorted(rectArray,key=lambda r:r[0][0])
-    # Creating left-facing rectangles
-    leftRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) <= 90,rectArray))
-    # Creating right-facing rectangles
-    rightRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) > 90,rectArray))
 
     # Check for size of xsorted rects
     if len(xSortedRects) < 2:
@@ -104,46 +100,21 @@ def pairRectangles(rectArray,debug=0):
         logging.debug("Pair1: " + str(pair1))
         logging.debug("Pair2: " + str(pair2))
         return True,pair1,pair2
-    
 
-# XXX: Should be a cleaner way of sharing this across files
-def getCorrectedAngle(sz, angle):
-    """
-    Corrects an angle returned by minAreaRect()
- 
-    :param sz: Width x height of rectangle
-    :param angle: Angle of rectangle 
-    :type sz: Tuple of np.int0
-    :type angle: np.int0
-    :return: the corrected angle
-    :rtype: np.int0
-    -----
-    """
-    if sz[0] < sz[1]:
-        return angle + 180
-    else:
-        return angle + 90
+def pairRectanglesLambda(rectArray,debug=0):
+    # 2nd method of sorting, commited for record, not for use
+    xSortedRects = sorted(rectArray,key=lambda r:r[0][0])
 
-if __name__ == "__main__":
-    import doctest
-    import logging
+    # Creating left-facing rectangles
+    leftRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) <= 90,rectArray))
+    # Creating right-facing rectangles
+    rightRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) > 90,rectArray))
 
-    # Debug logging
-    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
-    dateFmt = "%H:%M"
-    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+    # Majority of old logic
 
-    logging.info("Began logger")
-
-    doctest.testmod()
-
-
-
-
-'''
-Majority of old logic
     # Iterating a over a range the size of the left rectangles
     # See: ASCI art
+
     # len() returns how many elements are in a list
     if (len(leftRects) < 0) or (len(rightRects) < 0):
         # XXX: Begin to transfer prints to logger
@@ -181,4 +152,34 @@ Majority of old logic
         return False,None,None
     else:
         return True,pair1,pair2
-'''
+
+# XXX: Should be a cleaner way of sharing this across files
+def getCorrectedAngle(sz, angle):
+    """
+    Corrects an angle returned by minAreaRect()
+ 
+    :param sz: Width x height of rectangle
+    :param angle: Angle of rectangle 
+    :type sz: Tuple of np.int0
+    :type angle: np.int0
+    :return: the corrected angle
+    :rtype: np.int0
+    -----
+    """
+    if sz[0] < sz[1]:
+        return angle + 180
+    else:
+        return angle + 90
+
+if __name__ == "__main__":
+    import doctest
+    import logging
+
+    # Debug logging
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+
+    logging.info("Began logger")
+
+    doctest.testmod()
