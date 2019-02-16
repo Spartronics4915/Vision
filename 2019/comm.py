@@ -51,7 +51,7 @@ class Target:
         val.append(self.clock)
         vstr = ",".join(str(x) for x in val)
         #print("send: " + vstr)
-        targetTable.putString("target", vstr)
+        targetTable.putString("solvePNP", vstr)
 
 theComm = None
 
@@ -90,7 +90,7 @@ class Comm:
             # current thinking is that this should not be a subtable of
             # SmartDashboard, since traffic is multiplied by the number
             # of clients.
-            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision")
+            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision/Reverse")
             self.controlTable = NetworkTables.getTable("VisionControl")
 
             self.control = Control()
