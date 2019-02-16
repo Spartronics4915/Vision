@@ -101,10 +101,10 @@ class PiVideoStream:
         logging.debug(self.args)
 
     def Run(self):
-        self.go();
+        self.go()
 
     def go(self):
-        if self.args.threads == 0:
+        if self.args.threads <= 1:
             self.processVideo()
         else:
             try:
@@ -142,10 +142,6 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        if image == None:
-            logging.warning("runPicCam::processFrame received empty image")
-            return
-
         value, _ = algo.processFrame(image, algo=self.args.algo, 
                                         display=self.args.display,
                                         debug=self.args.debug)
