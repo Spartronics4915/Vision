@@ -16,7 +16,7 @@ import poseEstimation
 import pnpSorting
 import time
 import traceback
-import pairRectangles
+import rectUtil
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
@@ -46,22 +46,6 @@ def emptyAlgo(frame):
 def hsvAlgo(frame):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
-TARGETCENTER = (200,200)
-
-def checkCenter(point,currentCenter):
-    # XXX: Improve varible names
-    deltaPoint = (point[0]-TARGETCENTER[0],point[1]-TARGETCENTER[1])
-    currentDelta = (currentCenter[0]-TARGETCENTER[0],currentCenter[1]-TARGETCENTER[1])
-
-    # Distance formula
-    currentDeltaDist = (currentDelta[0]**2 + currentDelta[1]**2)**.5
-    checkDeltaDist = (deltaPoint[0]**2 + deltaPoint[1]**2)**.5
-
-    if checkDeltaDist < currentDeltaDist:
-        return True
-    else:
-        return False
-
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
         return defaultAlgo(frame, display, debug)
@@ -80,8 +64,8 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return emptyAlgo(frame)
 
 def maskAlgo(frame):
-    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
-    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))       # Our HSV filtering
+    # Show what is shown by the opencv HSV values
+    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))      
     return None,mask
 
 def rectAlgo(frame,display=1,debug=0):
@@ -93,85 +77,43 @@ def rectAlgo(frame,display=1,debug=0):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
 
+    rects = rectUtil.findRects(frame,200,display,debug)
+
     if display:
         # combine original image with mask, for visualization
+        cv2.drawContours(visImg, [box], 0,(0,0,255),2)
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
     else:
-        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
-
-    # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
-    im2, contours, hierarchy = cv2.findContours(mask,
-                    cv2.RETR_EXTERNAL,          # external contours only
-                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
-                                                # Less CPU intensive
-                        )
-    for cnt in contours:
-        rect = cv2.minAreaRect(cnt) # Search for rectangles in the countour
-
-        box = cv2.boxPoints(rect)  # Turning the rect into 4 points to draw
-        box = np.int0(box)
-
-        # print(type(box.astype(np.uint8)[0][0]))
-        if display:
-            cv2.drawContours(visImg, [box], 0,(0,0,255),2)
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs        
 
     return (None, visImg)
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
 
-# cribbed from team492
-def getCorrectedAngle(sz, angle):
-    if sz[0] < sz[1]:
-        return angle + 180
-    else:
-        return angle + 90
-
 def realPNP(frame, display, debug):
+    # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
     # Spew
     if debug:
         print("The frame type is: " + str(type(frame)))
 
-    startAlgo = time.time()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
-    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+    rects = rectUtil.findRects(frame,200,display,debug)
+
     if display:
         # combine original image with mask, for visualization
-        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
-    else:
-        visImg = frame
-    # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
-    im2, contours, hierarchy = cv2.findContours(mask,
-                    cv2.RETR_EXTERNAL,          # external contours only
-                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
-                                                # Less CPU intensive
-                        )
-    # first convert contours to rects
-    rects = []
-    for cnt in contours:
-        rects.append(cv2.minAreaRect(cnt))
-        # a rect is ((cx,cy), (sx,sy), degrees)
-
-    if display: # draw boxes in blue
+        visImg = cv2.bitwise_and(frame, frame, mask=mask) 
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             ipts = [np.int32(pts)]
             cv2.polylines(visImg, ipts, True, (255,0,0))
-
-    # select two "opposing rects"
-    rleft = None
-    rright = None
-    sizedRects = []
-
-    for r in rects:
-        sz = r[1]
-        area = sz[0] * sz[1]
-        if area > 200:
-            sizedRects.append(r)
+    else:
+        # Avoid a NoneType error
+        visImg = frame
+        
+    logger.debug("All valid rectangles are: " + str(sizedRects))   
 
     success,leftPair,rightPair = pairRectangles.pairRectangles(sizedRects,debug=1)
-    print("All valid rectangles are: " + str(sizedRects))   
 
     if success == False:
         # Logger debugs happened in pairRectangles

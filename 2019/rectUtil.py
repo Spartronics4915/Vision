@@ -4,7 +4,8 @@
 # XXX: Returns a maximum of 2 pairs.
 # Helpful link explaining how cv2 generates angles:
 # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
-
+import numpy as np
+import cv2
 # Philosophy:
 # How should bad cases be handled?
 #   I.E : When we don't get enough rects to generate a pair ; there isn't enough for a pair
@@ -12,6 +13,69 @@
 #     Ideal case (Input in the order of L, then R)
 #    >>> pairRectangles([((20,5),(10,5),-89),((40,5),(10,5), -21)])
 #    ([((40, 5), (10, 5), -15), ((20, 5), (10, 5), 15)], [])
+
+# Rects are returned in the form:
+#  ((cx,cy), (sx,sy), degrees)
+
+
+# XXX: In a perfect world, this should only be across one file
+range0 = np.array([30,150,170])
+range1 = np.array([90,255,255])
+
+def findRects(frame,minsize,display=0,debug=0):
+    """
+    Derive a list of rects from a frame
+ 
+    :param frame: image to scan for rectangles
+    :type frame: opencv frame (np.ndarray())
+
+    :param minsize: minimum size of the rectangles (Used for filtering)
+    :type minsize: int
+
+    :param display: Chose weather or not to draw rects on frame
+    :type display: bool
+
+    :param debug: logger.debug() prints 
+    :type debug: bool
+
+    :return: rectangles detected in the frame
+    :rtype: array
+    """
+    rects = []
+    sizedRects = []
+
+    # OpenCV Values
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
+    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+
+    if display:
+        # combine original image with mask, for visualization
+        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
+    else:
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
+
+    # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
+    im2, contours, hierarchy = cv2.findContours(mask,
+                    cv2.RETR_EXTERNAL,          # external contours only
+                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
+                                                # Less CPU intensive
+                        )
+    for cnt in contours:
+        rect = cv2.minAreaRect(cnt) # Search for rectangles in the countour
+
+        box = cv2.boxPoints(rect)  # Turning the rect into 4 points to draw
+        box = np.int0(box)
+
+        rects.append(rect)
+
+    for r in rects:
+        sz = r[1]
+        area = sz[0] * sz[1]
+        if area > 200:
+            sizedRects.append(r)
+
+    return sizedRects
+
 def pairRectangles(rectArray,debug=0):   
     """
     Given an input of rectangles, classify them into pairs and return the pairs
@@ -183,3 +247,18 @@ if __name__ == "__main__":
     logging.info("Began logger")
 
     doctest.testmod()
+
+def checkCenter(point,currentCenter):
+    # Depricated from old algo.py logic
+    # XXX: Improve varible names
+    deltaPoint = (point[0]-TARGETCENTER[0],point[1]-TARGETCENTER[1])
+    currentDelta = (currentCenter[0]-TARGETCENTER[0],currentCenter[1]-TARGETCENTER[1])
+
+    # Distance formula
+    currentDeltaDist = (currentDelta[0]**2 + currentDelta[1]**2)**.5
+    checkDeltaDist = (deltaPoint[0]**2 + deltaPoint[1]**2)**.5
+
+    if checkDeltaDist < currentDeltaDist:
+        return True
+    else:
+        return False
