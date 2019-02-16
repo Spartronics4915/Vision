@@ -142,19 +142,23 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        value, frame = algo.processFrame(image, algo=self.args.algo, 
+        # Target is of the form (dx,dy,theta)
+        target, frame = algo.processFrame(image, algo=self.args.algo, 
                                         display=self.args.display,
                                         debug=self.args.debug)
+
         if (self.args.debug):
-            logging.info("Target value is: ", value)
+            logging.info("Target value is: ", target)
 
         if self.commChan:
-            if (value == None):
+            if (target == None):
                 self.commChan.updateVisionState("Searching")
             else:
-                self.commChan.updateVisionState("Acquired")  
-                if self.target.setValue(value):
+                self.commChan.updateVisionState("Acquired")
+                if self.target.setValue(target):
                     self.commChan.SendTarget(self.target)
+
+
         else:
             print("Target value is: {}".format(value))
         
