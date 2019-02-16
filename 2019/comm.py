@@ -127,6 +127,10 @@ class Comm:
         self.target = t
         self.target.send(self.visionTable)
 
+    def UpdateTarget(self, value):
+        self.target.setValue(value)
+        self.target.send(self.visionTable)
+
     def GetIMUHeading(self):
         return self.control.imuHeading
 
