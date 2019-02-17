@@ -23,13 +23,16 @@ class Target:
         We take no opinion on the shape/type of value
         XXX: need a way to represent non-acquisition?
     """
-    def __init__(self, v=None):
+    def __init__(self, v=None, key="Reverse/solvePNP"):
         self.clock = time.clock()
+        self.lastclock = self.clock
+        self.dashboardKey = key
         self.value = v  # value can be a tuple, a list, a string
         #Invalid, bogus targets, to be changed if something goes ary
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
+            self.lastclock = self.clock
             self.clock = time.clock()
             self.value = value  # can be a tuple, a list, a string
             return True
@@ -48,10 +51,14 @@ class Target:
             val.extend(self.value) # fails if value is not iterable
         except TypeError:
             val.append(self.value)  # handle the single-number case
-        val.append(self.clock)
+        val.append(self.clock - self.lastclock)
         vstr = ",".join(str(x) for x in val)
         #print("send: " + vstr)
+<<<<<<< HEAD
         targetTable.putString("solvePNP", vstr)
+=======
+        targetTable.putString(self.dashboardKey, vstr)
+>>>>>>> 58fa510b41a5fb8b64254de3c992e898d7d87dcd
 
 theComm = None
 
