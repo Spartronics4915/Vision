@@ -81,9 +81,14 @@ def rectAlgo(frame,display=1,debug=0):
     rects = rectUtil.findRects(frame,200,display,debug)
 
     if display:
-        # combine original image with mask, for visualization
-        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
-        cv2.drawContours(visImg, [box], 0,(0,0,255),2)
+        for r in rects:
+            # combine original image with mask, for visualization
+            visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
+
+            pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
+            box = [np.int32(pts)]
+
+            cv2.drawContours(visImg, [box], 0,(0,0,255),2)
     else:
         visImg = frame # poseEstimation needs valid frame for camMatrix calcs        
 
@@ -102,6 +107,7 @@ def realPNP(frame, display, debug):
 
     if display:
         # combine original image with mask, for visualization
+        mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
         visImg = cv2.bitwise_and(frame, frame, mask=mask) 
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
