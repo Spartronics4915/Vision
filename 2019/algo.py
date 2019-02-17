@@ -123,36 +123,38 @@ def realPNP(frame, display, debug):
         # XXX: No right pair support (yet)
         rleft = leftPair[0]
         rright = leftPair[1]
-        
-    # TODO: Remove this if statment
-    if rleft != None and rright != None:
+            
+    rectPairs = (leftPair,rightPair)
+    lTarget = None
+    rTarget = None
+
+    for pair in rectPairs:
+        lPts = None
+        rPts = None
 
         # Creating lists of points
         # Left points
-        rleftPts = cv2.boxPoints(rleft)
-        rleftPts = np.int0(rleftPts)
+        lPts = cv2.boxPoints(pair[0])
+        lPts = np.int0(lPts)
         # Right points
-        rrightPts = cv2.boxPoints(rright)
-        rrightPts = np.int0(rrightPts)
+        rPts = cv2.boxPoints(rright[0])
+        rPts = np.int0(rPts)
 
         print("sending a point list of: " + str(rleftPts))
         orderedPoints = pnpSorting.sortPoints(rleftPts,rrightPts)
         print("Passing an orderedPoints of: " + str(orderedPoints))
-
-        # TODO: change hardcoded focalLength
-        # focalLen was 306.3829787
+            
         # now estimatePose accepts optional camera matrix
         target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
                                             cameraMatrix=None, display=False)
 
-        dx = target[0]
-        dy = target[1]
-        theta = target[2]
+        if not lTarget:
+            lTarget = target
+        else:
+            rTarget = target
 
-        print("Returning a target is: " + str(target))
-        return target,frame
-    else:
-        print("couldn't find two rects")
-        return None,frame
+    return target,frame
+
+
 
 
