@@ -235,19 +235,6 @@ def getCorrectedAngle(sz, angle):
     else:
         return angle + 90
 
-if __name__ == "__main__":
-    import doctest
-    import logging
-
-    # Debug logging
-    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
-    dateFmt = "%H:%M"
-    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
-
-    logging.info("Began logger")
-
-    doctest.testmod()
-
 def checkCenter(point,currentCenter):
     # Depricated from old algo.py logic
     # XXX: Improve varible names
@@ -262,3 +249,16 @@ def checkCenter(point,currentCenter):
         return True
     else:
         return False
+
+if __name__ == "__main__":
+    import doctest
+    import logging
+
+    # Debug logging
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+
+    logging.info("Began logger")
+
+    doctest.testmod()
