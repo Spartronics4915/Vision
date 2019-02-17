@@ -6,6 +6,8 @@
 # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
 import numpy as np
 import cv2
+import logging
+
 # Philosophy:
 # How should bad cases be handled?
 #   I.E : When we don't get enough rects to generate a pair ; there isn't enough for a pair
@@ -76,7 +78,7 @@ def findRects(frame,minsize,display=0,debug=0):
 
     return sizedRects
 
-def pairRectangles(rectArray,debug=0):   
+def pairRectangles(rectArray,wantedTargets=1,debug=0):   
     """
     Given an input of rectangles, classify them into pairs and return the pairs
  
@@ -142,7 +144,9 @@ def pairRectangles(rectArray,debug=0):
                     pair1.append(xSortedRects[i])
                     pair1.append(xSortedRects[i+1])
 
-                else:
+                elif wantedTargets == 2:
+                    # TODO: Add infinate support for as many targets as we want
+                    # Currently only supports a wantedTargets of 1 and 2
                     pair2.append(xSortedRects[i])
                     pair2.append(xSortedRects[i+1])
 
@@ -252,7 +256,6 @@ def checkCenter(point,currentCenter):
 
 if __name__ == "__main__":
     import doctest
-    import logging
 
     # Debug logging
     logFmt = "%(name)-8s %(levelname)-6s %(message)s"

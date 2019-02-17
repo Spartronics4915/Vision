@@ -40,6 +40,7 @@ class Target:
             return False
 
     def send(self, targetTable):
+        # TODO: Doctest 
         # convert the value and the clock to a comma-separated list of numbers
         #  value can be scalar, a tuple or an array, result will be flattened
         #  examples:
@@ -47,18 +48,24 @@ class Target:
         #       value: (1,2) -> "1,2,.3566" 
         #       value: [1,2,"hello world"] -> "1,2,hello world,.3566" 
         val = []
-        try:
-            val.extend(self.value) # fails if value is not iterable
-        except TypeError:
-            val.append(self.value)  # handle the single-number case
+
+        # For loop for two targets
+        for target in self.value:
+            try:
+                val.extend(self.value) # fails if value is not iterable
+                val.append(self.clock - self.lastclock)
+                val.append(';')
+
+            except TypeError:
+                logging.debug("Tried to append a None to a list...")
+                # val.append(self.value)  handle the single-number case
+                
+        
         val.append(self.clock - self.lastclock)
+        # create a string of comma seperated values
         vstr = ",".join(str(x) for x in val)
         #print("send: " + vstr)
-<<<<<<< HEAD
-        targetTable.putString("solvePNP", vstr)
-=======
         targetTable.putString(self.dashboardKey, vstr)
->>>>>>> 58fa510b41a5fb8b64254de3c992e898d7d87dcd
 
 theComm = None
 

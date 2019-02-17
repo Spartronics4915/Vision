@@ -17,6 +17,7 @@ import pnpSorting
 import time
 import traceback
 import rectUtil
+import logging
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
@@ -95,8 +96,7 @@ def realPNP(frame, display, debug):
     # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
     # Spew
-    if debug:
-        print("The frame type is: " + str(type(frame)))
+    logging.debug("The frame type is: " + str(type(frame)))
 
     rects = rectUtil.findRects(frame,200,display,debug)
 
@@ -113,35 +113,44 @@ def realPNP(frame, display, debug):
         
     logging.debug("All valid rectangles are: " + str(rects))   
 
-    success,leftPair,rightPair = rectUtil.pairRectangles(rects,debug=1)
+    # Leftpair is allways leftmost
+    # XXX: rightPair is not always the rightmost
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
 
     if success == False:
         # Logger debugs happened in pairRectangles
         return None, visImg
-
-    elif leftPair != None:
-        # XXX: No right pair support (yet)
-        rleft = leftPair[0]
-        rright = leftPair[1]
             
     rectPairs = (leftPair,rightPair)
+    
+    # TODO: support for infinite targets
     lTarget = None
     rTarget = None
 
     for pair in rectPairs:
+
         lPts = None
         rPts = None
 
         # Creating lists of points
-        # Left points
-        lPts = cv2.boxPoints(pair[0])
-        lPts = np.int0(lPts)
-        # Right points
-        rPts = cv2.boxPoints(rright[0])
-        rPts = np.int0(rPts)
+        try: 
+            # Left points
+            lPts = cv2.boxPoints(pair[0])
+            lPts = np.int0(lPts)
+            # Right points
+            rPts = cv2.boxPoints(pair[1])
+            rPts = np.int0(rPts)
 
-        print("sending a point list of: " + str(rleftPts))
-        orderedPoints = pnpSorting.sortPoints(rleftPts,rrightPts)
+        except TypeError:
+            # nb:   This is poor code in the event that we get a rectpair (l,None,r)
+            #       because the loop will break at the middle rect, and never reach the right rect.
+            break
+
+
+
+        print("sending a point list of: " + str(lPts))
+        # Orders the points according to modelpoints in solvePNP()
+        orderedPoints = pnpSorting.sortPoints(lPts,rPts)
         print("Passing an orderedPoints of: " + str(orderedPoints))
             
         # now estimatePose accepts optional camera matrix
@@ -153,7 +162,11 @@ def realPNP(frame, display, debug):
         else:
             rTarget = target
 
-    return target,frame
+    # The first return will be
+    # None
+    # (l, r)
+    # (l, None)
+    return (lTarget,rTarget),frame
 
 
 
