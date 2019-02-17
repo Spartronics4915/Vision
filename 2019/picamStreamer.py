@@ -15,6 +15,7 @@ import cv2
 import logging
 import argparse
 import comm
+import traceback
 
 s_args=None
 s_comm=None
@@ -118,7 +119,11 @@ class CamHandler(BaseHTTPRequestHandler):
                 time.sleep(0.05)
 
             except Exception as e:
+                # Error handling; Critical for anything that happens in algo or below
+                exc_info = sys.exc_info()
                 print("algo exception: " + str(e))
+                traceback.print_exception(*exc_info)
+                
                 break
 
 
