@@ -82,8 +82,8 @@ def rectAlgo(frame,display=1,debug=0):
 
     if display:
         # combine original image with mask, for visualization
-        cv2.drawContours(visImg, [box], 0,(0,0,255),2)
         visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
+        cv2.drawContours(visImg, [box], 0,(0,0,255),2)
     else:
         visImg = frame # poseEstimation needs valid frame for camMatrix calcs        
 
