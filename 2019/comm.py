@@ -97,7 +97,7 @@ class Comm:
             # update the dashboard with our state, NB: this is a different table
             # that both the vision and control tables.
             self.sd = NetworkTables.getTable("SmartDashboard")
-            self.sd.putString("Vision/Status", "OK")
+            self.sd.putString("Vision/Status", "Connected")
             self.updateVisionState("Standby")
 
             # We communicate target to robot via Vision table,

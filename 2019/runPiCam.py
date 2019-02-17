@@ -30,7 +30,7 @@ class PiVideoStream:
         logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("---------------------------------------------\n")
-        self.target = comm.Target()
+        self.target = comm.Target() # ?
         self.commChan = None
         self.parseArgs()
         logging.info("pid: %d" % os.getpid())
@@ -150,14 +150,12 @@ class PiVideoStream:
             logging.info("Target value is: " + value)
 
         if self.commChan:
-            if (value == None):
-                self.commChan.updateVisionState("Searching")
+            if value != None:
+                self.commChan.updateVisionState("Aquired")
+                self.commChan.UpdateTarget(value)
             else:
-                self.commChan.updateVisionState("Acquired")
-                if self.target.setValue(value):
-                    # Can a NoneType be sent as a valid target?
-                    self.commChan.SendTarget(self.target)
-
+                self.commChan.updateVisionState("Searching")
+                
         else:
             print("Target value is: {}".format(value))
         

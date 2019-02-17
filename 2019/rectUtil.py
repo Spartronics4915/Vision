@@ -25,6 +25,7 @@ range0 = np.array([30,150,170])
 range1 = np.array([90,255,255])
 
 def findRects(frame,minsize,display=0,debug=0):
+    # TODO: minsize as a arg for runPiCam.py
     """
     Derive a list of rects from a frame
  
