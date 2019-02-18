@@ -18,19 +18,20 @@ class Target:
 
         Vision/Target  number;dtime
     """
+    lastUpdate = 0  # NB class variable, shared across instances
+
     def __init__(self):
         self.subkey = "Target"
         self.autoSend = False
         self.clock = time.monotonic()
-        self.lastclock = 0
-        self.deltaclock = 0
+        self.lastUpdate = self.clock
         self.value = None
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
-            self.lastclock = self.clock
             self.clock = time.monotonic()
-            self.deltaclock = self.clock - self.lastclock
+            self.deltaclock = self.clock - self.lastUpdate
+            self.lastUpdate = self.clock
             self.value = value  # expect a tuple or list
             if self.autoSend:
                 self.send()
