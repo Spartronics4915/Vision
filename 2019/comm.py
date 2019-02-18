@@ -7,6 +7,7 @@ from networktables import NetworkTables
 import sys, traceback, time
 import json
 import logging
+import re
 
 class Control:
     """
@@ -39,32 +40,39 @@ class Target:
         else:
             return False
 
-    def send(self, targetTable):
+    def _serialize(self, dt):
         # TODO: Doctest 
-        # convert the value and the clock to a comma-separated list of numbers
-        #  value can be scalar, a tuple or an array, result will be flattened
-        #  examples:
-        #       value: 1 -> "1,.3566" 
-        #       value: (1,2) -> "1,2,.3566" 
-        #       value: [1,2,"hello world"] -> "1,2,hello world,.3566" 
-        val = []
-
-        # For loop for two targets
-        for target in self.value:
-            try:
-                val.extend(self.value) # fails if value is not iterable
-                val.append(self.clock - self.lastclock)
-                val.append(';')
-
-            except TypeError:
-                logging.debug("Tried to append a None to a list...")
-                # val.append(self.value)  handle the single-number case
-                
+        # convert the value to a comma and semicolor-separated list of 
+        # numbers. value can be scalar, a tuple or an array, result will 
+        # be flattened following this pattern
+        #
+        #   case 1: 1 -> "1,.3566;tstr" 
+        #   case 2: (1,2) -> "1,2;tstr" 
+        #   case 3: [1,2,"hello world"] -> "1,2,hello world;tstr" 
+        #   case 4: [(1,2),(3,4)] -> "1,2;3,4;tstr"
+        val = self.value
+        valstr = ""
+        tstr = str(dt)
+        if isinstance(val, tuple) or isinstance(val, list):
+            # self.value is a list or tuple
+            for el in val:
+                if isinstance(el, tuple) or isinstance(el, list):
+                    # nested list, separate sublists with ;
+                    for subel in el:
+                        valstr = valstr + str(subel) + ","
+                    valstr = valstr + ";"
+                else:
+                    valstr = valstr + str(el) + ","
+        else:
+            # scalar
+            valstr = str(self.value)
+        valstr = valstr + ";" + tstr
+        # print("before:" + valstr)
+        valstr = re.sub(",;;|,;", ";", valstr) # cleanup
+        return valstr
         
-        val.append(self.clock - self.lastclock)
-        # create a string of comma seperated values
-        vstr = ",".join(str(x) for x in val)
-        #print("send: " + vstr)
+    def send(self, targetTable):
+        valstr = self._serialize(self.clock-self.lastclock)
         targetTable.putString(self.dashboardKey, vstr)
 
 theComm = None
