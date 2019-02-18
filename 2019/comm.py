@@ -21,7 +21,7 @@ class Control:
 theComm = None
 def GetVisionTable():
     if theComm != None:
-        theComm.getVisionTable()
+        return theComm.getVisionTable()
     else:
         return None
 

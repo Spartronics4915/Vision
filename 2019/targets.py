@@ -25,6 +25,7 @@ class Target:
         self.clock = time.monotonic()
         self.lastclock = 0
         self.deltaclock = 0
+        self.value = None
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
@@ -32,7 +33,7 @@ class Target:
             self.clock = time.monotonic()
             self.deltaclock = self.clock - self.lastclock
             self.value = value  # expect a tuple or list
-            if this.autoSend:
+            if self.autoSend:
                 self.send()
             return True
         else:
@@ -64,7 +65,7 @@ class TargetPNP(Target):
             self.leftTarget,self.rightTarget = value
         else:
             logging.error("TargetPNP: invalid setValue")
-        super().setValue(self, value, forceUpdate)
+        super().setValue(value, forceupdate)
 
     def send(self):
         # solvePNP convention for target:
@@ -75,5 +76,5 @@ class TargetPNP(Target):
         if self.rightTarget != None:
             arrayValue.extend(self.rightTarget)
         arrayValue.append(self.deltaclock)
-        logging.info("send: " + str(self.arrayValue))
+        # logging.info("send: " + str(arrayValue))
         self.visionTable.putNumberArray(self.vistabKey, arrayValue)
