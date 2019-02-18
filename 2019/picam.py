@@ -39,6 +39,7 @@ class PiCam:
         self.cam.brightness = 60 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
         self.cam.ISO = 800 # 100-800
+        self.cam.rotate = 0# 0,90,180,270
         time.sleep(.1) # more settling
 
         print("camera settings:")

@@ -49,6 +49,7 @@ class PiVideoStream:
 
         self.picam = picam.PiCam(resolution=(self.args.iwidth,
                                              self.args.iheight),
+                                 rotate=self.args.rotate,
                                  framerate=(self.args.fps))
 
     def parseArgs(self):
@@ -90,6 +91,9 @@ class PiVideoStream:
         parser.add_argument("--color", dest="color",
                             help="color: ([0,255],[0,255])",
                             default=None)
+        parser.add_argument("--rotate", dest="rotate",
+                            help="Rotate: 90, 180, 270 (deg)",
+                            default=0)
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
