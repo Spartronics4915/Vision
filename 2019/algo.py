@@ -22,7 +22,7 @@ import logging
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
 
-range0 = np.array([30,150,170])
+range0 = np.array([30,150,100])
 range1 = np.array([90,255,255])
 
 # Reasoning behind Current range values:
