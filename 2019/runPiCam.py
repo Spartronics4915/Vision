@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 #
 # runPiCam.py runs the imaging algorithm in algo.py on a stream
 # of video frames.
@@ -47,7 +47,7 @@ class PiVideoStream:
             logging.info("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
-        self.picam = picam.PiCam(resolution=(self.args.iwidth, 
+        self.picam = picam.PiCam(resolution=(self.args.iwidth,
                                              self.args.iheight),
                                  framerate=(self.args.fps))
 
@@ -93,7 +93,7 @@ class PiVideoStream:
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
- 
+
         self.args = parser.parse_args()
         #Logging
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
@@ -108,8 +108,8 @@ class PiVideoStream:
             self.processVideo()
         else:
             try:
-                self.captureThread = picam.CaptureThread(self.picam, 
-                                                        self.processFrame, 
+                self.captureThread = picam.CaptureThread(self.picam,
+                                                        self.processFrame,
                                                         self.args.threads)
                 while self.captureThread.running:
                     time.sleep(1)
@@ -131,39 +131,35 @@ class PiVideoStream:
     def processVideo(self):
         """ create a camera, continually read frames and process them.
         """
-        print("  (single threaded)")
+        logging.info("  (single threaded)")
         self.picam.start()
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Began processing images")
         while True:
-            # The image here is directly passed to cv2. 
+            # The image here is directly passed to cv2.
             image = self.picam.next()
             if self.processFrame(image):
                 break
 
     def processFrame(self, image):
-        value, _ = algo.processFrame(image, algo=self.args.algo, 
+        logging.info("  (multi threaded)")
+        target, _ = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
 
-        if (self.args.debug):
-            logging.info("Target value is: " + value)
-
+        logging.debug("Target value is: " + value)
         if self.commChan:
-            if value != None:
+            if target != None:
                 self.commChan.updateVisionState("Aquired")
-                self.commChan.UpdateTarget(value)
+                target.send()
             else:
                 self.commChan.updateVisionState("Searching")
-                
-        else:
-            print("Target value is: {}".format(value))
-        
+
     def Shutdown(self):
         self.picam.stop()
         if self.commChan:
             self.commChan.Shutdown()
-            
+
 def main():
     pistream = PiVideoStream()
     pistream.Run()

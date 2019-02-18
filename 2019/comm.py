@@ -18,64 +18,12 @@ class Control:
         self.targeting = None
         self.imuHeading = None
 
-class Target:
-    """
-        Target represents the data vision passes to robot.
-        We take no opinion on the shape/type of value
-        XXX: need a way to represent non-acquisition?
-    """
-    def __init__(self, v=None, key="Reverse/solvePNP"):
-        self.clock = time.clock()
-        self.lastclock = self.clock
-        self.dashboardKey = key
-        self.value = v  # value can be a tuple, a list, a string
-        #Invalid, bogus targets, to be changed if something goes ary
-
-    def setValue(self, value, forceupdate=True):
-        if forceupdate or value != self.value:
-            self.lastclock = self.clock
-            self.clock = time.clock()
-            self.value = value  # can be a tuple, a list, a string
-            return True
-        else:
-            return False
-
-    def _serialize(self, dt):
-        # TODO: Doctest 
-        # convert the value to a comma and semicolor-separated list of 
-        # numbers. value can be scalar, a tuple or an array, result will 
-        # be flattened following this pattern
-        #
-        #   case 1: 1 -> "1,.3566;tstr" 
-        #   case 2: (1,2) -> "1,2;tstr" 
-        #   case 3: [1,2,"hello world"] -> "1,2,hello world;tstr" 
-        #   case 4: [(1,2),(3,4)] -> "1,2;3,4;tstr"
-        val = self.value
-        valstr = ""
-        tstr = str(dt)
-        if isinstance(val, tuple) or isinstance(val, list):
-            # self.value is a list or tuple
-            for el in val:
-                if isinstance(el, tuple) or isinstance(el, list):
-                    # nested list, separate sublists with ;
-                    for subel in el:
-                        valstr = valstr + str(subel) + ","
-                    valstr = valstr + ";"
-                else:
-                    valstr = valstr + str(el) + ","
-        else:
-            # scalar
-            valstr = str(self.value)
-        valstr = valstr + ";" + tstr
-        # print("before:" + valstr)
-        valstr = re.sub(",;;|,;", ";", valstr) # cleanup
-        return valstr
-        
-    def send(self, targetTable):
-        valstr = self._serialize(self.clock-self.lastclock)
-        targetTable.putString(self.dashboardKey, vstr)
-
 theComm = None
+def GetVisionTable():
+    if theComm != None:
+        theComm.getVisionTable()
+    else:
+        return None
 
 class Comm:
     """
@@ -93,8 +41,8 @@ class Comm:
                 # we're a client
                 self.asServer = False
                 NetworkTables.initialize(server=serverIP)
-                NetworkTables.setUpdateRate(.01)
-                # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
+                # don't override updaterate as it apparently causes
+                # odd behavior.
             else:
                 # we're fake server
                 self.asServer = True
@@ -106,20 +54,12 @@ class Comm:
             # that both the vision and control tables.
             self.sd = NetworkTables.getTable("SmartDashboard")
             self.sd.putString("Vision/Status", "Connected")
-            self.updateVisionState("Standby")
+            self.UpdateVisionState("Standby")
 
-            # We communicate target to robot via Vision table,
-            # current thinking is that this should not be a subtable of
-            # SmartDashboard, since traffic is multiplied by the number
-            # of clients.
-            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision/Reverse")
-            self.controlTable = NetworkTables.getTable("VisionControl")
-
+            # We communicate target to robot via Vision table.
+            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision")
+            self.controlTable = NetworkTables.getTable("/VisionControl")
             self.control = Control()
-            self.target = Target()
-
-            self.fpsHistory = []
-            self.lastUpdate = time.time()
 
             # Robot communicates to us via fields within the Vision/Control
             #  SubTable we opt for a different table to ensure we
@@ -138,31 +78,20 @@ class Comm:
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
 
-    def updateVisionState(self, state):
+    def UpdateVisionState(self, state):
         self.sd.putString("Vision/State", state)
+
+    def GetVisionTable(self):
+        return self.visionTable
 
     def Shutdown(self):
         NetworkTables.removeConnection(self.connectionListener)
         self.controlTable.removeEntryListener(self.visionControlEvent)
 
-    def SendTarget(self, t):
-        self.target = t
-        self.target.send(self.visionTable)
-
-    def UpdateTarget(self, value):
-        self.target.setValue(value)
-        self.target.send(self.visionTable)
-
     def GetIMUHeading(self):
         return self.control.imuHeading
 
-    def SetFPS(self, fps):
-        self.fpsHistory.append(fps)
-        self.fpsHistory = self.fpsHistory[-15*4:]
-        if time.time() - self.lastUpdate > 5:
-            self.target.SetFPS(sum(self.fpsHistory)/len(self.fpsHistory))
-            self.lastUpdate = time.time()
-
+    # called via callback
     def controlEvent(self, key, value, isNew):
         print("control event received: " + key)
         if key == 'SetTarget':
@@ -184,3 +113,5 @@ class Comm:
     def connectionListener(connected, connectionInfo):
         logging.getLogger("nt").debug("connected: %d" % connected)
         logging.getLogger("nt").debug("info: %s" % json.dumps(connectionInfo))
+
+

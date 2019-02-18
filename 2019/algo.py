@@ -18,6 +18,8 @@ import time
 import traceback
 import rectUtil
 import logging
+import targets
+
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
@@ -29,16 +31,16 @@ range1 = np.array([70,255,255])
 #   After changes to exposure of camera (Ridiculously low ISO),
 #   retro-reflective tape stands out more than it ever has,
 #   thus, hue and the saturation have less importance,
-#   which explains the wide range on the first two numbers. 
-#   10-115 represents an (approximate) range of blue to green 
-#   in the HSV colorspace 50-255 represents a wide range of the 
-#   saturation of any given color 
+#   which explains the wide range on the first two numbers.
+#   10-115 represents an (approximate) range of blue to green
+#   in the HSV colorspace 50-255 represents a wide range of the
+#   saturation of any given color
 #
 #   (This value is fluid, as we aren't searching for any particular 'color',
 #   [read: 2018], it can be very open)
 #
-#   Finally, the tightest value needs to be the value, representing how 
-#   close the color is to black.  We want colors as far away from black 
+#   Finally, the tightest value needs to be the value, representing how
+#   close the color is to black.  We want colors as far away from black
 #   as possible, thus the high range.
 
 def emptyAlgo(frame):
@@ -61,12 +63,12 @@ def processFrame(frame, algo=None, display=0,debug=0):
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:
-        print("algo: unexpected name " + algo)
-        return emptyAlgo(frame)
+        print("algo: unexpected name " + algo + " running default")
+        return defaultAlgo(frame)
 
 def maskAlgo(frame):
     # Show what is shown by the opencv HSV values
-    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))      
+    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))
     return None,mask
 
 def rectAlgo(frame,display=1,debug=0):
@@ -90,7 +92,7 @@ def rectAlgo(frame,display=1,debug=0):
 
             cv2.drawContours(visImg, [box], 0,(0,0,255),2)
     else:
-        visImg = frame # poseEstimation needs valid frame for camMatrix calcs        
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
 
     return (None, visImg)
 
@@ -108,7 +110,7 @@ def realPNP(frame, display, debug):
     if display:
         # combine original image with mask, for visualization
         mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
-        visImg = cv2.bitwise_and(frame, frame, mask=mask) 
+        visImg = cv2.bitwise_and(frame, frame, mask=mask)
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             ipts = [np.int32(pts)]
@@ -116,8 +118,8 @@ def realPNP(frame, display, debug):
     else:
         # Avoid a NoneType error
         visImg = frame
-        
-    logging.debug("All valid rectangles are: " + str(rects))   
+
+    logging.debug("All valid rectangles are: " + str(rects))
 
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
@@ -126,20 +128,21 @@ def realPNP(frame, display, debug):
     if success == False:
         # Logger debugs happened in pairRectangles
         return None, visImg
-            
+
     rectPairs = (leftPair,rightPair)
-    
+
     # TODO: support for infinite targets
     lTarget = None
     rTarget = None
 
+    print("rectPairs: " + str(rectPairs))
     for pair in rectPairs:
 
         lPts = None
         rPts = None
 
         # Creating lists of points
-        try: 
+        try:
             # Left points
             lPts = cv2.boxPoints(pair[0])
             lPts = np.int0(lPts)
@@ -147,18 +150,17 @@ def realPNP(frame, display, debug):
             rPts = cv2.boxPoints(pair[1])
             rPts = np.int0(rPts)
 
-        except TypeError:
-            # nb:   This is poor code in the event that we get a rectpair (l,None,r)
-            #       because the loop will break at the middle rect, and never reach the right rect.
+        except (TypeError, IndexError) as e:
+            # nb:   This is poor code in the event that we get a rectpair 
+            #       (l,None,r)  because the loop will break at the middle 
+            #       rect, and never reach the right rect.
             break
 
-
-
-        print("sending a point list of: " + str(lPts))
+        logging.debug("sending a point list of: " + str(lPts))
         # Orders the points according to modelpoints in solvePNP()
         orderedPoints = pnpSorting.sortPoints(lPts,rPts)
-        print("Passing an orderedPoints of: " + str(orderedPoints))
-            
+        logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
+
         # now estimatePose accepts optional camera matrix
         target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
                                             cameraMatrix=None, display=False)
@@ -168,11 +170,7 @@ def realPNP(frame, display, debug):
         else:
             rTarget = target
 
-    # The first return will be
-    # None
-    # (l, r)
-    # (l, None)
-    return (lTarget,rTarget),frame
+    return targets.TargetPNP(lTarget,rTarget),frame
 
 
 

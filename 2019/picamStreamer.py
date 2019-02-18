@@ -46,7 +46,7 @@ class CamHandler(BaseHTTPRequestHandler):
             cam = None
             try:
                 time.sleep(1) # wait for shutdown of alt stream
-                cam = picam.PiCam(resolution=(640, 480), 
+                cam = picam.PiCam(resolution=(640, 480),
                                   framerate=60, auto=False)
                 if not cam:
                     raise Exception("Hey no camera!")
@@ -96,15 +96,17 @@ class CamHandler(BaseHTTPRequestHandler):
         while True:
             camframe = cam.next()
             try:
-                value,frame = algo.processFrame(camframe, algoselector,
+                target,frame = algo.processFrame(camframe, algoselector,
                                             display=True, debug=False)
+                if target != None:
+                    logging.info("Target!!! ------------------")
                 if s_comm != None:
-                    if value != None:
+                    if target != None:
                         s_comm.updateVisionState("Acquired")
-                        s_comm.UpdateTarget(value)
+                        target.send()
                     else:
                         s_comm.updateVisionState("Searching")
-                    
+
                 rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
                 if not rc:
                     continue
@@ -119,11 +121,11 @@ class CamHandler(BaseHTTPRequestHandler):
                 time.sleep(0.05)
 
             except Exception as e:
-                # Error handling; Critical for anything that happens in algo or below
+                # Critical for anything that happens in algo or below
                 exc_info = sys.exc_info()
                 print("algo exception: " + str(e))
                 traceback.print_exception(*exc_info)
-                
+
                 break
 
 
