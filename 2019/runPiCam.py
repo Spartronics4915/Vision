@@ -147,13 +147,14 @@ class PiVideoStream:
                                         display=self.args.display,
                                         debug=self.args.debug)
 
-        logging.debug("Target value is: " + value)
+        if target != None:
+            logging.debug("Target value is: " + str(target))
         if self.commChan:
             if target != None:
-                self.commChan.updateVisionState("Aquired")
+                self.commChan.UpdateVisionState("Aquired")
                 target.send()
             else:
-                self.commChan.updateVisionState("Searching")
+                self.commChan.UpdateVisionState("Searching")
 
     def Shutdown(self):
         self.picam.stop()
