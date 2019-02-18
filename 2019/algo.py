@@ -76,7 +76,7 @@ def maskAlgo(frame):
 
     return None,mask
 
-def rectAlgo(frame,display=1,debug=0):s
+def rectAlgo(frame,display=1,debug=0):
     # TODO: Implement some form of threading / process optimisation
     rects = []
     #largeTargetA = 0        # Need these vars to filter for large targets
