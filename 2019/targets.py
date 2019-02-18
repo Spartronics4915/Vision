@@ -26,6 +26,7 @@ class Target:
         self.clock = time.monotonic()
         self.lastUpdate = self.clock
         self.value = None
+        self.deltaclock = 0
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
