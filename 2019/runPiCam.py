@@ -17,6 +17,7 @@ import logging
 import algo
 import comm
 import picam
+import targets
 
 class PiVideoStream:
     def __init__(self):
@@ -30,7 +31,6 @@ class PiVideoStream:
         logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("---------------------------------------------\n")
-        self.target = comm.Target() # ?
         self.commChan = None
         self.parseArgs()
         logging.info("pid: %d" % os.getpid())
