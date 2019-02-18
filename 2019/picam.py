@@ -31,13 +31,14 @@ class PiCam:
 
         self.cam.exposure_compensation = -25 # [-25, 25]
         self.cam.shutter_speed = 0 #10000 # set to 0 to go auto
-        self.cam.contrast = 70  # [-100, 100]
+        self.cam.contrast = 100  # [-100, 100]
+        self.cam.saturation = 100 # [0,100]
         self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
         self.cam.hflip = True
         self.cam.vflip = True
-        self.cam.brightness = 70 # [0, 100]
+        self.cam.brightness = 60 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
-        self.cam.ISO = 100 # 100-800
+        self.cam.ISO = 800 # 100-800
         time.sleep(.1) # more settling
 
         print("camera settings:")
