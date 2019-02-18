@@ -43,6 +43,8 @@ range1 = np.array([70,255,255])
 #   close the color is to black.  We want colors as far away from black
 #   as possible, thus the high range.
 
+#   TODO: Change all algo's to return a target
+
 def emptyAlgo(frame):
     return (None,frame)
 
@@ -68,10 +70,13 @@ def processFrame(frame, algo=None, display=0,debug=0):
 
 def maskAlgo(frame):
     # Show what is shown by the opencv HSV values
-    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    mask = cv2.inRange(frame, range0, range1)
+
     return None,mask
 
-def rectAlgo(frame,display=1,debug=0):
+def rectAlgo(frame,display=1,debug=0):s
     # TODO: Implement some form of threading / process optimisation
     rects = []
     #largeTargetA = 0        # Need these vars to filter for large targets
