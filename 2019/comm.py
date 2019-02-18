@@ -35,6 +35,7 @@ class Comm:
         by the fake robot server.
     """
     def __init__(self, serverIP):
+        global theComm
         try:
             # IPAddress can be
             #   - None: means run as fake server
