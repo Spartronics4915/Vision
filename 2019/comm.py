@@ -19,11 +19,14 @@ class Control:
         self.imuHeading = None
 
 theComm = None
-def GetVisionTable():
+
+def PutString(key, value):
     if theComm != None:
-        return theComm.getVisionTable()
-    else:
-        return None
+        theComm.sd.putString("Vision/"+key, value)
+
+def PutNumberArray(key, value):
+    if theComm != None:
+        theComm.sd.putNumberArray("Vision/"+key, value)
 
 class Comm:
     """
@@ -57,8 +60,7 @@ class Comm:
             self.UpdateVisionState("Standby")
 
             # We communicate target to robot via Vision table.
-            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision")
-            self.controlTable = NetworkTables.getTable("/VisionControl")
+            self.controlTable = NetworkTables.getTable("/VisionControl`")
             self.control = Control()
 
             # Robot communicates to us via fields within the Vision/Control
@@ -81,11 +83,8 @@ class Comm:
     def UpdateVisionState(self, state):
         self.sd.putString("Vision/State", state)
 
-    def GetVisionTable(self):
-        return self.visionTable
-
     def Shutdown(self):
-        NetworkTables.removeConnection(self.connectionListener)
+        NetworkTables.removeConnectionListener(self.connectionListener)
         self.controlTable.removeEntryListener(self.visionControlEvent)
 
     def GetIMUHeading(self):

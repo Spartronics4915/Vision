@@ -19,8 +19,7 @@ class Target:
         Vision/Target  number;dtime
     """
     def __init__(self):
-        self.visionTable = comm.GetVisionTable()
-        self.vistabKey = "Target"
+        self.subkey = "Target"
         self.autoSend = False
         self.clock = time.monotonic()
         self.lastclock = 0
@@ -41,7 +40,7 @@ class Target:
 
     # override me to present alternate respresentation
     def send(self):
-        self.visionTable.putString(self.vistabKey,
+        comm.PutString(self.subkey,
                 "{0};{1}".format(str(self.value), str(self.deltaclock)))
 
 class TargetPNP(Target):
@@ -52,7 +51,7 @@ class TargetPNP(Target):
     """
     def __init__(self, left, right, orientation="Reverse"):
         super().__init__()
-        self.vistabKey = orientation+"/solvePNP"
+        self.subkey = orientation+"/solvePNP"
         self.leftTarget = left
         self.rightTarget = right
 
@@ -77,4 +76,4 @@ class TargetPNP(Target):
             arrayValue.extend(self.rightTarget)
         arrayValue.append(self.deltaclock)
         # logging.info("send: " + str(arrayValue))
-        self.visionTable.putNumberArray(self.vistabKey, arrayValue)
+        comm.PutNumberArray(self.subkey, arrayValue)
