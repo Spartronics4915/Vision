@@ -135,7 +135,6 @@ def realPNP(frame, display, debug):
     lTarget = None
     rTarget = None
 
-    print("rectPairs: " + str(rectPairs))
     for pair in rectPairs:
 
         lPts = None
@@ -151,8 +150,8 @@ def realPNP(frame, display, debug):
             rPts = np.int0(rPts)
 
         except (TypeError, IndexError) as e:
-            # nb:   This is poor code in the event that we get a rectpair 
-            #       (l,None,r)  because the loop will break at the middle 
+            # nb:   This is poor code in the event that we get a rectpair
+            #       (l,None,r)  because the loop will break at the middle
             #       rect, and never reach the right rect.
             break
 

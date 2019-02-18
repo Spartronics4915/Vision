@@ -15,16 +15,18 @@
   * algo: "hsv" - show hsv of camera view
   * algo: "mask" - show hsv of camera view
   * algo: "default" - default algo
-  * algo: "realPNP" - 
-  * algo: "fakePNP" - 
+  * algo: "realPNP" - pose estimator, this is the default for 2019
   * algo: anythingelse - the "default" algo 
 
 ## library
 
+* `startVision.sh` - a script than launches runPiCam.py in competition mode
 * `algo.py` - collection of various vision pipelines
 * `picam.py` - thin vaneer atop PiCamera, support for threaded streaming
 * `comm.py` - manage communication with robot via networktables
-* 'fakerobot' - start this script to validate target communication.
+* `fakerobot` - start this script to validate target communication.
+* `targets.py` - abstraction for target nettab representation
+* `rectUtil.py` - utilities for captured and analysis of rectangles
 
 ## support
 
