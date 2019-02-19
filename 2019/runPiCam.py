@@ -155,7 +155,7 @@ class PiVideoStream:
             logging.debug("Target value is: " + str(target))
         if self.commChan:
             if target != None:
-                self.commChan.UpdateVisionState("Aquired")
+                self.commChan.UpdateVisionState("Acquired")
                 target.send()
             else:
                 self.commChan.UpdateVisionState("Searching")
