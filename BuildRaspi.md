@@ -147,7 +147,8 @@ Here's a recipe to run uv4l via a shell script:
 ``` bash
 #!/bin/bash -f
 uv4l -f \
- --driver raspicam \
+ --driver raspicam '--vflip=yes' \
+ --driver raspicam '--hflip=yes' \
  --auto-video_nr \
  --enable-server \
  --server-option '--enable-webrtc-audio=0' \
