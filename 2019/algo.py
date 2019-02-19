@@ -15,50 +15,42 @@ import cv2
 import poseEstimation
 import pnpSorting
 import time
+import traceback
+import rectUtil
+import logging
+import targets
+
 # Deprecated 2018 values:
 # range0 = np.array([0,150,150]) # min hsv
 # range1 = np.array([50, 255, 255]) # max hsv
 
-range0 = np.array([30,150,170])
-range1 = np.array([90,255,255])
+range0 = np.array([50,150,100])
+range1 = np.array([70,255,255])
 
 # Reasoning behind Current range values:
 #   After changes to exposure of camera (Ridiculously low ISO),
 #   retro-reflective tape stands out more than it ever has,
 #   thus, hue and the saturation have less importance,
-#   which explains the wide range on the first two numbers. 
-#   10-115 represents an (approximate) range of blue to green 
-#   in the HSV colorspace 50-255 represents a wide range of the 
-#   saturation of any given color 
+#   which explains the wide range on the first two numbers.
+#   10-115 represents an (approximate) range of blue to green
+#   in the HSV colorspace 50-255 represents a wide range of the
+#   saturation of any given color
 #
 #   (This value is fluid, as we aren't searching for any particular 'color',
 #   [read: 2018], it can be very open)
 #
-#   Finally, the tightest value needs to be the value, representing how 
-#   close the color is to black.  We want colors as far away from black 
+#   Finally, the tightest value needs to be the value, representing how
+#   close the color is to black.  We want colors as far away from black
 #   as possible, thus the high range.
 
+#   TODO: Change all algo's to return a target
+
 def emptyAlgo(frame):
-    return (0,frame)
+    return (None,frame)
 
 def hsvAlgo(frame):
-    return (0,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+    return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
-TARGETCENTER = (200,200)
-
-def checkCenter(point,currentCenter):
-    # XXX: Improve varible names
-    deltaPoint = (point[0]-TARGETCENTER[0],point[1]-TARGETCENTER[1])
-    currentDelta = (currentCenter[0]-TARGETCENTER[0],currentCenter[1]-TARGETCENTER[1])
-
-    # Distance formula
-    currentDeltaDist = (currentDelta[0]**2 + currentDelta[1]**2)**.5
-    checkDeltaDist = (deltaPoint[0]**2 + deltaPoint[1]**2)**.5
-
-    if checkDeltaDist < currentDeltaDist:
-        return True
-    else:
-        return False
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
         return defaultAlgo(frame, display, debug)
@@ -68,20 +60,21 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return emptyAlgo(frame)
     elif algo == "mask":
         return maskAlgo(frame)
-    elif algo == "fakePNP":
-        return fakePNP(frame,display,debug)
     elif algo == "realPNP":
         return realPNP(frame,display,debug)
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:
-        print("algo: unexpected name " + algo)
-        return emptyAlgo(frame)
+        print("algo: unexpected name " + algo + " running default")
+        return defaultAlgo(frame)
 
 def maskAlgo(frame):
-    # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
-    mask = cv2.inRange(frame, np.array([225,225,225]), np.array([255,255,255]))       # Our HSV filtering
-    return 0, mask
+    # Show what is shown by the opencv HSV values
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    mask = cv2.inRange(frame, range0, range1)
+
+    return None,mask
 
 def rectAlgo(frame,display=1,debug=0):
     # TODO: Implement some form of threading / process optimisation
@@ -92,177 +85,97 @@ def rectAlgo(frame,display=1,debug=0):
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
 
+    rects = rectUtil.findRects(frame,200,display,debug)
+
     if display:
-        # combine original image with mask, for visualization
-        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
-    else:
-        visImg = None
+        for r in rects:
+            # combine original image with mask, for visualization
+            visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
 
-    # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
-    im2, contours, hierarchy = cv2.findContours(mask,
-                    cv2.RETR_EXTERNAL,          # external contours only
-                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
-                                                # Less CPU intensive
-                        )
-    for cnt in contours:
-        rect = cv2.minAreaRect(cnt) # Search for rectangles in the countour
+            pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
+            box = [np.int32(pts)]
 
-        box = cv2.boxPoints(rect)  # Turning the rect into 4 points to draw
-        box = np.int0(box)
-
-        print(type(box.astype(np.uint8)[0][0]))
-        if display:
             cv2.drawContours(visImg, [box], 0,(0,0,255),2)
+    else:
+        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
 
-    return (0, visImg)
+    return (None, visImg)
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
 
-# cribbed from team492
-def getCorrectedAngle(sz, angle):
-    if sz[0] < sz[1]:
-        return angle + 180
-    else:
-        return angle + 90
-
-def fakePNP(frame, display, debug):
-    # here we pass in plausible points to the pose estimator 
-    imgPts = [
-        [50, 90], [60, 100], [58, 200],
-        [180, 110], [195, 100], [200, 195] ]
-    imgPtsNP = np.array(imgPts, dtype="double")
-    dx,dy,theta = poseEstimation.estimatePose(frame, imgPtsNP, 0)
-    return dx,dy,theta
-
 def realPNP(frame, display, debug):
+    # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
-    startAlgo = time.time()
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
-    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+    # Spew
+    logging.debug("The frame type is: " + str(type(frame)))
+
+    rects = rectUtil.findRects(frame,200,display,debug)
+
     if display:
         # combine original image with mask, for visualization
-        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
-    else:
-        visImg = None
-    # could employ erosion+dilation if noise presents a prob (aka MORPH_OPEN)
-    im2, contours, hierarchy = cv2.findContours(mask,
-                    cv2.RETR_EXTERNAL,          # external contours only
-                    cv2.CHAIN_APPROX_SIMPLE     # used by 254, cf:APPROX_SIMPLE
-                                                # Less CPU intensive
-                        )
-    # first convert contours to rects
-    rects = []
-    for cnt in contours:
-        rects.append(cv2.minAreaRect(cnt))
-        # a rect is ((cx,cy), (sx,sy), degrees)
-
-    print("I see " + str(len(rects)) + " rects")
-    if len(rects) < 6:
-        print(" " + str(rects))
-    
-    if display: # draw boxes in blue
+        mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+        visImg = cv2.bitwise_and(frame, frame, mask=mask)
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             ipts = [np.int32(pts)]
             cv2.polylines(visImg, ipts, True, (255,0,0))
-
-    # select two "opposing rects"
-    rleft = None
-    rright = None
-    centerR = (0,0)
-    centerL = (0,0)
-    for r in rects:
-        sz = r[1]
-        area = sz[0] * sz[1]
-        if area > 200:  # XXX: is this a good size contraint?
-            center = r[0]
-            angle = getCorrectedAngle(sz, r[2])
-            # Sorting by center
-            # For every left rectangle
-            if angle <= 90:
-                if checkCenter(center,centerR):
-                    rleft = r
-                    centerR = center
-                # if not rleft: # currently we do first-one-wins, (XXX: improve)
-                #     rleft = r
-            else:
-                if checkCenter(center,centerL):
-                    rright = r
-                    centerL = center
-                # if not rright: # currently we do first-one-wins, (XXX: improve)
-                #     rright = r
-
-    if rleft != None and rright != None:
-        # orderedPoints = []  # build a list of 6 pairs (pts)
-        # boxPts = cv2.boxPoints(rleft) # an array of 4 pairs
-        # for i in range(0,3):
-        #     orderedPoints.append(boxPts[i])
-        # boxPts = cv2.boxPoints(rright) # an array of 4 pairs
-        # for i in range(0,3):
-        #     orderedPoints.append(boxPts[i])
-        rleftPts = cv2.boxPoints(rleft)
-        rrightPts = cv2.boxPoints(rright)
-        rleftPts = np.int0(rleftPts)
-        rrightPts = np.int0(rrightPts)
-
-        print("sending a point list of: " + str(rleftPts))
-        orderedPoints = pnpSorting.sortPoints(rleftPts,rrightPts)
-        print("Passing an orderedPoints of: " + str(orderedPoints))
-
-        # TODO: change hardcoded focalLength
-        # focalLen was 306.3829787
-        # now estimatePose accepts optional camera matrix
-        dx,dy,theta = poseEstimation.estimatePose(visImg, orderedPoints,
-                                            camerMatrix=None, display=False)
-
-        endAlgo = time.time()
-        deltaTime = startAlgo - endAlgo
-        
-        print("A succcessful run of pnp algo took(sec): " + str(deltaTime))        
-        return (dx,dy,theta), visImg
-
     else:
-        print("couldn't find two rects")
+        # Avoid a NoneType error
+        visImg = frame
+
+    logging.debug("All valid rectangles are: " + str(rects))
+
+    # Leftpair is allways leftmost
+    # XXX: rightPair is not always the rightmost
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
+
+    if success == False:
+        # Logger debugs happened in pairRectangles
         return None, visImg
 
+    rectPairs = (leftPair,rightPair)
 
-# ax = ax - 160           # center o' the screen being 0(-160-160)
-# dx = ax * 0.1375        # See: LearningVision.md (-22-22)
+    # TODO: support for infinite targets
+    lTarget = None
+    rTarget = None
 
-'''
-if boxArea > 1500:
+    for pair in rectPairs:
+
+        lPts = None
+        rPts = None
+
+        # Creating lists of points
+        try:
+            # Left points
+            lPts = cv2.boxPoints(pair[0])
+            lPts = np.int0(lPts)
+            # Right points
+            rPts = cv2.boxPoints(pair[1])
+            rPts = np.int0(rPts)
+
+        except (TypeError, IndexError) as e:
+            # nb:   This is poor code in the event that we get a rectpair
+            #       (l,None,r)  because the loop will break at the middle
+            #       rect, and never reach the right rect.
+            break
+
+        logging.debug("sending a point list of: " + str(lPts))
+        # Orders the points according to modelpoints in solvePNP()
+        orderedPoints = pnpSorting.sortPoints(lPts,rPts)
+        logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
+
+        # now estimatePose accepts optional camera matrix
+        target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
+                                            cameraMatrix=None, display=False)
+
+        if not lTarget:
+            lTarget = target
+        else:
+            rTarget = target
+
+    return targets.TargetPNP(lTarget,rTarget),frame
 
 
-            if display:  # No need to do this math and computation if we
-                         # are not running in dispay mode
-                cv2.drawContours(visImg, [box], 0,(0,0,255),2)
 
-
-            if debug:   # This is helpful because I can glance at my computer,
-                        # and see if it found a target or not.
-                print("center is currently: %d, %d" %
-                        (int(boxCenter[0]), int(boxCenter[1])))
-
-            if boxArea > largeTargetA:
-                largeTarget = box           # Set of poitns
-                largeTargetA = boxArea     # Area of the box
-                largeTargetC = boxCenter   # Center of the box (sent)
-
-    ### DX math ###
-    ax = largeTargetC[0]    # X value(0-320)
-    ax = ax - 160           # center o' the screen being 0(-160-160)
-    dx = ax * 0.1375        # See: LearningVision.md (-22-22)
-'''
-
-'''
-        box_index = 0
-        for point in box:
-            foo = []
-            foo.append(point[0])
-            foo.append(point[1])
-            bar = (foo[0],foo[1])
-            cv2.putText(visImg,str(box_index),bar,cv2.FONT_HERSHEY_SIMPLEX,2,255)
-            box_index += 1
-        '''
 

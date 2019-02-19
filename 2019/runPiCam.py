@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 
+#!/usr/bin/env python3
 #
 # runPiCam.py runs the imaging algorithm in algo.py on a stream
 # of video frames.
@@ -17,6 +17,7 @@ import logging
 import algo
 import comm
 import picam
+import targets
 
 class PiVideoStream:
     def __init__(self):
@@ -30,7 +31,6 @@ class PiVideoStream:
         logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("---------------------------------------------\n")
-        self.target = comm.Target()
         self.commChan = None
         self.parseArgs()
         logging.info("pid: %d" % os.getpid())
@@ -43,12 +43,13 @@ class PiVideoStream:
                 logging.debug("Connecting to robot at 10.49.15.2...")
                 ip = "10.49.15.2"
             else:
-                ip = "localhost"
+                ip = self.args.robot
             logging.info("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
-        self.picam = picam.PiCam(resolution=(self.args.iwidth, 
+        self.picam = picam.PiCam(resolution=(self.args.iwidth,
                                              self.args.iheight),
+                                 rotate=self.args.rotate,
                                  framerate=(self.args.fps))
 
     def parseArgs(self):
@@ -90,10 +91,13 @@ class PiVideoStream:
         parser.add_argument("--color", dest="color",
                             help="color: ([0,255],[0,255])",
                             default=None)
+        parser.add_argument("--rotate", dest="rotate",
+                            help="Rotate: 90, 180, 270 (deg)",
+                            default=0)
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
- 
+
         self.args = parser.parse_args()
         #Logging
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
@@ -101,15 +105,15 @@ class PiVideoStream:
         logging.debug(self.args)
 
     def Run(self):
-        self.go();
+        self.go()
 
     def go(self):
-        if self.args.threads == 0:
+        if self.args.threads <= 1:
             self.processVideo()
         else:
             try:
-                self.captureThread = picam.CaptureThread(self.picam, 
-                                                        self.processFrame, 
+                self.captureThread = picam.CaptureThread(self.picam,
+                                                        self.processFrame,
                                                         self.args.threads)
                 while self.captureThread.running:
                     time.sleep(1)
@@ -131,38 +135,36 @@ class PiVideoStream:
     def processVideo(self):
         """ create a camera, continually read frames and process them.
         """
-        print("  (single threaded)")
+        logging.info("  (single threaded)")
         self.picam.start()
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Began processing images")
         while True:
-            # The image here is directly passed to cv2. 
+            # The image here is directly passed to cv2.
             image = self.picam.next()
             if self.processFrame(image):
                 break
 
     def processFrame(self, image):
-        value, frame = algo.processFrame(image, algo=self.args.algo, 
+        logging.info("  (multi threaded)")
+        target, _ = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
-        if (self.args.debug):
-            logging.info("Target value is: ", value)
 
+        if target != None:
+            logging.debug("Target value is: " + str(target))
         if self.commChan:
-            if (value == None):
-                self.commChan.updateVisionState("Searching")
+            if target != None:
+                self.commChan.UpdateVisionState("Aquired")
+                target.send()
             else:
-                self.commChan.updateVisionState("Acquired")  
-                if self.target.setValue(value):
-                    self.commChan.SendTarget(self.target)
-        else:
-            print("Target value is: {}".format(value))
-        
+                self.commChan.UpdateVisionState("Searching")
+
     def Shutdown(self):
         self.picam.stop()
         if self.commChan:
             self.commChan.Shutdown()
-            
+
 def main():
     pistream = PiVideoStream()
     pistream.Run()

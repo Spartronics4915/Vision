@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
   A Simple mjpg stream http server for the Raspberry Pi Camera
@@ -12,7 +12,13 @@ import algo
 import os
 import sys
 import cv2
+import logging
+import argparse
+import comm
+import traceback
 
+s_args=None
+s_comm=None
 s_first=True
 s_jpgQuality = 80 # used by direct streaming, quality differs from opencv
 s_jpgParam = [int(cv2.IMWRITE_JPEG_QUALITY), 50] # used by opencv
@@ -40,7 +46,7 @@ class CamHandler(BaseHTTPRequestHandler):
             cam = None
             try:
                 time.sleep(1) # wait for shutdown of alt stream
-                cam = picam.PiCam(resolution=(640, 480), 
+                cam = picam.PiCam(resolution=(640, 480),
                                   framerate=60, auto=False)
                 if not cam:
                     raise Exception("Hey no camera!")
@@ -90,9 +96,18 @@ class CamHandler(BaseHTTPRequestHandler):
         while True:
             camframe = cam.next()
             try:
-                dx, frame = algo.processFrame(camframe, algoselector,
+                target,frame = algo.processFrame(camframe, algoselector,
                                             display=True, debug=False)
-                rc, jpg = cv2.imencode('.jpg', frame, s_jpgParam)
+                if target != None:
+                    logging.info("Target!!! ------------------")
+                if s_comm != None:
+                    if target != None:
+                        s_comm.UpdateVisionState("Acquired")
+                        target.send()
+                    else:
+                        s_comm.UpdateVisionState("Searching")
+
+                rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
                 if not rc:
                     continue
                 if s_first:
@@ -106,12 +121,29 @@ class CamHandler(BaseHTTPRequestHandler):
                 time.sleep(0.05)
 
             except Exception as e:
+                # Critical for anything that happens in algo or below
+                exc_info = sys.exc_info()
                 print("algo exception: " + str(e))
+                traceback.print_exception(*exc_info)
+
                 break
 
 
 def main():
+  global s_args
+  global s_comm
   try:
+    parser = argparse.ArgumentParser(description="Start the picam streamer")
+    parser.add_argument("--robot", dest="robot",
+                        help="robot (none, localhost, roborio) [none]",
+                        default="none")
+    s_args = parser.parse_args()
+    if s_args.robot != "none":
+        if s_args.robot == "roborio":
+            ip = "10.49.15.2"
+        else:
+            ip = s_args.robot
+        s_comm = comm.Comm(ip)
     server = HTTPServer(('',5080),CamHandler)
     print ("server started")
     server.serve_forever()

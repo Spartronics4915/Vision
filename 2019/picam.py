@@ -11,11 +11,12 @@ class PiCam:
         self.framerate = framerate
         self.stream = None
         self.rawCapture = None
+
         if auto:
             smode = 0
         else:
             smode = 7 # fast
-        self.cam = PiCamera(resolution=resolution, framerate=framerate,
+        self.cam = PiCamera(resolution=resolution, framerate=framerate,rotate=0,
                             sensor_mode=smode) # for fastest rates, 0 is auto)
         time.sleep(.1) # allow the camera to warm up
         if auto:
@@ -31,13 +32,17 @@ class PiCam:
 
         self.cam.exposure_compensation = -25 # [-25, 25]
         self.cam.shutter_speed = 0 #10000 # set to 0 to go auto
-        self.cam.contrast = 70  # [-100, 100]
+        self.cam.contrast = 100  # [-100, 100]
+        self.cam.saturation = 100 # [0,100]
         self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
         self.cam.hflip = True
         self.cam.vflip = True
-        self.cam.brightness = 70 # [0, 100]
+        self.cam.brightness = 60 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
-        self.cam.ISO = 100 # 100-800
+        self.cam.ISO = 800 # 100-800
+        
+        self.cam.rotation = rotate # 0,90,180,270
+
         time.sleep(.1) # more settling
 
         print("camera settings:")
@@ -118,7 +123,7 @@ class CaptureThread(threading.Thread):
         self.picam.stop()
         print("Capture thread terminated")
 
-    def cleanup():
+    def cleanup(self):
         self.running = False
         if self.procThreads:
             for proc in self.procThreads:

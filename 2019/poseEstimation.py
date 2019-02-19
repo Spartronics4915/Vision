@@ -103,7 +103,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
     if cameraMatrix != None:
         camMat = cameraMatrix
     else:
-        y,x = im.shape  # shape is rows, cols (y, x)
+        y,x,_ = im.shape  # shape is rows, cols (y, x)
         if False:
             # couch-potato formulation
             fx = x
@@ -128,7 +128,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
                                         flags=cv2.SOLVEPNP_ITERATIVE)
     if not success:
         logging.warning("solvePnP fail")
-        return (0,0,0)
+        return None
     else:
         # here's the shapes and sizes of matrices for reference
         # Camera Matrix :
@@ -157,7 +157,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             (1.0, 0.0, 0.0), # point "into" wall from pov of robot
             (0.0, 0.0, 1.0)  # point up
         ])
-        (rotmat,_) = cv2.Rodriques(rotVec) # produces 3x3 rotation matrix
+        (rotmat,_) = cv2.Rodrigues(rotVec) # produces 3x3 rotation matrix
         camPts = []
         xlateVec = xlateVec.reshape(3,) # so we can add to rotpt below
         for p in targetPts:
@@ -201,4 +201,9 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cv2.circle(im, org, 3, (255,0,0), -1)
             cv2.line(im, org, perp, (255,0,0), 2) # blue line
 
-        return (robotPts[0][0], robotPts[0][1], theta)
+        # in the form x,y, theta
+        print("X 'point': " + str(robotPts[0][0]))
+        print("Y 'point': " + str(robotPts[0][1]))
+        print("Theta 'number': " + str(theta))
+
+        return (robotPts[0][0], robotPts[0][1], theta), im

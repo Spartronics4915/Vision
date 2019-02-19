@@ -7,6 +7,7 @@ from networktables import NetworkTables
 import sys, traceback, time
 import json
 import logging
+import re
 
 class Control:
     """
@@ -17,43 +18,15 @@ class Control:
         self.targeting = None
         self.imuHeading = None
 
-class Target:
-    """
-        Target represents the data vision passes to robot.
-        We take no opinion on the shape/type of value
-        XXX: need a way to represent non-acquisition?
-    """
-    def __init__(self, v=None):
-        self.clock = time.clock()
-        self.value = v  # value can be a tuple, a list, a string
-        #Invalid, bogus targets, to be changed if something goes ary
-
-    def setValue(self, value, forceupdate=True):
-        if forceupdate or value != self.value:
-            self.clock = time.clock()
-            self.value = value  # can be a tuple, a list, a string
-            return True
-        else:
-            return False
-
-    def send(self, targetTable):
-        # convert the value and the clock to a comma-separated list of numbers
-        #  value can be scalar, a tuple or an array, result will be flattened
-        #  examples:
-        #       value: 1 -> "1,.3566" 
-        #       value: (1,2) -> "1,2,.3566" 
-        #       value: [1,2,"hello world"] -> "1,2,hello world,.3566" 
-        val = []
-        try:
-            val.extend(self.value) # fails if value is not iterable
-        except TypeError:
-            val.append(self.value)  # handle the single-number case
-        val.append(self.clock)
-        vstr = ",".join(str(x) for x in val)
-        #print("send: " + vstr)
-        targetTable.putString("target", vstr)
-
 theComm = None
+
+def PutString(key, value):
+    if theComm != None:
+        theComm.sd.putString("Vision/"+key, value)
+
+def PutNumberArray(key, value):
+    if theComm != None:
+        theComm.sd.putNumberArray("Vision/"+key, value)
 
 class Comm:
     """
@@ -62,6 +35,7 @@ class Comm:
         by the fake robot server.
     """
     def __init__(self, serverIP):
+        global theComm
         try:
             # IPAddress can be
             #   - None: means run as fake server
@@ -71,8 +45,8 @@ class Comm:
                 # we're a client
                 self.asServer = False
                 NetworkTables.initialize(server=serverIP)
-                NetworkTables.setUpdateRate(.01)
-                # default is .05 (50ms/20Hz), .01 (10ms/100Hz)
+                # don't override updaterate as it apparently causes
+                # odd behavior.
             else:
                 # we're fake server
                 self.asServer = True
@@ -83,21 +57,12 @@ class Comm:
             # update the dashboard with our state, NB: this is a different table
             # that both the vision and control tables.
             self.sd = NetworkTables.getTable("SmartDashboard")
-            self.sd.putString("Vision/Status", "OK")
-            self.updateVisionState("Standby")
+            self.sd.putString("Vision/Status", "Connected")
+            self.UpdateVisionState("Standby")
 
-            # We communicate target to robot via Vision table,
-            # current thinking is that this should not be a subtable of
-            # SmartDashboard, since traffic is multiplied by the number
-            # of clients.
-            self.visionTable = NetworkTables.getTable("/SmartDashboard/Vision")
-            self.controlTable = NetworkTables.getTable("VisionControl")
-
+            # We communicate target to robot via Vision table.
+            self.controlTable = NetworkTables.getTable("/VisionControl`")
             self.control = Control()
-            self.target = Target()
-
-            self.fpsHistory = []
-            self.lastUpdate = time.time()
 
             # Robot communicates to us via fields within the Vision/Control
             #  SubTable we opt for a different table to ensure we
@@ -116,27 +81,17 @@ class Comm:
             print("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
 
-    def updateVisionState(self, state):
+    def UpdateVisionState(self, state):
         self.sd.putString("Vision/State", state)
 
     def Shutdown(self):
-        NetworkTables.removeConnection(self.connectionListener)
+        NetworkTables.removeConnectionListener(self.connectionListener)
         self.controlTable.removeEntryListener(self.visionControlEvent)
-
-    def SendTarget(self, t):
-        self.target = t
-        self.target.send(self.visionTable)
 
     def GetIMUHeading(self):
         return self.control.imuHeading
 
-    def SetFPS(self, fps):
-        self.fpsHistory.append(fps)
-        self.fpsHistory = self.fpsHistory[-15*4:]
-        if time.time() - self.lastUpdate > 5:
-            self.targetState.SetFPS(sum(self.fpsHistory)/len(self.fpsHistory))
-            self.lastUpdate = time.time()
-
+    # called via callback
     def controlEvent(self, key, value, isNew):
         print("control event received: " + key)
         if key == 'SetTarget':
@@ -158,3 +113,5 @@ class Comm:
     def connectionListener(connected, connectionInfo):
         logging.getLogger("nt").debug("connected: %d" % connected)
         logging.getLogger("nt").debug("info: %s" % json.dumps(connectionInfo))
+
+
