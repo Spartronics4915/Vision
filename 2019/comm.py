@@ -18,6 +18,7 @@ class Control:
         self.targeting = None
         self.imuHeading = None
 
+# Comm is a singleton
 theComm = None
 
 def PutString(key, value):
@@ -28,6 +29,10 @@ def PutNumberArray(key, value):
     if theComm != None:
         theComm.sd.putNumberArray("Vision/"+key, value)
 
+def updateDisplayTarget(key, value):
+    if theComm != None:
+        theComm.overlayTable.putNumberArray(key,value)
+        # Should nwo be: SD/Driver/CameraOverlay/Circle
 class Comm:
     """
         Comm abstracts our network-tables conventions.
@@ -63,6 +68,8 @@ class Comm:
             # We communicate target to robot via Vision table.
             self.controlTable = NetworkTables.getTable("/VisionControl`")
             self.control = Control()
+
+            self.overlayTable = sd.getTable("Driver/CameraOverlay")
 
             # Robot communicates to us via fields within the Vision/Control
             #  SubTable we opt for a different table to ensure we

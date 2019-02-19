@@ -96,8 +96,13 @@ class CamHandler(BaseHTTPRequestHandler):
         while True:
             camframe = cam.next()
             try:
-                target,frame = algo.processFrame(camframe, algoselector,
-                                            display=True, debug=False)
+                # Temp fix for 3 returns from algo.processframe(default)
+                if algoselector != "default":
+                    target,_,frame = algo.processFrame(camframe, algoselector,
+                                                display=True, debug=False)
+                else:
+                    target,frame = algo.processFrame(camframe, algoselector,
+                                                display=True, debug=False)
                 if target != None:
                     logging.info("Target!!! ------------------")
                 if s_comm != None:

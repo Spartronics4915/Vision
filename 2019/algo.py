@@ -44,12 +44,7 @@ range1 = np.array([70,255,255])
 #   as possible, thus the high range.
 
 #   TODO: Change all algo's to return a target
-
-def emptyAlgo(frame):
-    return (None,frame)
-
-def hsvAlgo(frame):
-    return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+#   TODO: Change all algo's to return the same amount of things
 
 def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
@@ -67,6 +62,12 @@ def processFrame(frame, algo=None, display=0,debug=0):
     else:
         print("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame)
+
+def emptyAlgo(frame):
+    return (None,frame)
+
+def hsvAlgo(frame):
+    return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
 def maskAlgo(frame):
     # Show what is shown by the opencv HSV values
@@ -102,15 +103,34 @@ def rectAlgo(frame,display=1,debug=0):
     return (None, visImg)
 
 def defaultAlgo(frame,display=0,debug=0):
-    return realPNP(frame, display, debug)
+    # Thoughts: See white board, soon to move to README.md
+    # Find rectangle
+    rects = rectUtil.findRects(frame,200,display,debug)
 
-def realPNP(frame, display, debug):
+    # Pair rectangles
+    # Leftpair is allways leftmost
+    # XXX: rightPair is not always the rightmost
+    success, leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
+
+    # Apply real pnp
+    # THIS IS A FUNCTION TO CALL:
+    # sort points
+    # estimate pose
+    target, frame = realPNP(frame,(leftPair,rightPair),success,display)
+
+    # Generate drawing values
+    displayTarget = rectUtil.circlesFromRects(rect)
+
+    return target, displayTarget, frame
+
+def realPNP(frame, pairs, success,display=0):
     # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
     # Spew
-    logging.debug("The frame type is: " + str(type(frame)))
 
-    rects = rectUtil.findRects(frame,200,display,debug)
+    if success == False:
+        # Logger debugs happened in pairRectangles
+        return None, visImg
 
     if display:
         # combine original image with mask, for visualization
@@ -126,21 +146,11 @@ def realPNP(frame, display, debug):
 
     logging.debug("All valid rectangles are: " + str(rects))
 
-    # Leftpair is allways leftmost
-    # XXX: rightPair is not always the rightmost
-    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
-
-    if success == False:
-        # Logger debugs happened in pairRectangles
-        return None, visImg
-
-    rectPairs = (leftPair,rightPair)
-
     # TODO: support for infinite targets
     lTarget = None
     rTarget = None
 
-    for pair in rectPairs:
+    for pair in pairs:
 
         lPts = None
         rPts = None
@@ -165,7 +175,8 @@ def realPNP(frame, display, debug):
         orderedPoints = pnpSorting.sortPoints(lPts,rPts)
         logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
 
-        # now estimatePose accepts optional camera matrix
+        # Now estimatePose accepts optional camera matrix
+        # Only takes a image to draw on it if spectified
         target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
                                             cameraMatrix=None, display=False)
 

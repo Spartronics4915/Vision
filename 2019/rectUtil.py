@@ -255,6 +255,22 @@ def checkCenter(point,currentCenter):
     else:
         return False
 
+def circlesFromRects(rect):
+    # XXX:  When a method similar to this was implemetned at CKHS,
+    #       the frame was unstable, and the entire system was faulty.
+    #       If similar behaivor occurs, THIS is the culprit.
+    circles = []
+    for r in rect:
+        # CHECK: This suffers from the potential 'opencv can't handle rects properly'
+        # TODO:  Write a 'correct WxH' method
+        centerX = r[0] * 2
+        centerY = r[1] * 2
+
+        circles.append(centerX)
+        circles.append(centerY)
+ 
+    return circles
+
 if __name__ == "__main__":
     import doctest
 
