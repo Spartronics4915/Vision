@@ -106,7 +106,7 @@ def defaultAlgo(frame,display=0,debug=0):
     # Thoughts: See white board, soon to move to README.md
     # Find rectangle
     rects = rectUtil.findRects(frame,200,display,debug)
-
+     
     # Pair rectangles
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
@@ -118,8 +118,16 @@ def defaultAlgo(frame,display=0,debug=0):
     # estimate pose
     target, frame = realPNP(frame,(leftPair,rightPair),success,display)
 
+    # TODO: Fix this, bad stle code
+    targetRects = []
+
+    for r in leftPair:
+        targetRects.append(r)
+    for r in rightPair:
+        targetRects.append(r)
+
     # Generate drawing values
-    displayTarget = rectUtil.circlesFromRects(rect)
+    displayTarget = rectUtil.circlesFromRects(targetRects)
 
     return target, displayTarget, frame
 
@@ -130,7 +138,7 @@ def realPNP(frame, pairs, success,display=0):
 
     if success == False:
         # Logger debugs happened in pairRectangles
-        return None, visImg
+        return None, frame
 
     if display:
         # combine original image with mask, for visualization
