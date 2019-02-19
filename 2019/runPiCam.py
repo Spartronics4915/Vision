@@ -147,7 +147,7 @@ class PiVideoStream:
 
     def processFrame(self, image):
         logging.info("  (multi threaded)")
-        target, _ = algo.processFrame(image, algo=self.args.algo,
+        target, dispTarget, _ = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
 
@@ -156,6 +156,7 @@ class PiVideoStream:
         if self.commChan:
             if target != None:
                 self.commChan.UpdateVisionState("Aquired")
+                dispTarget.send()
                 target.send()
             else:
                 self.commChan.UpdateVisionState("Searching")
