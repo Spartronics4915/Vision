@@ -37,7 +37,7 @@ class PiCam:
         self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
         self.cam.hflip = True
         self.cam.vflip = True
-        self.cam.brightness = 60 # [0, 100]
+        self.cam.brightness = 20 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
         self.cam.ISO = 800 # 100-800
         
