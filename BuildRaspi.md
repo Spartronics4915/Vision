@@ -147,8 +147,9 @@ Here's the drivercam recipe to run uv4l via a shell script:
 ``` bash
 #!/bin/bash -f
 uv4l -f \
- --driver raspicam '--vflip=yes' \
- --driver raspicam '--hflip=yes' \
+ --driver raspicam \
+ --vflip=yes \
+ --hflip=yes \
  --auto-video_nr \
  --enable-server \
  --server-option '--enable-webrtc-audio=0' \
@@ -156,17 +157,12 @@ uv4l -f \
  --server-option '--webrtc-preferred-vcodec=3' \
  --server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
  --server-option '--webrtc-enable-hw-codec'
---driver raspicam \
---auto-video_nr \
---enable-server \
---server-option '--enable-webrtc-audio=0' \
---server-option '--webrtc-receive-audio=0' \
---server-option '--webrtc-preferred-vcodec=3' \
---server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
---server-option '--webrtc-enable-hw-codec'
 ```
 
-Note that if you manually copy or create a file on the raspi for this
+Note that the hflip and vflip settings depend upon the orientation
+of the camera mount on the robot.
+
+Note that if you _manually_ copy or create a file on the raspi for this
 purpose that it must be _executable_.  You can make a file executable
 via: `chmod +x yourfile`.  And verify that it is executable via
 `ls -l yourfile`.  Here is a before and after:
