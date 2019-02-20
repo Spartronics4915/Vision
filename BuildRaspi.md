@@ -142,7 +142,7 @@ import runPiCam
 runPiCam.main()
 ```
 
-Here's a recipe to run uv4l via a shell script:
+Here's the drivercam recipe to run uv4l via a shell script:
 
 ``` bash
 #!/bin/bash -f
@@ -172,6 +172,19 @@ via: `chmod +x yourfile`.  And verify that it is executable via
 ```
 
 ## Prepare for Competition
+
+### official pre-built pi image
+
+Once we've built-out a canonical raspberry pi, we can create a disk
+image that should be used to build out new microsd cards.  This should
+be made available in the release section of our Vision github following
+[these instructions](https://stackoverflow.com/questions/47584988/how-to-upload-tar-gz-and-jar-files-as-github-assets-using-python-requests).  
+Note that this disk image will reflect a specific machine identity 
+([see here](#duplicate-working-microsd-card)) (ie: its static ip).  After cloning 
+this disk image, you'll need to boot your new raspi and reconfigure its static ip.  
+The distinction between driver and vision cameras is characterized by static ip __and__ the 
+camera process that runs after each reboot.  For driver camera, we use the uv4l script and 
+for vision camera we employ python plus `runPiCam.py`.
 
 ### read-only-raspberry-pi
 
@@ -224,7 +237,10 @@ sudo /bin/mount -o remount,rw / && sudo /bin/mount -o remount,rw /boot
 
 Following are details on how to buy, provision and operate a raspi based
 on the FRCVision-rPi image.  Additional customizations are offered to maximize
-utility in the context of Spatronics4915.
+utility in the context of Spatronics4915. These are the steps needed to build
+a raspi that can be used as a base-image. If you already have a base-image available,
+use it skip these steps. In that case, remember to set the static IP and drive
+script appropriate for the raspi's role on the robot.
 
 ### make sure you have a raspi 3 with picam
 
