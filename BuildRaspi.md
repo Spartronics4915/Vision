@@ -205,13 +205,85 @@ sudo /bin/mount -o remount,rw / && sudo /bin/mount -o remount,rw /boot
 
 ### disable wireless (wifi and bluetooth)
 
-* following isn't necessary for FRCVision-rPi but left here for reference.
-* add to /etc/modprobe.d/raspi-blacklist.config (via [stackexchange](http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3))
+FRCVision-rPi disables both wifi and bluetooth via these contents of
+    `/etc/modprobe.d/raspi-blacklist.config`.
 
+```sh
+#wifi
+blacklist brcmfmac
+blacklist brcmutil
+#bt
+blacklist btbcm
+blacklist hci_uart
 ```
- *blacklist brcmfmac*
- *blacklist brcmutil*
+
+During debugging and provisioning of a raspi, you may find it useful
+to enable the wifi.  If you do so, __make sure to disable it before competing__.
+
+After commenting out the two wifi entries and rebooting verify that
+the wifi is active:
+
+```sh
+% ifconfig wlan0
+wlan0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether b8:27:eb:47:2d:bd  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
+
+Check which wifi networks are available:
+
+```sh
+% sudo iwlist wlan0 scan | grep ESSID
+ESSID:"Tortellini"
+ESSID:"WIFI"
+ESSID:""
+ESSID:"CenturyLink1238"
+ESSID:""
+ESSID:"xfinitywifi"
+```
+
+Add network password  to `/etc/wpa_supplicant/wpa_supplicant.conf`:
+
+```txt
+country=US
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+    ssid="BISD-OPEN-WIFI"
+    key_mgmt=NONE
+    proto=RSN
+    key_mgmt=WPA-PSK
+    pairwise=CCMP
+    auth_alg=OPEN
+}
+# if your network has a password replace key_mgmt with psk="YourPassword"
+```
+
+To reconfigure wifi network:
+
+```sh
+% wpa_cli -i wlan0 reconfigure
+% ifconfig wlan0
+```
+
+If you have two routes to the internet you may need to look at the routes.
+
+```sh
+% ip route
+default via 192.168.0.1 dev eth0 src 192.168.0.8 metric 202
+default via 192.168.1.1 dev wlan0 src 192.168.1.74 metric 303
+192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.8 metric 202
+192.168.1.0/24 dev wlan0 proto kernel scope link src 192.168.1.74 metric 303
+```
+
+Here, 192.168.1 and 192.168.0 are our two networks and each have a default
+route.
+
+More information on configuration wifi can be found [here](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md).
 
 ### duplicate working microSD card
 
