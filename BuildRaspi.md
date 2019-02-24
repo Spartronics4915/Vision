@@ -502,7 +502,10 @@ server-option = --webrtc-hw-vcodec-maxbitrate=3000
   `/media/pi`.
 * if you have a ext4 thumbdrive, you may need to manually mount it:
    `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
+   If you don't know the device id: `lsblk`.
 * remember to eject/umount the thumbdrive!
+* it's possible that support for "exfat" (large-file FAT) isn't present
+  on the system.   To `sudo apt-get install exfat-fuse exfat-utils`.
 
 #### FRCVision-rPi services
 
