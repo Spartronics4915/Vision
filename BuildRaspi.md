@@ -499,13 +499,16 @@ server-option = --webrtc-hw-vcodec-maxbitrate=3000
 
 * for FAT32 thumbdrives, the desktop environment can be used to
   mount and eject.  In this case, the contents are found under
-  `/media/pi`.
+  `/media/pi`. Via CLI: `sudo mount /dev/sda1 /media/usb -o umask=000`. You
+  might need to `sudo mkdir /media/usb`.  It's possible that support for 
+  "exfat" (large-file FAT) isn't present on the system. Install via: 
+  `sudo apt-get install exfat-fuse exfat-utils`. Finally, remember that
+  portable FAT doessn't have user permissions (or any security for that matter).
+  Get used to all files being owned by root, etc.
 * if you have a ext4 thumbdrive, you may need to manually mount it:
    `sudo mount /dev/sda1 /mnt/usbdrive`. (you might need to mkdir)
    If you don't know the device id: `lsblk`.
 * remember to eject/umount the thumbdrive!
-* it's possible that support for "exfat" (large-file FAT) isn't present
-  on the system.   To `sudo apt-get install exfat-fuse exfat-utils`.
 
 #### FRCVision-rPi services
 
