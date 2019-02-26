@@ -49,7 +49,6 @@ class PiVideoStream:
 
         self.picam = picam.PiCam(resolution=(self.args.iwidth,
                                              self.args.iheight),
-                                 rotate=self.args.rotate,
                                  framerate=(self.args.fps))
 
     def parseArgs(self):
@@ -91,9 +90,6 @@ class PiVideoStream:
         parser.add_argument("--color", dest="color",
                             help="color: ([0,255],[0,255])",
                             default=None)
-        parser.add_argument("--rotate", dest="rotate",
-                            help="Rotate: 90, 180, 270 (deg)",
-                            default=0)
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
@@ -147,7 +143,7 @@ class PiVideoStream:
 
     def processFrame(self, image):
         logging.info("  (multi threaded)")
-        target, _ = algo.processFrame(image, algo=self.args.algo,
+        target, dispTarget, _ = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
 
@@ -155,7 +151,8 @@ class PiVideoStream:
             logging.debug("Target value is: " + str(target))
         if self.commChan:
             if target != None:
-                self.commChan.UpdateVisionState("Acquired")
+                self.commChan.UpdateVisionState("Aquired")
+                dispTarget.send()
                 target.send()
             else:
                 self.commChan.UpdateVisionState("Searching")

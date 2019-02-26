@@ -16,7 +16,7 @@ class PiCam:
             smode = 0
         else:
             smode = 7 # fast
-        self.cam = PiCamera(resolution=resolution, framerate=framerate,rotate=0,
+        self.cam = PiCamera(resolution=resolution, framerate=framerate,
                             sensor_mode=smode) # for fastest rates, 0 is auto)
         time.sleep(.1) # allow the camera to warm up
         if auto:
@@ -41,7 +41,7 @@ class PiCam:
         self.cam.sharpness = 0 # [-100, 100]
         self.cam.ISO = 800 # 100-800
         
-        self.cam.rotation = rotate # 0,90,180,270
+        self.cam.rotation = 90 # 0,90,180,270
 
         time.sleep(.1) # more settling
 
