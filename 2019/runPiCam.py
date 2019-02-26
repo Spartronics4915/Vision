@@ -143,7 +143,7 @@ class PiVideoStream:
 
     def processFrame(self, image):
         logging.info("  (multi threaded)")
-        target, dispTarget, _ = algo.processFrame(image, algo=self.args.algo,
+        target, frame = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
 
