@@ -21,21 +21,46 @@ import targets
 
 class PiVideoStream:
     def __init__(self):
-        # no longer needed:
-        #   os.system('sudo ifconfig wlan0 down')
-        logFmt = "%(name)-8s %(levelname)-6s %(message)s"
-        dateFmt = "%H:%M"
-        logging.basicConfig(filename="/tmp/runPiCam.log",level=logging.DEBUG,
-                            format=logFmt, datefmt=dateFmt)
+        
+        self.commChan = None
+        self.parseArgs()
+        #   logger init
+        # TODO: log level should be represented by a word, not a number
+
+        if self.args.debug:
+            logLevel = logging.DEBUG
+        else:
+            logLevel = logging.INFO
+        
+        logger = logging.getLogger()
+        logger.setLevel(logLevel)
+
+        # File handler (responsible to outputting to file)
+        fh = logging.FileHandler('logtest.txt')
+        fh.setLevel(logging.DEBUG)
+    
+        # Console handler (responsible for printing to stdout)
+        ch = logging.StreamHandler()
+        ch.setLevel(logLevel)
+
+        # create formatter
+        formatter = logger.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        # Set format of handler
+        ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
+        # add handlers to logger
+        logger.addHandler(ch)
+        logger.addHandler(fh)
+
         logging.debug("\n--------------------New run------------------")
         logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("---------------------------------------------\n")
-        self.commChan = None
-        self.parseArgs()
         logging.info("pid: %d" % os.getpid())
         logging.info("args: " + str(self.args))
         logging.info("opencv version: {}".format(cv2.__version__))
+        
         if self.args.robot != "none":
             if self.args.robot == "roborio":
                 fmt = "%Y/%m/%d %H:%M:%S"
@@ -95,7 +120,7 @@ class PiVideoStream:
                             default=0)
 
         self.args = parser.parse_args()
-        #Logging
+
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Parsed the following args:")
         logging.debug(self.args)
