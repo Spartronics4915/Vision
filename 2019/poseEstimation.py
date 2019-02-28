@@ -100,6 +100,33 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 # the origin # to the target.
 
 def estimatePose(im, imgPts, cameraMatrix=None, display=False):
+    """
+    Given an imput image and image points, guess where we are
+
+    :param im: frame from which the image points were captured
+    :type im: opencv frame (np.ndarray())
+
+    :param imgPts: the critical points of the target figure
+    :type imgPts: array
+
+    :param cameraMatrix: The camera matrix to use. If this value is none, it is caluclated using domestic methods
+    :type cameraMatrix: bool
+
+    :param debug: logger.debug() prints
+    :type debug: bool
+
+    :return robotPoints: Where the robot is, with the target center as the point (0,0,0)
+    :rtype: tuple, in the form of (x,y,theta)
+
+    640x480
+    Known inputs -> known outputs
+    >>> class A(): pass
+    >>> img = A()
+    >>> img.shape = (480,640,1)
+    >>> estimatePose(img,np.array([[269, 204],[301,212],[279,301],[429,211],[461,203],[451,299]],dtype='double'))
+    (50, 0, 0), img
+    """
+
     if cameraMatrix != None:
         camMat = cameraMatrix
     else:
@@ -207,3 +234,15 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         print("Theta 'number': " + str(theta))
 
         return (robotPts[0][0], robotPts[0][1], theta), im
+
+if __name__ ==  "__main__":
+    import doctest
+    import logging
+
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+
+    logging.info("Began logger")
+    
+    doctest.testmod()
