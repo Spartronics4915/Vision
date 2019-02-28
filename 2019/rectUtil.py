@@ -172,17 +172,17 @@ def pairRectangles(rectArray,wantedTargets=1,debug=0):
 
 def pairRectanglesLambda(rectArray,debug=0):
     # 2nd method of sorting, commited for record, not for use
+    pair1 = None
+    pair2 = None
     xSortedRects = sorted(rectArray,key=lambda r:r[0][0])
 
     # Creating left-facing rectangles
     leftRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) <= 90,rectArray))
     # Creating right-facing rectangles
     rightRects = list(filter(lambda r: getCorrectedAngle(r[0],r[2]) > 90,rectArray))
-
-    # Majority of old logic
-
+ 
     # Iterating a over a range the size of the left rectangles
-    # See: ASCI art
+    # See: ASCI art in poseEstimation.py
 
     # len() returns how many elements are in a list
     if (len(leftRects) < 0) or (len(rightRects) < 0):
