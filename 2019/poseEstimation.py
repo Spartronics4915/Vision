@@ -118,8 +118,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
     :return robotPoints: Where the robot is, with the target center as the point (0,0,0)
     :rtype: tuple, in the form of (x,y,theta)
 
-    640x480
     Known inputs -> known outputs
+    These points are based on test images
     >>> class A(): pass
     >>> img = A()
     >>> img.shape = (480,640,1)
