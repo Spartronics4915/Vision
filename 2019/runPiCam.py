@@ -23,16 +23,24 @@ class PiVideoStream:
     def __init__(self):
         # no longer needed:
         #   os.system('sudo ifconfig wlan0 down')
+        self.parseArgs()
         logFmt = "%(name)-8s %(levelname)-6s %(message)s"
         dateFmt = "%H:%M"
-        logging.basicConfig(filename="/tmp/runPiCam.log",level=logging.DEBUG,
+        if self.args.debug:
+            loglevel = logging.DEBUG
+        else:
+            loglevel = logging.INFO
+        logging.basicConfig(filename="/tmp/runPiCam.log",level=loglevel,
                             format=logFmt, datefmt=dateFmt)
-        logging.debug("\n--------------------New run------------------")
-        logging.debug("Run started at: ")
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-        logging.debug("---------------------------------------------\n")
+        logging.debug("Parsed the following args:")
+        logging.debug(self.args)
+
+        logging.info("\n--------------------New run------------------")
+        logging.info("Run started at: ")
+        logging.info(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+        logging.info("---------------------------------------------\n")
         self.commChan = None
-        self.parseArgs()
         logging.info("pid: %d" % os.getpid())
         logging.info("args: " + str(self.args))
         logging.info("opencv version: {}".format(cv2.__version__))
@@ -95,10 +103,6 @@ class PiVideoStream:
                             default=0)
 
         self.args = parser.parse_args()
-        #Logging
-        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-        logging.debug("Parsed the following args:")
-        logging.debug(self.args)
 
     def Run(self):
         self.go()
