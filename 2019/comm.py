@@ -78,7 +78,7 @@ class Comm:
 
         except:
             xcpt = sys.exc_info()
-            print("ERROR initializing network tables", xcpt[0])
+            logging.info("ERROR initializing network tables", xcpt[0])
             traceback.print_tb(xcpt[2])
 
     def UpdateVisionState(self, state):
@@ -93,14 +93,13 @@ class Comm:
 
     # called via callback
     def controlEvent(self, key, value, isNew):
-        print("control event received: " + key)
+        logging.debug("control event received: " + key)
         if key == 'SetTarget':
         	self.control.targeting = value
         elif key == 'IMUHeading':
         	self.control.imuHeading = value
-            #print(value)
         else:
-        	print("Unexpected key in visValueChanged")
+        	logging.info("Unexpected key in visValueChanged")
 
     @staticmethod
     def visionControlEvent(table, key, value, isNew):

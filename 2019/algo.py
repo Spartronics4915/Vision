@@ -13,7 +13,6 @@ TODO: Better Varible Names
 import numpy as np
 import cv2
 import poseEstimation
-import pnpSorting
 import time
 import traceback
 import rectUtil
@@ -65,7 +64,7 @@ def processFrame(frame, algo=None, display=0,debug=0):
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:
-        print("algo: unexpected name " + algo + " running default")
+        logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame)
 
 def maskAlgo(frame):
@@ -160,9 +159,12 @@ def realPNP(frame, display, debug):
             #       rect, and never reach the right rect.
             break
 
-        logging.debug("sending a point list of: " + str(lPts))
+        logging.debug("sending a left point list of: " + str(lPts))
+        logging.debug("sending a right point list of: " + str(rPts))
+
         # Orders the points according to modelpoints in solvePNP()
-        orderedPoints = pnpSorting.sortPoints(lPts,rPts)
+        orderedPoints = rectUtil.sortPoints(lPts,rPts)
+
         logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
 
         # now estimatePose accepts optional camera matrix

@@ -229,9 +229,9 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cv2.line(im, org, perp, (255,0,0), 2) # blue line
 
         # in the form x,y, theta
-        print("X 'point': " + str(robotPts[0][0]))
-        print("Y 'point': " + str(robotPts[0][1]))
-        print("Theta 'number': " + str(theta))
+        logging.debug("X 'point': " + str(robotPts[0][0]))
+        logging.debug("Y 'point': " + str(robotPts[0][1]))
+        logging.debug("Theta 'number': " + str(theta))
 
         return (robotPts[0][0], robotPts[0][1], theta), im
 

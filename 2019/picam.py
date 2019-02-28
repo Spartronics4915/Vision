@@ -3,6 +3,7 @@ from picamera.array import PiRGBArray
 import time
 import threading
 import sys
+import logging
 
 # -------------------------------------------------------------------------
 class PiCam:
@@ -45,21 +46,21 @@ class PiCam:
 
         time.sleep(.1) # more settling
 
-        print("camera settings:")
-        print("  analog_gain:%s" % self.cam.analog_gain)
-        print("  digital_gain:%s" % self.cam.digital_gain)
-        print("  awb_mode:%s" % self.cam.awb_mode)
-        print("  awb_gains:(%g, %g)" % self.cam.awb_gains)
-        print("  brightness:%d" % self.cam.brightness)
-        print("  contrast:%d"  % self.cam.contrast)
-        print("  saturation:%d" % self.cam.saturation)
-        print("  drc_strength:%s" % self.cam.drc_strength)
-        print("  exposure_compensation:%d" % self.cam.exposure_compensation)
-        print("  exposure_mode:%s" % self.cam.exposure_mode)
-        print("  exposure_speed:%d us" % self.cam.exposure_speed)
-        print("  shutter_speed:%d us" % self.cam.shutter_speed)
-        print("  framerate:%s" % self.cam.framerate)
-        print("  ISO:%s" % self.cam.ISO)
+        logging.info("camera settings:")
+        logging.info("  analog_gain:%s" % self.cam.analog_gain)
+        logging.info("  digital_gain:%s" % self.cam.digital_gain)
+        logging.info("  awb_mode:%s" % self.cam.awb_mode)
+        logging.info("  awb_gains:(%g, %g)" % self.cam.awb_gains)
+        logging.info("  brightness:%d" % self.cam.brightness)
+        logging.info("  contrast:%d"  % self.cam.contrast)
+        logging.info("  saturation:%d" % self.cam.saturation)
+        logging.info("  drc_strength:%s" % self.cam.drc_strength)
+        logging.info("  exposure_compensation:%d" % self.cam.exposure_compensation)
+        logging.info("  exposure_mode:%s" % self.cam.exposure_mode)
+        logging.info("  exposure_speed:%d us" % self.cam.exposure_speed)
+        logging.info("  shutter_speed:%d us" % self.cam.shutter_speed)
+        logging.info("  framerate:%s" % self.cam.framerate)
+        logging.info("  ISO:%s" % self.cam.ISO)
 
     def start(self):
         self.rawCapture = PiRGBArray(self.cam, size=self.resolution)
@@ -100,7 +101,7 @@ class CaptureThread(threading.Thread):
         self.start()
 
     def run(self):
-        print("Capture thread starting")
+        logging.info("Capture thread starting")
         self.picam.start()
         while self.running:
             if self.procThreads == None:
@@ -121,7 +122,7 @@ class CaptureThread(threading.Thread):
                     sys.stderr.write('z')
                     time.sleep(0.01)
         self.picam.stop()
-        print("Capture thread terminated")
+        logging.info("Capture thread terminated")
 
     def cleanup(self):
         self.running = False
@@ -140,7 +141,7 @@ class ProcessingThread(threading.Thread):
         self.event = threading.Event()
         self.eventWait = .01 # wait 
         self.name = str(id)
-        print('Processor thread %s started with idle time of %.2fs' %
+        logging.info('Processor thread %s started with idle time of %.2fs' %
                              (self.name, self.eventWait))
         self.start() 
 
@@ -157,5 +158,5 @@ class ProcessingThread(threading.Thread):
                     self.event.clear()
                     with self.mainthread.lock:
                         self.mainthread.procPool.insert(0, self)
-        print("Processor thread %s terminated" % self.name)
+        logging.info("Processor thread %s terminated" % self.name)
 

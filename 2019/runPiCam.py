@@ -139,12 +139,12 @@ class PiVideoStream:
                 while self.captureThread.running:
                     time.sleep(1)
             except KeyboardInterrupt:
-                print("\nuser shutdown")
+                logging.info("\nuser shutdown")
             except:
                 e = sys.exc_info()
-                print("\n")
-                print(e)
-                print("\nunexpected error")
+                logging.info("\n")
+                logging.info(e)
+                logging.info("\nunexpected error")
 
             self.captureThread.running = False
             self.captureThread.join()

@@ -56,13 +56,13 @@ class CamHandler(BaseHTTPRequestHandler):
                     self.streamAlgo(cam, algostr)
 
             except Exception as e:
-                print(e)
+                logging.info(e)
 
-            print("done streaming ----------------------")
+            logging.info("done streaming ----------------------")
             if cam:
                 cam.stop() # triggers PiCamera.close()
             else:
-                print("(cam init problem)")
+                logging.info("(cam init problem)")
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -71,7 +71,7 @@ class CamHandler(BaseHTTPRequestHandler):
             return
 
     def streamDirect(self, cam):
-        print("direct streaming")
+        logging.info("direct streaming")
         stream = io.BytesIO()
         try:
             for i in cam.cam.capture_continuous(stream, "jpeg",
@@ -91,7 +91,7 @@ class CamHandler(BaseHTTPRequestHandler):
 
     def streamAlgo(self, cam, algoselector):
         global s_first
-        print(algoselector + " algo streaming")
+        (algoselector + " algo streaming")
         cam.start()
         while True:
             camframe = cam.next()
@@ -111,7 +111,7 @@ class CamHandler(BaseHTTPRequestHandler):
                 if not rc:
                     continue
                 if s_first:
-                    print(jpg.size)
+                    logging.info(jpg.size)
                     s_first = False
                 self.wfile.write(bytes("--jpgboundary\n","utf-8"))
                 self.send_header('Content-type','image/jpeg')
@@ -123,7 +123,7 @@ class CamHandler(BaseHTTPRequestHandler):
             except Exception as e:
                 # Critical for anything that happens in algo or below
                 exc_info = sys.exc_info()
-                print("algo exception: " + str(e))
+                logging.error("algo exception: " + str(e))
                 traceback.print_exception(*exc_info)
 
                 break
