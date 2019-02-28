@@ -39,7 +39,7 @@ class PiCam:
         self.cam.vflip = True
         self.cam.brightness = 20 # [0, 100]
         self.cam.sharpness = 0 # [-100, 100]
-        self.cam.ISO = 800 # 100-800
+        self.cam.ISO = 400 # 100-800
         
         self.cam.rotation = 90 # 0,90,180,270
 
