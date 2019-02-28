@@ -137,6 +137,9 @@ def main():
     parser.add_argument("--robot", dest="robot",
                         help="robot (none, localhost, roborio) [none]",
                         default="none")
+    parser.add_argument("--debug", dest="debug",
+                        help="debug: [0,1] ",
+                        default=0)
     s_args = parser.parse_args()
     if s_args.robot != "none":
         if s_args.robot == "roborio":
@@ -144,11 +147,18 @@ def main():
         else:
             ip = s_args.robot
         s_comm = comm.Comm(ip)
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    if self.args.debug:
+        loglevel = logging.DEBUG
+    else:
+        loglevel = logging.INFO
+    logging.basicConfig(level=loglevel, format=logFmt, datefmt=dateFmt)
     server = HTTPServer(('',5080),CamHandler)
-    print ("server started")
+    logging.info ("server started")
     server.serve_forever()
   except KeyboardInterrupt:
-    print ("aborting server")
+    logging.warning("aborting server")
     server.socket.close()
 
 if __name__ == '__main__':
