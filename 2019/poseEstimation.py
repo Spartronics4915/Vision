@@ -100,6 +100,33 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 # the origin # to the target.
 
 def estimatePose(im, imgPts, cameraMatrix=None, display=False):
+    """
+    Given an imput image and image points, guess where we are
+
+    :param im: frame from which the image points were captured
+    :type im: opencv frame (np.ndarray())
+
+    :param imgPts: the critical points of the target figure
+    :type imgPts: array
+
+    :param cameraMatrix: The camera matrix to use. If this value is none, it is caluclated using domestic methods
+    :type cameraMatrix: bool
+
+    :param debug: logger.debug() prints
+    :type debug: bool
+
+    :return robotPoints: Where the robot is, with the target center as the point (0,0,0)
+    :rtype: tuple, in the form of (x,y,theta)
+
+    Known inputs -> known outputs
+    These points are based on test images
+    >>> class A(): pass
+    >>> img = A()
+    >>> img.shape = (480,640,1)
+    >>> estimatePose(img,np.array([[269, 204],[301,212],[279,301],[429,211],[461,203],[451,299]],dtype='double'))
+    (50, 0, 0), img
+    """
+
     if cameraMatrix != None:
         camMat = cameraMatrix
     else:
@@ -111,8 +138,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cx,cy = (x/2, y/2)
         else:
             # we employ picam1 specs to compute fx
-            fx = x*3.6/3.76
-            fy = y*3.6/2.74
+            fx = 1.2*x*3.6/3.76
+            fy = 1.2*y*3.6/2.74
             cx,cy = (fx/2,fy/2)
 
         camMat = np.array([
@@ -196,8 +223,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             worldPts = np.array([(0.0, 0.0, 0.0), (-10.0,0.0,0.0)])
             (projPts, _) = cv2.projectPoints(worldPts,
                                         rotVec, xlateVec, camMat, distCoeffs)
-            org = (int(projPts[0][0][0]), int(projPts[0][0][1]));
-            perp = (int(projPts[0][1][0]), int(projPts[0][1][1]));
+            org = (int(projPts[0][0]), int(projPts[0][1]))
+            perp = (int(projPts[1][0]), int(projPts[1][1]))
             cv2.circle(im, org, 3, (255,0,0), -1)
             cv2.line(im, org, perp, (255,0,0), 2) # blue line
 
@@ -207,3 +234,15 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         print("Theta 'number': " + str(theta))
 
         return (robotPts[0][0], robotPts[0][1], theta), im
+
+if __name__ ==  "__main__":
+    import doctest
+    import logging
+
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
+
+    logging.info("Began logger")
+    
+    doctest.testmod()
