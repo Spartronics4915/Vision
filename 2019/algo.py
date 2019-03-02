@@ -61,6 +61,8 @@ def processFrame(frame, algo=None, display=0,debug=0):
         return maskAlgo(frame)
     elif algo == "realPNP":
         return realPNP(frame,display,debug)
+    elif algo == "heading":
+        return headingAlgo(frame,display,debug)
     elif algo == "hsv":
         return hsvAlgo(frame)
     else:
@@ -102,6 +104,32 @@ def rectAlgo(frame,display=1,debug=0):
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
+
+def headingAlgo(frame, display, debug):
+    rects = rectUtil.findRects(frame,200,display,debug)
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
+                                                         debug=debug)
+    if success:
+        lPts = None
+        rPts = None
+        if leftPair:
+            lPts = cv2.boxPoints(leftPair)
+            lPts = np.int0(lPts)
+        if rightPair:
+            rPts = cv2.boxPoints(rightPair)
+            rPts = np.int0(rPts)
+        # Darwin: this is the method we need!
+        #   return the angle-offset in x and a height error which
+        #   is small when the height is near the "target" height
+        #   (ie: big).  And the error is big, say 100, as the height
+        #   approaches a small value. The offset(s) are either the
+        #   fraction of the horizontal frame or the angle as approximated
+        #   by that value * hfov/2.
+        tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
+        return targets.TargetHeadings(tgval),frame
+    else:
+        return (None, frame)
+
 
 def realPNP(frame, display, debug):
     # TODO: Remove debug from all function calls, and use logger.debug()

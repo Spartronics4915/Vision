@@ -20,13 +20,20 @@ class Target:
     """
     lastUpdate = 0  # NB class variable, shared across instances
 
-    def __init__(self):
+    def __init__(self, updateDelta=True):
         self.subkey = "Target"
         self.autoSend = False
         self.clock = time.monotonic()
-        self.lastUpdate = self.clock
         self.value = None
-        self.deltaclock = 0
+        if updateDelta:
+            # Used when setValue *is* construction, NB: if there
+            # are > 1 live targets in the codebase, this isn't
+            # valid.
+            self.deltaclock = self.clock - self.lastUpdate
+            self.lastUpdate = self.clock
+        else:
+            self.deltaclock = 0
+            self.lastUpdate = self.clock
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
@@ -79,3 +86,23 @@ class TargetPNP(Target):
         arrayValue.append(self.deltaclock)
         # logging.info("send: " + str(arrayValue))
         comm.PutNumberArray(self.subkey, arrayValue)
+
+class TargetHeadings(Target):
+    def __init__(self, headings, orientation="Reverse"):
+        super().__init__()
+        self.subkey = orientation+"/heading"
+        self.headings = headings
+
+    # currently no need to override setValue
+    def send(self):
+        # TargetHeadings convention for target:
+        #     all numbers, 2 per target, 1 timestamp
+        arrayValue = []
+        arrayValue.extend(self.headings)
+        arrayValue.append(self.deltaclock)
+        # logging.info("send: " + str(arrayValue))
+        comm.PutNumberArray(self.subkey, arrayValue)
+
+
+
+    
