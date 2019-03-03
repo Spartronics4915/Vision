@@ -100,6 +100,8 @@ class CamHandler(BaseHTTPRequestHandler):
                                             display=True, debug=False)
                 if target != None:
                     logging.info("Target!!! ------------------")
+                    if algoselector == "heading":
+                        logging.info(target.headings)
                 if s_comm != None:
                     if target != None:
                         s_comm.UpdateVisionState("Acquired")

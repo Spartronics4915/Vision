@@ -312,17 +312,19 @@ def sortPoints(leftPoints, rightPoints):
 def computeTargetOffSet(frame,center):
     # Only need the center of the target for this caluclation, not all points  
     # TODO: Phoenix documentation
-    x,y,_ = frame.shape()
+    x,y,_ = frame.shape
 
     pixelToDegRatio = x / RPICAMFOV
 
-    if center[0] < x/2:
-        # Left side of screen 
-        centerDegOffset = -(center[0] / pixelToDegRatio)
+    centerX = center[0]
 
-    elif center[0] > x/2:
+    if centerX < x/2:
+        # Left side of screen 
+        centerDegOffset = -(centerX / pixelToDegRatio)
+
+    elif centerX > x/2:
         # Right side of screen
-        centerDegOffset = (center[0] - x/2) / pixelToDegRatio 
+        centerDegOffset = (centerX - x/2) / pixelToDegRatio 
 
     return centerDegOffset
 
@@ -330,7 +332,7 @@ def computeTargetOffSet(frame,center):
 def computeHeightError(lPts,rPts):
     # numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double") 
     # TODO: Phoenix documentation
-    
+
     
 
     return None

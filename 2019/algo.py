@@ -111,16 +111,17 @@ def headingAlgo(frame, display, debug):
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
 
+    x,y,_ = frame.shape
     # For simplicity, we are only thinking about one target
     if leftPair:
         lRect = leftPair[0]
         rRect = leftPair[1]
         if lRect:
             lPts = cv2.boxPoints(lRect)
-            lPts = np.int0(lRect)
+            lPts = np.int0(lPts)
         if rRect:
             rPts = cv2.boxPoints(rRect)
-            rPts = np.int0(rRect)
+            rPts = np.int0(rPts)
         # Darwin: this is the method we need!
         #   return the angle-offset in x and a height error which
         #   is small when the height is near the "target" height
@@ -129,10 +130,10 @@ def headingAlgo(frame, display, debug):
         #   fraction of the horizontal frame or the angle as approximated
         #   by that value * hfov/2.
         PnpPts = rectUtil.sortPoints(lPts,rPts)
+        pointsCenter = rectUtil.points2center(PnpPts)
+        angleOffset = rectUtil.computeTargetOffSet(frame,pointsCenter)
 
-        center = rectUtil.points2center(PnpPts)
-
-        angleOffset = rectUtil.computeTargetOffSet(frame,center)
+        cv2.line(frame,(x,pointsCenter[1]),(0,[pointsCenter[1]]),(0,0,255),thickness = 2)
 
         # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
         return targets.TargetHeadings(angleOffset),frame
