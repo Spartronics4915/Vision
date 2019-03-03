@@ -223,8 +223,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             worldPts = np.array([(0.0, 0.0, 0.0), (-10.0,0.0,0.0)])
             (projPts, _) = cv2.projectPoints(worldPts,
                                         rotVec, xlateVec, camMat, distCoeffs)
-            org = (int(projPts[0][0][0]), int(projPts[0][0][1]))
-            perp = (int(projPts[0][1][0]), int(projPts[0][1][1]))
+            org = (int(projPts[0][0]), int(projPts[0][1]))
+            perp = (int(projPts[1][0]), int(projPts[1][1]))
             cv2.circle(im, org, 3, (255,0,0), -1)
             cv2.line(im, org, perp, (255,0,0), 2) # blue line
 
