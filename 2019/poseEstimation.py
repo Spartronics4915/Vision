@@ -138,8 +138,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cx,cy = (x/2, y/2)
         else:
             # we employ picam1 specs to compute fx
-            fx = 1.2*x*3.6/3.76
-            fy = 1.2*y*3.6/2.74
+            fx = 1.35*x*3.6/3.76
+            fy = 1.35*y*3.6/2.74
             cx,cy = (fx/2,fy/2)
 
         camMat = np.array([
