@@ -17,7 +17,7 @@
         videostream cls is set to `size1280`.
     * `index.css` can be used to change resolution (this is the where the
       in-browser zoom is controlled).
-    * for the cleanest shutdown, reset the VideoStream value to "Test" at 
+    * for the cleanest shutdown, reset the VideoStream value to "_cleanup_" at 
       the end of a match.
 
 #### Bottom screen (standard dashboard)
