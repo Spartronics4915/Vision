@@ -87,8 +87,8 @@ Also note that the the disk must be in Read-Write mode to make this change.
 
     ```txt
     Vision:  10.49.15.10
-        Back:  10.49.15.11
-        Front:  10.49.15.12
+    Back:    10.49.15.11
+    Front:   10.49.15.12
     ```
 
   Also make sure that the uv4l service isn't running:  `sudo systemctl disable
