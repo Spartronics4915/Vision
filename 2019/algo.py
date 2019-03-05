@@ -106,17 +106,21 @@ def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
 
 def headingAlgo(frame, display, debug):
+    # Intrestingly, with this algo, it also requires proper different configs in runPiCam (lower res)
     rects = rectUtil.findRects(frame,200,display,debug)
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
-    if success:
-        lPts = None
-        rPts = None
-        if leftPair:
-            lPts = cv2.boxPoints(leftPair)
+
+    x,y,_ = frame.shape
+    # For simplicity, we are only thinking about one target
+    if leftPair:
+        lRect = leftPair[0]
+        rRect = leftPair[1]
+        if lRect:
+            lPts = cv2.boxPoints(lRect)
             lPts = np.int0(lPts)
-        if rightPair:
-            rPts = cv2.boxPoints(rightPair)
+        if rRect:
+            rPts = cv2.boxPoints(rRect)
             rPts = np.int0(rPts)
         # Darwin: this is the method we need!
         #   return the angle-offset in x and a height error which
@@ -125,8 +129,14 @@ def headingAlgo(frame, display, debug):
         #   approaches a small value. The offset(s) are either the
         #   fraction of the horizontal frame or the angle as approximated
         #   by that value * hfov/2.
-        tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
-        return targets.TargetHeadings(tgval),frame
+        PnpPts = rectUtil.sortPoints(lPts,rPts)
+        pointsCenter = rectUtil.points2center(PnpPts)
+        angleOffset = rectUtil.computeTargetOffSet(frame,pointsCenter)
+
+        cv2.line(frame,(x,pointsCenter[1]),(0,[pointsCenter[1]]),(0,0,255),thickness = 2)
+
+        # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
+        return targets.TargetHeadings(angleOffset),frame
     else:
         return (None, frame)
 

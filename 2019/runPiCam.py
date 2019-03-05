@@ -28,6 +28,7 @@ class PiVideoStream:
         # TODO: log level should be represented by a word, not a number
 
         if self.args.debug:
+
             logLevel = logging.DEBUG
         else:
             logLevel = logging.INFO
@@ -44,7 +45,7 @@ class PiVideoStream:
         ch.setLevel(logLevel)
 
         # create formatter
-        formatter = logger.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logger.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
 
         # Set format of handler
         ch.setFormatter(formatter)

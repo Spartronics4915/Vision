@@ -24,6 +24,10 @@ import logging
 range0 = np.array([30,150,170])
 range1 = np.array([90,255,255])
 
+RPICAMFOV = 45  # Working deg offset for 2018
+                # nb: This is different than the noted fov in the rpicam spec sheet
+
+
 def findRects(frame,minsize,display=0,debug=0):
     # TODO: minsize as a arg for runPiCam.py
     """
@@ -305,6 +309,61 @@ def sortPoints(leftPoints, rightPoints):
 
     return np.array(orderedPoints,dtype="double")
 
+def computeTargetOffSet(frame,center):
+    # Only need the center of the target for this caluclation, not all points  
+    # TODO: Phoenix documentation
+    x,y,_ = frame.shape
+
+    pixelToDegRatio = x / RPICAMFOV
+
+    centerX = center[0]
+
+    if centerX < x/2:
+        # Left side of screen 
+        centerDegOffset = -(centerX / pixelToDegRatio)
+
+    elif centerX > x/2:
+        # Right side of screen
+        centerDegOffset = (centerX - x/2) / pixelToDegRatio 
+
+    return centerDegOffset
+
+
+def computeHeightError(lPts,rPts):
+    # numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double") 
+    # TODO: Phoenix documentation
+
+    
+
+    return None
+
+def points2center(points):
+    # Given points in a PNP format, return the center
+    # XXX: Does not work as intended with rotated targets
+    # TODO: Phoenix documentation
+
+    lTopRightPt = points[1] # According to PNP order
+
+    rTopLeftPt =  points[3]
+
+    # How far apart those points are
+    # Center is top left
+    xDelta = lTopRightPt[0] - rTopLeftPt[0]
+    '''
+    Center art:
+                   xDelta
+                <--------->
+        A-------B    X    F-------E
+                |         |
+                |         |
+                |         |
+                |         |
+                C         G
+
+    '''
+    center = (lTopRightPt+xDelta/2,lTopRightPt[1])
+
+    return center
 
 if __name__ == "__main__":
     import doctest

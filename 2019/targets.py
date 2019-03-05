@@ -18,7 +18,7 @@ class Target:
 
         Vision/Target  number;dtime
     """
-    lastUpdate = 0  # NB class variable, shared across instances
+    lastUpdate = 0  # Nb: class variable, shared across instances
 
     def __init__(self, updateDelta=True):
         self.subkey = "Target"
@@ -88,12 +88,14 @@ class TargetPNP(Target):
         comm.PutNumberArray(self.subkey, arrayValue)
 
 class TargetHeadings(Target):
+
     def __init__(self, headings, orientation="Reverse"):
         super().__init__()
         self.subkey = orientation+"/heading"
         self.headings = headings
 
-    # currently no need to override setValue
+    # Currently no override to the super.setValue()
+
     def send(self):
         # TargetHeadings convention for target:
         #     all numbers, 2 per target, 1 timestamp

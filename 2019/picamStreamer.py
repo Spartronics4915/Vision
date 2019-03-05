@@ -100,6 +100,8 @@ class CamHandler(BaseHTTPRequestHandler):
                                             display=True, debug=False)
                 if target != None:
                     logging.info("Target!!! ------------------")
+                    if algoselector == "heading":
+                        logging.info(target.headings)
                 if s_comm != None:
                     if target != None:
                         s_comm.UpdateVisionState("Acquired")
@@ -149,7 +151,7 @@ def main():
         s_comm = comm.Comm(ip)
     logFmt = "%(name)-8s %(levelname)-6s %(message)s"
     dateFmt = "%H:%M"
-    if self.args.debug:
+    if s_args.debug:
         loglevel = logging.DEBUG
     else:
         loglevel = logging.INFO
