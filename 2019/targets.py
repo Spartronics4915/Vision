@@ -87,12 +87,13 @@ class TargetPNP(Target):
         # logging.info("send: " + str(arrayValue))
         comm.PutNumberArray(self.subkey, arrayValue)
 
-class TargetHeadings(Target):
+class TargetHeadingsAndHeightOffset(Target):
 
-    def __init__(self, headings, orientation="Reverse"):
+    def __init__(self, headings,hOffset, orientation="Reverse"):
         super().__init__()
         self.subkey = orientation+"/heading"
         self.headings = headings
+        self.hOffset = hOffset
 
     # Currently no override to the super.setValue()
 
@@ -101,6 +102,7 @@ class TargetHeadings(Target):
         #     all numbers, 2 per target, 1 timestamp
         arrayValue = []
         arrayValue.extend(self.headings)
+        arrayValue.extend(self.hOffset)
         arrayValue.append(self.deltaclock)
         # logging.info("send: " + str(arrayValue))
         comm.PutNumberArray(self.subkey, arrayValue)
