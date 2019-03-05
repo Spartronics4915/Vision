@@ -19,6 +19,9 @@
       in-browser zoom is controlled).
     * for the cleanest shutdown, reset the VideoStream value to "_cleanup_" at 
       the end of a match.
+* Best practice:  make sure both feeds are running before the match begins.
+   As long as there are no networking hiccups during the match you should 
+   have stable feeds for the duration.
 
 #### Bottom screen (standard dashboard)
 
@@ -72,16 +75,16 @@ Also note that the the disk must be in Read-Write mode to make this change.
 * refreshing a web-browser page while a video feed is running may cause
   problems.  So might closing the page.  The issue is that the feed 
   hasn't been properly shutdown and since only a single feed is available 
-  at a time, this condition renders the pi useless. This condition can
-  be identified by inspecting the bandwidth usage via the frc control panel.
-  If bandwidth is high, the video stream is still "open".  Even if the 
-  bandwidth isn't high, connection refusals are likely to be caused by
-  this condition. Using the restart button on the pi's control panel is 
-  __not__ the best choice to fix the problem, since the open stream can 
-  take many minutes to timeout.  The fastest remedy to this problem is 
-  to remove power from the pi, then re-power it. The total boot cycle 
-  is less than one minute. At the same time, it's likely to be a good
-  idea to restart Chrome as the timeouts can be on the "client side".
+  at a time, this condition renders the pi useless for many minutes. This 
+  condition can be identified by inspecting the bandwidth usage via the 
+  frc control panel.  If bandwidth is high, the video stream is still "open".
+  Even if the bandwidth isn't high, connection refusals are likely to be 
+  caused by this condition. Using the restart button on the pi's control 
+  panel is __not__ the best choice to fix the problem, since the open 
+  stream can take many minutes to timeout.  The fastest remedy to this 
+  problem is to remove power from the pi, then re-power it. The total 
+  boot cycle is less than one minute. At the same time, it's likely to 
+  be a good idea to restart Chrome as the timeouts can be on the "client side".
 
 * video feeds behave better with chrome. Firefox appears flaky for h264 feeds.
   Also: make sure you have the latest chrome installed.
@@ -90,7 +93,9 @@ Also note that the the disk must be in Read-Write mode to make this change.
   that the each backup has an IP address and it may match the requirements
   for the pi that failed.  You'll need to carefully make the mods to 
   the IP, etc to ensure that the right camera has the right ip address.
-  As of this writing here are the standard ip addresses:
+  Remember that two raspis on the same network with the same IP address
+  is a recipe for trouble.  As of this writing here are the standard IP 
+  addresses:
 
     ```txt
     Vision:  10.49.15.10
