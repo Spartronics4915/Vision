@@ -8,5 +8,5 @@ uv4l -f \
  --server-option '--enable-webrtc-audio=0' \
  --server-option '--webrtc-receive-audio=0' \
  --server-option '--webrtc-preferred-vcodec=3' \
- --server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
+ --server-option '--webrtc-hw-vcodec-maxbitrate=1500' \
  --server-option '--webrtc-enable-hw-codec'
