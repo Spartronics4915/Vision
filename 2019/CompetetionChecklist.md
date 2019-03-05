@@ -68,13 +68,15 @@ Also note that the the disk must be in Read-Write mode to make this change.
 ## Known issues and remedies
 
 * refreshing a web-browser page while a video feed is running may cause
-  problems.  The issue is that the feed hasn't been properly shutdown and
-  since only a single feed is available at a time, this condition renders
-  the pi useless.   Using the restart button on the pi's control panel is
-  __not__ the best choice to fix the problem, since the open stream can take
-  many minutes to timeout.  The fastest remedy to this problem is to remove
-  power from the pi, then re-power it. The total boot cycle is less than
-  one minute.
+  problems.  So might closing the page.  The issue is that the feed 
+  hasn't been properly shutdown and since only a single feed is available 
+  at a time, this condition renders the pi useless. This condition can
+  be identified by inspecting the bandwidth usage via the frc control panel.
+  If bandwidth is high, the video stream is still "open".  Using the restart 
+  button on the pi's control panel is __not__ the best choice to fix 
+  the problem, since the open stream can take many minutes to timeout.  
+  The fastest remedy to this problem is to remove power from the pi, 
+  then re-power it. The total boot cycle is less than one minute.
 
 * video feeds behave better with chrome. Firefox appears flaky for h264 feeds.
   Also: make sure you have the latest chrome installed.
