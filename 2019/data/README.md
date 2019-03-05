@@ -158,3 +158,12 @@ root     DEBUG  Camera Matrix :
 root     DEBUG  X 'point': 82.3191590504
 root     DEBUG  Y 'point': 4.81642504683
 root     DEBUG  Theta 'number': 0.09138552677821109
+
+### Rect Height Offset
+
+At index 0[120 227]
+At index 1[120 132]
+At index 2[157 132]
+At index 3[157 227]
+
+@@ 20-25 in @@ 640 x 480
