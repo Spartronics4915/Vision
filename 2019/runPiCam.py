@@ -44,7 +44,7 @@ class PiVideoStream:
         ch.setLevel(logLevel)
 
         # create formatter
-        formatter = logger.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
 
         # Set format of handler
         ch.setFormatter(formatter)
@@ -152,7 +152,7 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        logging.info("  (multi threaded)")
+        logging.debug("  (multi threaded)")
         target, frame = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
