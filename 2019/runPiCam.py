@@ -26,42 +26,27 @@ class PiVideoStream:
         self.commChan = None
         self.parseArgs()
 
-        #   logger init
-        # TODO: log level should be represented by a word, not a number
-
+        #   logger init:
+        #     - we write logging info to file, for performance this should be
+        #       minimized.
+        #     - during debugging, set the loglevel to debug and see the 'spew'
+        #       via:  "tail -f /tmp/runPiCam.log"
         if self.args.debug:
             logLevel = logging.DEBUG
         else:
             logLevel = logging.INFO
         
-        logger = logging.getLogger()
-        logger.setLevel(logLevel)
-
-        # File handler (responsible to outputting to file)
-        fh = logging.FileHandler('/tmp/runPiCam.log')
-        fh.setLevel(logging.DEBUG)
-    
-        # Console handler (responsible for printing to stdout)
-        ch = logging.StreamHandler()
-        ch.setLevel(logLevel)
-
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
-
-        # Set format of handler
-        ch.setFormatter(formatter)
-        fh.setFormatter(formatter)
-        # add handlers to logger
-        logger.addHandler(ch)
-        logger.addHandler(fh)
-
-        logging.debug("\n--------------------New run------------------")
-        logging.debug("Run started at: ")
-        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-        logging.debug("---------------------------------------------\n")
+        logging.basicConfig(level=logLevel,
+                            format="%(asctime)s %(levelname)s: %(message)s",
+                            datefmt="%m/%d %H:%M:%S",
+                            filename="/tmp/runPiCam.log",
+                            filemode="a")
+        logging.info("--------------------New run------------------")
         logging.info("pid: %d" % os.getpid())
         logging.info("args: " + str(self.args))
         logging.info("opencv version: {}".format(cv2.__version__))
+        logging.debug("Parsed the following args:")
+        logging.debug(self.args)
         
         if self.args.robot != "none":
             if self.args.robot == "roborio":
@@ -104,10 +89,6 @@ class PiVideoStream:
                             default=0)
 
         self.args = parser.parse_args()
-
-        logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
-        logging.debug("Parsed the following args:")
-        logging.debug(self.args)
 
     def Run(self):
         self.go()

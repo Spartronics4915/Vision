@@ -140,7 +140,7 @@ class CaptureThread(threading.Thread):
                     procThread.event.set()
                 else:
                     # pool is empty, wait for work to complete
-                    sys.stderr.write('z')
+                    # sys.stderr.write('z')
                     time.sleep(0.01)
         self.picam.stop()
         logging.info("Capture thread terminated")
