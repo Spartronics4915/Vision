@@ -273,11 +273,8 @@ def sortPoints2PNP(leftPoints, rightPoints):
     :rtype: 2d array of points. In the form of numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")
     -----
     """
-    logging.debug("Received a leftPoints of: " + str(leftPoints))
-    logging.debug("Received a rightPoints of:" + str(rightPoints))
-    logging.debug("Type of the points is: " + str(type(leftPoints[0])))
-    logging.debug("A sample point is: " + str(leftPoints[0]))
-    logging.debug("A sample value is: " + str(type(leftPoints[0][0])))
+    if False:
+        logging.debug("Received l/r points : %s,%s" % (str(leftPoints),str(rightPoints)))
     """
     Doctest logic
     >>> sortPoints2PNP([(2,1),(2,4),(1,3),(3,2)],[(7,1),(8,3),(6,2),(7,4)])

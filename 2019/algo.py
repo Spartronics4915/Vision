@@ -199,13 +199,15 @@ def realPNP(frame, cfg, display, debug):
             #       rect, and never reach the right rect.
             break
 
-        logging.debug("sending a left point list of: " + str(lPts))
-        logging.debug("sending a right point list of: " + str(rPts))
+        if False:
+            logging.debug("sending a left point list of: " + str(lPts))
+            logging.debug("sending a right point list of: " + str(rPts))
 
         # Orders the points according to modelpoints in solvePNP()
         orderedPoints = rectUtil.sortPoints2PNP(lPts,rPts)
 
-        logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
+        if False:
+            logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
 
         # now estimatePose accepts optional camera matrix
         target,frame = poseEstimation.estimatePose(visImg, orderedPoints,

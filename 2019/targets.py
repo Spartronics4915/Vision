@@ -64,6 +64,15 @@ class TargetPNP(Target):
         self.leftTarget = left
         self.rightTarget = right
 
+    def __str__(self):
+        arrayValue = []
+        if self.leftTarget != None:
+            arrayValue.extend(self.leftTarget)
+        if self.rightTarget != None:
+            arrayValue.extend(self.rightTarget)
+        arrayValue.append(int(1000*self.deltaclock))
+        return "TargetPNP: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue)
+
     # here: value is presumed to be a tuple of length 2
     def setValue(self, value, forceupdate=True):
         if len(value) == 1:
@@ -94,6 +103,13 @@ class TargetHeadingsAndHeightOffset(Target):
         self.subkey = orientation+"/heading"
         self.headings = headings
         self.hError = hError
+
+    def __str__(self):
+        arrayValue = []
+        arrayValue.extend(self.headings)
+        arrayValue.extend(self.hError)
+        arrayValue.append(int(1000*self.deltaclock))
+        return "Headings-n-Heights: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue) 
 
     # Currently no override to the super.setValue()
 

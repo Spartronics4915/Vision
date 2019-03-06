@@ -112,9 +112,8 @@ class CamHandler(BaseHTTPRequestHandler):
                                             cfg=s_config["algo"],
                                             display=True, debug=False)
             if target != None:
-                logging.info("Target!!! ------------------")
-                if algoselector == "heading":
-                    logging.info(target.headings)
+                logging.info(str(target))
+
             if s_comm != None:
                 if target != None:
                     s_comm.UpdateVisionState("Acquired")
