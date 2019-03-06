@@ -34,7 +34,7 @@ def findRects(frame,minsize,display=0,debug=0):
     Derive a list of rects from a frame
  
     :param frame: image to scan for rectangles
-    :type frame: opencv frame (np.ndarray())
+    :type frame: raw opencv captured frame (no HSV or mask nessissary)
 
     :param minsize: minimum size of the rectangles (Used for filtering)
     :type minsize: int
@@ -259,7 +259,7 @@ def checkCenter(point,currentCenter):
     else:
         return False
 
-def sortPoints(leftPoints, rightPoints):
+def sortPoints2PNP(leftPoints, rightPoints):
     # XXX: change defualt debug value
     logging.debug("Received a leftPoints of: " + str(leftPoints))
     logging.debug("Received a rightPoints of:" + str(rightPoints))
@@ -268,7 +268,7 @@ def sortPoints(leftPoints, rightPoints):
     logging.debug("A sample value is: " + str(type(leftPoints[0][0])))
     """
     Doctest logic
-    >>> sortPoints([(2,1),(2,4),(1,3),(3,2)],[(7,1),(8,3),(6,2),(7,4)])
+    >>> sortPoints2PNP([(2,1),(2,4),(1,3),(3,2)],[(7,1),(8,3),(6,2),(7,4)])
     [(2, 1), (3, 2), (2, 4), (6, 2), (7, 1), (7, 4)]
     """
     orderedPoints = []
@@ -312,7 +312,7 @@ def sortPoints(leftPoints, rightPoints):
 def computeTargetOffSet(frame,center):
     # Only need the center of the target for this caluclation, not all points  
     # TODO: Phoenix documentation
-    x,y,_ = frame.shape
+    y,x,_ = frame.shape
 
     pixelToDegRatio = x / RPICAMFOV
 
@@ -338,7 +338,7 @@ def computeHeightError(lPts,rPts):
     return None
 
 def points2center(points):
-    # Given points in a PNP format, return the center
+    # Given a target in PNP format, return the center
     # XXX: Does not work as intended with rotated targets
     # TODO: Phoenix documentation
 
@@ -364,6 +364,38 @@ def points2center(points):
     center = (lTopRightPt+xDelta/2,lTopRightPt[1])
 
     return center
+
+def getRectHeight(rect):
+    # Get the height from the topmost point to the bottommost point
+    '''
+    Doctest
+    >>> getRectHeight(((544.0203857421875, 256.99468994140625), (29.743717193603516, 83.71994018554688), -14.620874404907227))
+    
+    '''
+    pts = cv2.boxPoints(rect)
+    boxPts = np.int32(pts)
+
+    # Of points    
+    boxPts = boxPts.tolist()
+
+    # Lambda sorting does NOT work with a numpy array (properly)
+    boxPtsSorted = sorted(boxPts,key=lambda p:p[1]) # Sort points by y
+
+    # for point in boxPtsSorted:
+    #     # Fixing numpy appending of objects
+    #     point = point.tolist()
+    #     orderedPoints.append(point)
+
+    logging.debug(boxPtsSorted)
+    # Widest Y
+    height = boxPtsSorted[3] - boxPtsSorted[0]
+
+    return height
+
+
+
+
+    
 
 if __name__ == "__main__":
     import doctest
