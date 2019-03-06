@@ -19,7 +19,6 @@ import logging
 # Rects are returned in the form:
 #  ((cx,cy), (sx,sy), degrees)
 
-
 def findRects(frame, minsize, cfg, display=0, debug=0):
     # TODO: minsize as a arg for runPiCam.py
     """
@@ -75,6 +74,18 @@ def findRects(frame, minsize, cfg, display=0, debug=0):
 
     return sizedRects
 
+def prettyRects(rl):
+    #  rl is [((cx,cy), (sx,sy), degrees), ...]
+    str = "[ "
+    for r in rl:
+        c,s,d = r
+        str += "("
+        str += "({:.2f}, {:.2f}), ".format(c[0], c[1])
+        str += "({:.2f}, {:.2f}), ".format(s[0], s[1])
+        str += "{:.1f}), ".format(d)
+    str += " ]"
+    return str
+
 def pairRectangles(rectArray,wantedTargets=1,debug=0):   
     """
     Given an input of rectangles, classify them into pairs and return the pairs
@@ -118,7 +129,7 @@ def pairRectangles(rectArray,wantedTargets=1,debug=0):
 
     # Check for size of xsorted rects
     if len(xSortedRects) < 2:
-        logging.debug("Not enough rects to generate a pair")    
+        # logging.debug("Not enough rects to generate a pair")    
         return False,pair1,pair2
 
     # Doing this by index allows us to access the next rect in the list

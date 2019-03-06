@@ -23,8 +23,8 @@ _base = {
         # Deprecated 2019 values:
         # "hsvRange1": np.array([50, 255, 255]),
         #              np.array([70,255,255]),
-        "hsvRange0": np.array([30,150,170])
-        "hsvRange1": np.array([90,255,255])
+        "hsvRange0": np.array([30,150,170]),
+        "hsvRange1": np.array([90,255,255]),
     }
 }
 

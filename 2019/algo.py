@@ -147,10 +147,9 @@ def realPNP(frame, cfg, display, debug):
     # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
     # Spew
-    logging.debug("The frame type is: " + str(type(frame)))
+    #logging.debug("The frame type is: " + str(type(frame)))
 
     rects = rectUtil.findRects(frame, 200, cfg, display, debug)
-
     if display:
         # combine original image with mask, for visualization
         mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"])     # Our HSV filtering
@@ -163,7 +162,8 @@ def realPNP(frame, cfg, display, debug):
         # Avoid a NoneType error
         visImg = frame
 
-    logging.debug("All valid rectangles are: " + str(rects))
+    if logging.getLogger().getEffectiveLevel() <= logging.DEBUG:
+        print("rects: " + rectUtil.prettyRects(rects), end="\r")
 
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
