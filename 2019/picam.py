@@ -7,42 +7,62 @@ import logging
 
 # -------------------------------------------------------------------------
 class PiCam:
-    def __init__(self, resolution=(320,240), framerate=60, auto=False):
-        self.resolution = resolution
-        self.framerate = framerate
+    def __init__(self, config=None):
+        self.config = config
+        if self.config == None:
+            self.config = {
+                "resolution": (640,480),
+                "framerate": 60,
+                "sensormode": 0,
+            }
+
+        self.resolution = self.config["resolution"]
         self.stream = None
         self.rawCapture = None
 
-        if auto:
-            smode = 0
-        else:
-            smode = 7 # fast
-        self.cam = PiCamera(resolution=resolution, framerate=framerate,
-                            sensor_mode=smode) # for fastest rates, 0 is auto)
+        self.cam = PiCamera(resolution=self.config["resolution"],
+                            framerate=self.config["framerate"],
+                            sensor_mode=self.config["sensormode"])
         time.sleep(.1) # allow the camera to warm up
-        if auto:
-            self.cam.awb_mode = "auto"
-            self.cam.exposure_mode = "auto"
-            self.cam.shutter_speed = 0 # set to 0 to go auto
-        else:
-            self.cam.awb_mode = "off"
-            # for digital-gain and analog_gain. These values can't
-            # be set directly, rather "let them settle"...
-            self.cam.exposure_mode = "fireworks"
-            self.cam.shutter_speed = 10000 # set to 0 to go auto
 
-        self.cam.exposure_compensation = -25 # [-25, 25]
-        self.cam.shutter_speed = 0 #10000 # set to 0 to go auto
-        self.cam.contrast = 100  # [-100, 100]
-        self.cam.saturation = 100 # [0,100]
-        self.cam.awb_gains = (1.2, 1.6)  # red, blue balance
-        self.cam.hflip = True
-        self.cam.vflip = True
-        self.cam.brightness = 20 # [0, 100]
-        self.cam.sharpness = 0 # [-100, 100]
-        self.cam.ISO = 400 # 100-800
-        
-        self.cam.rotation = 90 # 0,90,180,270
+
+        if "iso" in self.config:
+            self.cam.iso = self.config["iso"]
+            # allow the camera to warm up in case exposure_mode is "off"
+            time.sleep(.1) 
+
+        if "awb_mode" in self.config:
+            self.cam.awb_mode = self.config["awb_mode"]
+
+        if "awb_gains" in self.config:
+            self.cam.awb_gains = self.config["awb_gains"]
+
+        if "brightness" in self.config:
+            self.cam.brightness = self.config["brightness"]
+
+        if "contrast" in self.config:
+            self.cam.contrast = self.config["contrast"]
+
+        if "exposure_mode" in self.config:
+            self.cam.exposure_mode = self.config["exposure_mode"]
+
+        if "exposure_compensation" in self.config:
+            self.cam.exposure_compensation=self.config["exposure_compensation"]
+
+        if "flip" in self.config:
+            self.cam.vflip = self.cam.hflip = self.config["flip"]
+
+        if "rotation" in self.config:
+            self.cam.rotation = self.config["rotation"]
+
+        if "saturation" in self.config:
+            self.cam.saturation = self.config["saturation"]
+
+        if "sharpness" in self.config:
+            self.cam.sharpness = self.config["sharpness"]
+
+        if "shutter_speed" in self.config:
+            self.cam.shutter_speed = self.config["shutter_speed"]
 
         time.sleep(.1) # more settling
 
@@ -60,7 +80,7 @@ class PiCam:
         logging.info("  exposure_speed:%d us" % self.cam.exposure_speed)
         logging.info("  shutter_speed:%d us" % self.cam.shutter_speed)
         logging.info("  framerate:%s" % self.cam.framerate)
-        logging.info("  ISO:%s" % self.cam.ISO)
+        logging.info("  iso:%s" % self.cam.iso)
 
     def start(self):
         self.rawCapture = PiRGBArray(self.cam, size=self.resolution)

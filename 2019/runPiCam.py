@@ -18,12 +18,14 @@ import algo
 import comm
 import picam
 import targets
+import config
 
 class PiVideoStream:
     def __init__(self):
         
         self.commChan = None
         self.parseArgs()
+
         #   logger init
         # TODO: log level should be represented by a word, not a number
 
@@ -36,7 +38,7 @@ class PiVideoStream:
         logger.setLevel(logLevel)
 
         # File handler (responsible to outputting to file)
-        fh = logging.FileHandler('logtest.txt')
+        fh = logging.FileHandler('/tmp/runPiCam.log')
         fh.setLevel(logging.DEBUG)
     
         # Console handler (responsible for printing to stdout)
@@ -72,9 +74,9 @@ class PiVideoStream:
             logging.info("starting comm to " + ip)
             self.commChan = comm.Comm(ip)
 
-        self.picam = picam.PiCam(resolution=(self.args.iwidth,
-                                             self.args.iheight),
-                                 framerate=(self.args.fps))
+        # parameter configuration -----
+        self.config = getattr(config, self.args.config) # reads named dict
+        self.picam = picam.PiCam(self.config)
 
     def parseArgs(self):
         """
@@ -82,18 +84,15 @@ class PiVideoStream:
         """
         parser = argparse.ArgumentParser(description=
                             "Capture and process picamera stream")
+        parser.add_argument("--config", dest="config",
+                            help="config: default,greenled,noled...",
+                            default="default")
         parser.add_argument("--threads", dest="threads",
                             help="threads: (0-4) [2]",
                             default=2, type=int)
         parser.add_argument("--algo", dest="algo",
                             help="(empty, default)",
                             default="default")
-        parser.add_argument("--width", dest="iwidth",
-                            help="image width [320]",
-                            default=320, type=int)
-        parser.add_argument("--height", dest="iheight",
-                            help="image height [240]",
-                            default=240, type=int)
         parser.add_argument("--display", dest="display",
                             help="display [0]",
                             default=0, type=int)
@@ -153,7 +152,8 @@ class PiVideoStream:
 
     def processFrame(self, image):
         logging.debug("  (multi threaded)")
-        target, frame = algo.processFrame(image, algo=self.args.algo,
+        target, frame = algo.processFrame(image, self.config,
+                                        algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)
 

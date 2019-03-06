@@ -16,8 +16,10 @@ import logging
 import argparse
 import comm
 import traceback
+import config
 
 s_args=None
+s_config=None
 s_comm=None
 s_first=True
 s_jpgQuality = 80 # used by direct streaming, quality differs from opencv
@@ -46,23 +48,32 @@ class CamHandler(BaseHTTPRequestHandler):
             cam = None
             try:
                 time.sleep(1) # wait for shutdown of alt stream
-                cam = picam.PiCam(resolution=(640, 480),
-                                  framerate=60, auto=False)
+                cam = picam.PiCam(s_config["picam"])
                 if not cam:
                     raise Exception("Hey no camera!")
                 if algostr == "direct":
                     self.streamDirect(cam)
                 else:
-                    self.streamAlgo(cam, algostr)
+                    self.streamAlgo(cam, algostr, s_config["algo"])
+
+            except BrokenPipeError:
+                pass
+
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
 
             except Exception as e:
-                logging.info(e)
+                # Critical for anything that happens in algo or below
+                exc_info = sys.exc_info()
+                logging.error("algo exception: " + str(e))
+                traceback.print_exception(*exc_info)
 
-            logging.info("done streaming ----------------------")
-            if cam:
-                cam.stop() # triggers PiCamera.close()
-            else:
-                logging.info("(cam init problem)")
+            finally:
+                logging.info("done streaming ----------------------")
+                if cam:
+                    cam.stop() # triggers PiCamera.close()
+                else:
+                    logging.info("(cam init problem)")
         else:
             self.send_response(200)
             self.send_header('Content-type','text/html')
@@ -85,11 +96,13 @@ class CamHandler(BaseHTTPRequestHandler):
                 self.wfile.write(val)
                 stream.seek(0)
                 stream.truncate()
+
         finally:
             stream.seek(0)
             stream.truncate()
+            # cam.stop() called above
 
-    def streamAlgo(self, cam, algoselector):
+    def streamAlgo(self, cam, algoselector, algoCfg):
         global s_first
         (algoselector + " algo streaming")
         cam.start()
@@ -122,18 +135,14 @@ class CamHandler(BaseHTTPRequestHandler):
                 self.wfile.write(jpg.tostring())
                 time.sleep(0.05)
 
-            except Exception as e:
-                # Critical for anything that happens in algo or below
-                exc_info = sys.exc_info()
-                logging.error("algo exception: " + str(e))
-                traceback.print_exception(*exc_info)
-
+            finally:
                 break
 
 
 def main():
   global s_args
   global s_comm
+  global s_config
   try:
     parser = argparse.ArgumentParser(description="Start the picam streamer")
     parser.add_argument("--robot", dest="robot",
@@ -142,7 +151,11 @@ def main():
     parser.add_argument("--debug", dest="debug",
                         help="debug: [0,1] ",
                         default=0)
+    parser.add_argument("--config", dest="config",
+                        help="config: default,greenled,noled...",
+                        default="default")
     s_args = parser.parse_args()
+    s_config = getattr(config, s_args.config)
     if s_args.robot != "none":
         if s_args.robot == "roborio":
             ip = "10.49.15.2"
