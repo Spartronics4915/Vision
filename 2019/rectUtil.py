@@ -20,13 +20,7 @@ import logging
 #  ((cx,cy), (sx,sy), degrees)
 
 
-# XXX: In a perfect world, this should only be across one file
-range0 = np.array([30,150,170])
-range1 = np.array([90,255,255])
-
-
-
-def findRects(frame,minsize,display=0,debug=0):
+def findRects(frame, minsize, cfg, display=0, debug=0):
     # TODO: minsize as a arg for runPiCam.py
     """
     Derive a list of rects from a frame
@@ -51,7 +45,7 @@ def findRects(frame,minsize,display=0,debug=0):
 
     # OpenCV Values
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
-    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+    mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"])       # Our HSV filtering
 
     if display:
         # combine original image with mask, for visualization

@@ -76,7 +76,7 @@ def rectDebugAlgo(frame, cfg, display=1, debug=0):
     # Used to find all relevent imformation about rectangles on screen
     logging.warning("running rectDebugAlgo on frame, not hsv");
     mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"]) # Our HSV filtering
-    rects = rectUtil.findRects(frame,200,display,debug)
+    rects = rectUtil.findRects(frame, 200, cfg, display, debug)
 
     if display:
         # Draw each rect + properties of it
@@ -108,7 +108,7 @@ def rectDebugAlgo(frame, cfg, display=1, debug=0):
 def headingAlgo(frame, cfg, display, debug):
     # Intrestingly, with this algo, it also requires proper different 
     #  configs in runPiCam (lower res)
-    rects = rectUtil.findRects(frame, 200, display, debug)
+    rects = rectUtil.findRects(frame, 200, cfg, display, debug)
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
 
@@ -149,7 +149,7 @@ def realPNP(frame, cfg, display, debug):
     # Spew
     logging.debug("The frame type is: " + str(type(frame)))
 
-    rects = rectUtil.findRects(frame,200,display,debug)
+    rects = rectUtil.findRects(frame, 200, cfg, display, debug)
 
     if display:
         # combine original image with mask, for visualization
