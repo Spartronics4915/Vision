@@ -7,6 +7,8 @@
 #  cfg = getattr(config, "greenled")
 #
 #  (see bottom for details on parameters)
+import numpy as np
+import copy
 
 _base = {
     "picam": {
@@ -15,13 +17,18 @@ _base = {
         "sensormode": 0,  # auto-calc based on res and framerate
     },
     "algo": {
+        # Deprecated 2018 values:
+        # "hsvRange0": np.array([0,150,150]),
+        # "hsvRange1": np.array([50, 255, 255]),
+        "hsvRange0": np.array([50,150,100]),
+        "hsvRange1": np.array([70,255,255]),
     }
 }
 
-greenled = {
+greenled = copy.deepcopy(_base)
+greenled.update({
     "name": "greenled",
-}
-greenled.update(_base)
+});
 greenled["picam"].update({
     "iso": 400,  # 100-800 (higher numbers are brighter)
     "brightness": 20,
@@ -32,10 +39,10 @@ greenled["picam"].update({
     "exposure_compensation": -25, # [-25, 25]
 })
 
-noled = {
+noled = copy.deepcopy(_base)
+noled.update({
     "name": "noled",
-}
-noled.update(_base)
+})
 noled["picam"].update({
     "iso": 400,
     "brightness": 40,
@@ -44,6 +51,10 @@ noled["picam"].update({
     "rotate": 0,
     "exposure_mode": "off", #"fixedfps",
     "exposure_compensation": 0, # [-25, 25]
+})
+noled["algo"].update({
+    "hsvRange0": np.array([50,150,100]),
+    "hsvRange1": np.array([70,255,255]),
 })
 
 default = greenled

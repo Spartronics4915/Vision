@@ -163,7 +163,7 @@ def main():
         else:
             ip = s_args.robot
         s_comm = comm.Comm(ip)
-    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    logFmt = "streamer %(levelname)-6s %(message)s"
     dateFmt = "%H:%M"
     if s_args.debug:
         loglevel = logging.DEBUG
@@ -171,7 +171,7 @@ def main():
         loglevel = logging.INFO
     logging.basicConfig(level=loglevel, format=logFmt, datefmt=dateFmt)
     server = HTTPServer(('',5080),CamHandler)
-    logging.info ("server started")
+    logging.info ("server started with config " + s_args.config)
     server.serve_forever()
   except KeyboardInterrupt:
     logging.warning("aborting server")

@@ -37,7 +37,7 @@ class PiVideoStream:
             logLevel = logging.INFO
         
         logging.basicConfig(level=logLevel,
-                            format="%(asctime)s %(levelname)s: %(message)s",
+                            format="%(asctime)s %(levelname)-6s: %(message)s",
                             datefmt="%m/%d %H:%M:%S",
                             filename="/tmp/runPiCam.log",
                             filemode="a")

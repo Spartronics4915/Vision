@@ -19,12 +19,6 @@ import rectUtil
 import logging
 import targets
 
-# Deprecated 2018 values:
-# range0 = np.array([0,150,150]) # min hsv
-# range1 = np.array([50, 255, 255]) # max hsv
-
-range0 = np.array([50,150,100])
-range1 = np.array([70,255,255])
 
 # Reasoning behind Current range values:
 #   After changes to exposure of camera (Ridiculously low ISO),
@@ -72,7 +66,7 @@ def processFrame(frame, algo=None, cfg=None, display=0, debug=0):
 def maskAlgo(frame, cfg):
     # Show what is shown by the opencv HSV values
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(frame, range0, range1)
+    mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"])
     return None,mask
 
 def rectDebugAlgo(frame, cfg, display=1, debug=0):

@@ -31,6 +31,8 @@ class PiCam:
             self.cam.iso = self.config["iso"]
             # allow the camera to warm up in case exposure_mode is "off"
             time.sleep(.1) 
+        else:
+            logging.warning("picam: no iso")
 
         if "awb_mode" in self.config:
             self.cam.awb_mode = self.config["awb_mode"]
@@ -40,9 +42,13 @@ class PiCam:
 
         if "brightness" in self.config:
             self.cam.brightness = self.config["brightness"]
+        else:
+            logging.warning("picam: no brightness")
 
         if "contrast" in self.config:
             self.cam.contrast = self.config["contrast"]
+        else:
+            logging.warning("picam: no contrast")
 
         if "exposure_mode" in self.config:
             self.cam.exposure_mode = self.config["exposure_mode"]
