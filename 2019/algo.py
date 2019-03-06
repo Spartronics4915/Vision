@@ -63,6 +63,9 @@ def processFrame(frame, algo=None, cfg=None, display=0, debug=0):
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg, display, debug)
 
+def defaultAlgo(frame, cfg, display=0, debug=0):
+    return realPNP(frame, cfg, display, debug)
+
 def maskAlgo(frame, cfg):
     # Show what is shown by the opencv HSV values
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -71,10 +74,8 @@ def maskAlgo(frame, cfg):
 
 def rectDebugAlgo(frame, cfg, display=1, debug=0):
     # Used to find all relevent imformation about rectangles on screen
-    # TODO: Implement some form of threading / process optimisation
-    # TODO: Phoenix documentation
-    mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
-
+    logging.warning("running rectDebugAlgo on frame, not hsv");
+    mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"]) # Our HSV filtering
     rects = rectUtil.findRects(frame,200,display,debug)
 
     if display:
@@ -103,9 +104,6 @@ def rectDebugAlgo(frame, cfg, display=1, debug=0):
         visImg = frame
 
     return None,visImg
-
-def defaultAlgo(frame, cfg, display=0, debug=0):
-    return realPNP(frame, cfg, display, debug)
 
 def headingAlgo(frame, cfg, display, debug):
     # Intrestingly, with this algo, it also requires proper different 
@@ -155,7 +153,7 @@ def realPNP(frame, cfg, display, debug):
 
     if display:
         # combine original image with mask, for visualization
-        mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
+        mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"])     # Our HSV filtering
         visImg = cv2.bitwise_and(frame, frame, mask=mask)
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
