@@ -316,7 +316,7 @@ def sortPoints2PNP(leftPoints, rightPoints):
 
     return np.array(orderedPoints,dtype="double")
 
-def computeTargetAngleOffSet(frame,centerm,RPICAMFOV=45):
+def computeTargetAngleOffSet(frame,center,RPICAMFOV=45):
     # Only need the center of the target for this caluclation, not all points  
     """
     Crudely calculate the angle offset of the center of a target.
