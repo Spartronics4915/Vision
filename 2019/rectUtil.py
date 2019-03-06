@@ -179,7 +179,7 @@ def pairRectangles(rectArray,wantedTargets=1,debug=0):
 
 def pairRectanglesLambda(rectArray):
     """
-    DEPRICATED, USE pairRectangles()
+    DEPRECATED, USE pairRectangles()
 
     Find a list of valid rectangle pairs from a list of all valid rectangles
  

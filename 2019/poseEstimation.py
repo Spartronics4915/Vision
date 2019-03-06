@@ -7,7 +7,7 @@
 #                      picam1             picam2
 #       sensor res     2592x1944px        3280x2464px
 #       sensor size    3.76x2.74mm        3.68x2.76mm
-#       aspect ratio   1.372              1.333 3
+#       aspect ratio   1.372              1.333
 #       focal length   3.6mm              3.04mm
 #       fov (h,v)      53.5,41.4deg       62.2,48.8deg
 #
@@ -223,10 +223,19 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             worldPts = np.array([(0.0, 0.0, 0.0), (-10.0,0.0,0.0)])
             (projPts, _) = cv2.projectPoints(worldPts,
                                         rotVec, xlateVec, camMat, distCoeffs)
-            org = (int(projPts[0][0]), int(projPts[0][1]))
-            perp = (int(projPts[1][0]), int(projPts[1][1]))
+            # print("shape of projPts:" + str(projPts.shape)) 
+            #    returns (2, 1, 2)
+            # print(str(projPts)) 
+            #  returns  [[[ 125  153]]
+            #            [[ 118 126.]]]
+            # a[0] is [[125 153]],
+            # a[1] is [[128 126]]
+            # a[0][0][0] is 125
+            # a[1][0][1] is 126
+            org = (int(projPts[0][0][0]), int(projPts[0][0][1]))
+            perp = (int(projPts[1][0][0]), int(projPts[1][0][1]))
             cv2.circle(im, org, 3, (255,0,0), -1)
-            cv2.line(im, org, perp, (255,0,0), 2) # blue line
+            cv2.line(im, org, perp, (255,255,0), 2) # cyan line
 
         # in the form x,y, theta
         logging.debug("X 'point': " + str(robotPts[0][0]))

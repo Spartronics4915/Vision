@@ -163,7 +163,7 @@ def realPNP(frame, cfg, display, debug):
         visImg = frame
 
     if logging.getLogger().getEffectiveLevel() <= logging.DEBUG:
-        print("rects: " + rectUtil.prettyRects(rects), end="\r")
+        print("%d rects: %s" % (len(rects), rectUtil.prettyRects(rects)), end="\r")
 
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
@@ -209,7 +209,7 @@ def realPNP(frame, cfg, display, debug):
 
         # now estimatePose accepts optional camera matrix
         target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
-                                            cameraMatrix=None, display=False)
+                                            cameraMatrix=None, display=display)
 
         if not lTarget:
             lTarget = target
