@@ -24,8 +24,6 @@ import logging
 range0 = np.array([30,150,170])
 range1 = np.array([90,255,255])
 
-RPICAMFOV = 45  # Working deg offset for 2018
-                # nb: This is different than the noted fov in the rpicam spec sheet
 
 
 def findRects(frame,minsize,display=0,debug=0):
@@ -174,8 +172,21 @@ def pairRectangles(rectArray,wantedTargets=1,debug=0):
         logging.debug("Pair2: " + str(pair2))
         return True,pair1,pair2
 
-def pairRectanglesLambda(rectArray,debug=0):
+def pairRectanglesLambda(rectArray):
+    """
+    DEPRICATED, USE pairRectangles()
+
+    Find a list of valid rectangle pairs from a list of all valid rectangles
+ 
+    :param rectArray: List of rectangles
+    :type rectArray: rects returned by cv2.minAreaRect or rectUtil.findRects()
+
+    :return: the possible pairs of rectangles found (leftmost pair will be earlier in the list)
+    :rtype: np.array() of opencv rect format.
+    -----
+    """
     # 2nd method of sorting, commited for record, not for use
+
     pair1 = None
     pair2 = None
     xSortedRects = sorted(rectArray,key=lambda r:r[0][0])
@@ -244,23 +255,19 @@ def getCorrectedAngle(sz, angle):
     else:
         return angle + 90
 
-def checkCenter(point,currentCenter):
-    # Depricated from old algo.py logic
-    # XXX: Improve varible names
-    deltaPoint = (point[0]-TARGETCENTER[0],point[1]-TARGETCENTER[1])
-    currentDelta = (currentCenter[0]-TARGETCENTER[0],currentCenter[1]-TARGETCENTER[1])
-
-    # Distance formula
-    currentDeltaDist = (currentDelta[0]**2 + currentDelta[1]**2)**.5
-    checkDeltaDist = (deltaPoint[0]**2 + deltaPoint[1]**2)**.5
-
-    if checkDeltaDist < currentDeltaDist:
-        return True
-    else:
-        return False
-
 def sortPoints2PNP(leftPoints, rightPoints):
-    # XXX: change defualt debug value
+    """
+    Given the 8 verticies of a valid target pair, turn them into 'PnP format'
+ 
+    :param leftPoints: all the left points of the left rectangle pair in a valid target
+    :param rightPoints: all the right points of the right rectangle pair in a valid target 
+    :type leftPoints: Array of points, the same values returned by cv2.boxPoints()
+    :type rightPoints: Array of points, the same values returned by cv2.boxPoints()
+
+    :return: Points in proper 'PnP format'
+    :rtype: 2d array of points. In the form of numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")
+    -----
+    """
     logging.debug("Received a leftPoints of: " + str(leftPoints))
     logging.debug("Received a rightPoints of:" + str(rightPoints))
     logging.debug("Type of the points is: " + str(type(leftPoints[0])))
@@ -309,9 +316,23 @@ def sortPoints2PNP(leftPoints, rightPoints):
 
     return np.array(orderedPoints,dtype="double")
 
-def computeTargetOffSet(frame,center):
+def computeTargetAngleOffSet(frame,centerm,RPICAMFOV=45):
     # Only need the center of the target for this caluclation, not all points  
-    # TODO: Phoenix documentation
+    """
+    Crudely calculate the angle offset of the center of a target.
+ 
+    :param frame: the frame in which the target resides
+    :param center: the screen cordinate point of the center of the target
+    :type frame: Very large np.array(). This param is only needed to find the dimensions of the image.
+    :type center: simple 2d point. Tuple
+
+    :type RPICAMFOV: Value used to calucalte the px to angle ratio. Defined at the top of rectUtil.py file. 
+                     Note, this value is different that the FOV on the raspicam spec sheet. It can be tuned as seen fit.
+
+    :return: Degrees offset of the passed target
+    :rtype: float
+    -----
+    """
     y,x,_ = frame.shape
 
     pixelToDegRatio = x / RPICAMFOV
@@ -329,18 +350,58 @@ def computeTargetOffSet(frame,center):
     return centerDegOffset
 
 
-def computeHeightError(lPts,rPts):
-    # numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double") 
-    # TODO: Phoenix documentation
+def computeHeightError(height,targetPxHeight=89):
+    """
+    Given the height in pixels of a target, calculate the ERROR between that height and the target height
+ 
+    :param height: The height to compare to the target height
+    :param targetPxHeight: The 'wanted' height. Corrisponds to a real-world distance.
+    :type height: Integer.
+    :type targetPxHeight: Integer.
 
-    
+    :return: Height error as a decimal. The passed height * heightError should equal targetPxHeight
+    :rtype: float
+    -----
+    """
+    # XXX: Only is calculated for 640x480 frames
+    # NOTE: The calculations in this method are based on data measured on 2019/03/04
+    '''
+    Based on these PnP points, we know a target with a (approximate)height of:
+        (leftHeight + rightHeight) / 2 = 
+        ((413 - 326) + (412 - 321)) / 2 = 
+        (87 + 91) / 2 = 
+        (178) / 2 = 
+        *89* 
+        in pixels, is going to be about 55 inches away
 
-    return None
+    Additionaly, doing the same caluclation, we can create another known
+        (leftHeight + rightHeight) / 2 =
+        ((399 - 318) + (403 - 320)) / 2 =
+        (81 + 83) / 2 = 
+        *82*
+        in pixels is going to be about 58 inches away
+    '''
+    # Now we simply do a calculation for 55 inches.
+    # NOTE: In reality, the hight we are dividing by should be the WANTED distance away from the target.
+    #       Because of the inner-loop PID, we want a result of '1' to be at an 'arrived' state.
+    #       The current division is simply a proof of concept / framework. These numbers should be recalculated
+    #       with a wanted 'target' distance (55 inches is not the wanted target distance)
+
+    return height / targetPxHeight
 
 def points2center(points):
-    # Given a target in PNP format, return the center
+    """
+    Find the center of a target in 'PnP format'
+ 
+    :param points: The points that corrospond to a target
+    :type points: np.array() or python list
+
+    :return: the center(x,y) of the target
+    :rtype: tuple
+    -----
+    """
+    # Given a target in PNP format, return the center of the target
     # XXX: Does not work as intended with rotated targets
-    # TODO: Phoenix documentation
 
     lTopRightPt = points[1] # According to PNP order
 
@@ -366,6 +427,16 @@ def points2center(points):
     return center
 
 def getRectHeight(rect):
+    """
+    Find the height of a rectangle
+ 
+    :param rect: The rectangle to find the height of
+    :type rect: rect as returned by cv2.minAreaRect
+
+    :return: The height of the rectangle
+    :rtype: int32
+    -----
+    """
     # Get the height from the topmost point to the bottommost point
     '''
     Doctest
@@ -381,14 +452,9 @@ def getRectHeight(rect):
     # Lambda sorting does NOT work with a numpy array (properly)
     boxPtsSorted = sorted(boxPts,key=lambda p:p[1]) # Sort points by y
 
-    # for point in boxPtsSorted:
-    #     # Fixing numpy appending of objects
-    #     point = point.tolist()
-    #     orderedPoints.append(point)
-
     logging.debug(boxPtsSorted)
     # Widest Y
-    height = boxPtsSorted[3] - boxPtsSorted[0]
+    height = boxPtsSorted[3][1] - boxPtsSorted[0][1]
 
     return height
 
