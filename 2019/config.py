@@ -53,8 +53,8 @@ noled["picam"].update({
     "exposure_compensation": 0, # [-25, 25]
 })
 noled["algo"].update({
-    "hsvRange0": np.array([50,150,100]),
-    "hsvRange1": np.array([70,255,255]),
+    "hsvRange0": np.array([0,0,100]),
+    "hsvRange1": np.array([255,255,255]),
 })
 
 default = greenled

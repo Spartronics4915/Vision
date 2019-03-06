@@ -57,10 +57,10 @@ class CamHandler(BaseHTTPRequestHandler):
                     self.streamAlgo(cam, algostr)
 
             except BrokenPipeError:
-                pass
+                logging.warning("broken pipe error")
 
             except KeyboardInterrupt:
-                raise KeyboardInterrupt
+                logging.info("keyboard interrupt")
 
             except Exception as e:
                 # Critical for anything that happens in algo or below
@@ -108,37 +108,32 @@ class CamHandler(BaseHTTPRequestHandler):
         cam.start()
         while True:
             camframe = cam.next()
-            try:
-                target,frame = algo.processFrame(camframe, algoselector,
+            target,frame = algo.processFrame(camframe, algoselector,
                                             cfg=s_config["algo"],
                                             display=True, debug=False)
+            if target != None:
+                logging.info("Target!!! ------------------")
+                if algoselector == "heading":
+                    logging.info(target.headings)
+            if s_comm != None:
                 if target != None:
-                    logging.info("Target!!! ------------------")
-                    if algoselector == "heading":
-                        logging.info(target.headings)
-                if s_comm != None:
-                    if target != None:
-                        s_comm.UpdateVisionState("Acquired")
-                        target.send()
-                    else:
-                        s_comm.UpdateVisionState("Searching")
+                    s_comm.UpdateVisionState("Acquired")
+                    target.send()
+                else:
+                    s_comm.UpdateVisionState("Searching")
 
-                rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
-                if not rc:
-                    continue
-                if s_first:
-                    logging.info(jpg.size)
-                    s_first = False
-                self.wfile.write(bytes("--jpgboundary\n","utf-8"))
-                self.send_header('Content-type','image/jpeg')
-                self.send_header('Content-length', jpg.size)
-                self.end_headers()
-                self.wfile.write(jpg.tostring())
-                time.sleep(0.05)
-
-            finally:
-                break
-
+            rc,jpg = cv2.imencode('.jpg', frame, s_jpgParam)
+            if not rc:
+                continue
+            if s_first:
+                logging.debug("jpg file size: %s" % jpg.size)
+                s_first = False
+            self.wfile.write(bytes("--jpgboundary\n","utf-8"))
+            self.send_header('Content-type','image/jpeg')
+            self.send_header('Content-length', jpg.size)
+            self.end_headers()
+            self.wfile.write(jpg.tostring())
+            time.sleep(0.05)
 
 def main():
   global s_args
