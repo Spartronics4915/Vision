@@ -28,7 +28,6 @@ class PiVideoStream:
         # TODO: log level should be represented by a word, not a number
 
         if self.args.debug:
-
             logLevel = logging.DEBUG
         else:
             logLevel = logging.INFO
@@ -45,7 +44,7 @@ class PiVideoStream:
         ch.setLevel(logLevel)
 
         # create formatter
-        formatter = logger.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s\n')
 
         # Set format of handler
         ch.setFormatter(formatter)
@@ -95,27 +94,12 @@ class PiVideoStream:
         parser.add_argument("--height", dest="iheight",
                             help="image height [240]",
                             default=240, type=int)
-        parser.add_argument("--fps", dest="fps",
-                            help="FPS [60]",
-                            default=60, type=int)
         parser.add_argument("--display", dest="display",
                             help="display [0]",
                             default=0, type=int)
         parser.add_argument("--robot", dest="robot",
                             help="robot (localhost, roborio) [localhost]",
                             default="localhost")
-        parser.add_argument("--brightness", dest="brightness",
-                            help="brightness: [0, 100]",
-                            default=50, type=int)
-        parser.add_argument("--exposure", dest="exposure",
-                            help="exposure: (5, 20000) [10]",
-                            default=10, type=int)
-        parser.add_argument("--contrast", dest="contrast",
-                            help="contrast: (-100, 100) [0]",
-                            default=0, type=int)
-        parser.add_argument("--color", dest="color",
-                            help="color: ([0,255],[0,255])",
-                            default=None)
         parser.add_argument("--debug", dest="debug",
                             help="debug: [0,1] ",
                             default=0)
@@ -168,7 +152,7 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        logging.info("  (multi threaded)")
+        logging.debug("  (multi threaded)")
         target, frame = algo.processFrame(image, algo=self.args.algo,
                                         display=self.args.display,
                                         debug=self.args.debug)

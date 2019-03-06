@@ -54,7 +54,7 @@ def processFrame(frame, algo=None, display=0,debug=0):
     if algo == None or algo == "default":
         return defaultAlgo(frame, display, debug)
     elif algo == "rect":
-        return rectAlgo(frame, display, debug)
+        return rectDebugAlgo(frame, display, debug)
     elif algo == "empty" or algo == "bypass":
         return emptyAlgo(frame)
     elif algo == "mask":
@@ -77,30 +77,40 @@ def maskAlgo(frame):
 
     return None,mask
 
-def rectAlgo(frame,display=1,debug=0):
+def rectDebugAlgo(frame,display=1,debug=0):
+    # Used to find all relevent imformation about rectangles on screen
     # TODO: Implement some form of threading / process optimisation
-    rects = []
-    #largeTargetA = 0        # Need these vars to filter for large targets
-    #largeTargetC = (1600,0)
-
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # HSV color space
+    # TODO: Phoenix documentation
     mask = cv2.inRange(frame, range0, range1)       # Our HSV filtering
 
     rects = rectUtil.findRects(frame,200,display,debug)
 
     if display:
+        # Draw each rect + properties of it
         for r in rects:
             # combine original image with mask, for visualization
             visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
 
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
-            box = [np.int32(pts)]
+            boxPts = [np.int32(pts)]
 
-            cv2.drawContours(visImg, [box], 0,(0,0,255),2)
+            # Draw the box
+            #cv2.drawContours(visImg,boxPts, 0,(0,0,255),2)
+            # Draw a line through the center of the rect
+            #cv2.line(visImg,(frame.shape[1],r[0][1],(0,r[0][1]),(0,255,0)))
+            # Draw a line between Two points in the rectangle
+            #cv2.line(visImg,boxPts[1],boxPts[2],(0,255,0))
+
+            # Draw each point
+            i = 0
+            for p in boxPts:
+                # cv2.circle(visImg,p,5,(0,255,0))
+                print("At index " + str(i) + str(p))
+
     else:
-        visImg = frame # poseEstimation needs valid frame for camMatrix calcs
+        visImg = frame
 
-    return (None, visImg)
+    return None,visImg
 
 def defaultAlgo(frame,display=0,debug=0):
     return realPNP(frame, display, debug)
@@ -111,9 +121,9 @@ def headingAlgo(frame, display, debug):
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
 
-    x,y,_ = frame.shape
     # For simplicity, we are only thinking about one target
     if leftPair:
+
         lRect = leftPair[0]
         rRect = leftPair[1]
         if lRect:
@@ -122,23 +132,24 @@ def headingAlgo(frame, display, debug):
         if rRect:
             rPts = cv2.boxPoints(rRect)
             rPts = np.int0(rPts)
-        # Darwin: this is the method we need!
-        #   return the angle-offset in x and a height error which
-        #   is small when the height is near the "target" height
-        #   (ie: big).  And the error is big, say 100, as the height
-        #   approaches a small value. The offset(s) are either the
-        #   fraction of the horizontal frame or the angle as approximated
-        #   by that value * hfov/2.
-        PnpPts = rectUtil.sortPoints(lPts,rPts)
-        pointsCenter = rectUtil.points2center(PnpPts)
-        angleOffset = rectUtil.computeTargetOffSet(frame,pointsCenter)
 
-        cv2.line(frame,(x,pointsCenter[1]),(0,[pointsCenter[1]]),(0,0,255),thickness = 2)
+        PnpPts = rectUtil.sortPoints2PNP(lPts,rPts)
+
+        targetCenter = rectUtil.points2center(PnpPts)
+
+        angleOffset = rectUtil.computeTargetAngleOffSet(frame,targetCenter)
+
+        # Getting average height offset (between the two rectangles in a target)
+        targetAvgHeight = (rectUtil.getRectHeight(lRect) + rectUtil.getRectHeight(rRect)) / 2
+
+        heightError = rectUtil.computeHeightError(targetAvgHeight)
+
 
         # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
-        return targets.TargetHeadings(angleOffset),frame
+        return targets.TargetHeadingsAndHeightOffset(angleOffset,heightError),frame
+
     else:
-        return (None, frame)
+        return None, frame
 
 
 def realPNP(frame, display, debug):
@@ -201,7 +212,7 @@ def realPNP(frame, display, debug):
         logging.debug("sending a right point list of: " + str(rPts))
 
         # Orders the points according to modelpoints in solvePNP()
-        orderedPoints = rectUtil.sortPoints(lPts,rPts)
+        orderedPoints = rectUtil.sortPoints2PNP(lPts,rPts)
 
         logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
 

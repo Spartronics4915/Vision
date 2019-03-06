@@ -158,3 +158,38 @@ root     DEBUG  Camera Matrix :
 root     DEBUG  X 'point': 82.3191590504
 root     DEBUG  Y 'point': 4.81642504683
 root     DEBUG  Theta 'number': 0.09138552677821109
+
+### Rect Height Offset
+
+At index 0[120 227]
+At index 1[120 132]
+At index 2[157 132]
+At index 3[157 227]
+
+@@ 20-25 in @@ 640 x 480
+
+-----
+
+Real: x=58 y=0 theata=0
+Res:640x480
+
+[[ 252.  318.] A
+ [ 278.  325.] B
+ [ 259.  399.] C
+ [ 388.  327.] F
+ [ 416.  320.] E
+ [ 406.  403.]] G
+
+
+Real: x=55, y=0,theata=~0
+Res:640x480
+[[ 345.  326.] A 
+ [ 374.  332.] B
+ [ 355.  413.] C
+ [ 490.  330.] F
+ [ 520.  321.] E
+ [ 514.  412.]] G
+
+
+
+
