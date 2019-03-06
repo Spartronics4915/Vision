@@ -121,9 +121,9 @@ def headingAlgo(frame, display, debug):
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
 
-    x,y,_ = frame.shape
     # For simplicity, we are only thinking about one target
     if leftPair:
+
         lRect = leftPair[0]
         rRect = leftPair[1]
         if lRect:
@@ -132,23 +132,24 @@ def headingAlgo(frame, display, debug):
         if rRect:
             rPts = cv2.boxPoints(rRect)
             rPts = np.int0(rPts)
-        # Darwin: this is the method we need!
-        #   return the angle-offset in x and a height error which
-        #   is small when the height is near the "target" height
-        #   (ie: big).  And the error is big, say 100, as the height
-        #   approaches a small value. The offset(s) are either the
-        #   fraction of the horizontal frame or the angle as approximated
-        #   by that value * hfov/2.
-        PnpPts = rectUtil.sortPoints2PNP(lPts,rPts)
-        pointsCenter = rectUtil.points2center(PnpPts)
-        angleOffset = rectUtil.computeTargetOffSet(frame,pointsCenter)
 
-        cv2.line(frame,(x,pointsCenter[1]),(0,[pointsCenter[1]]),(0,0,255),thickness = 2)
+        PnpPts = rectUtil.sortPoints2PNP(lPts,rPts)
+
+        targetCenter = rectUtil.points2center(PnpPts)
+
+        angleOffset = rectUtil.computeTargetAngleOffSet(frame,targetCenter)
+
+        # Getting average height offset (between the two rectangles in a target)
+        targetAvgHeight = (rectUtil.getRectHeight(lRect) + rectUtil.getRectHeight(rRect)) / 2
+
+        heightError = rectUtil.computeHeightError(targetAvgHeight)
+
 
         # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
-        return targets.TargetHeadings(angleOffset),frame
+        return targets.TargetHeadingsAndHeightOffset(angleOffset,heightError),frame
+
     else:
-        return (None, frame)
+        return None, frame
 
 
 def realPNP(frame, display, debug):
