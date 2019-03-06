@@ -54,7 +54,7 @@ class CamHandler(BaseHTTPRequestHandler):
                 if algostr == "direct":
                     self.streamDirect(cam)
                 else:
-                    self.streamAlgo(cam, algostr, s_config["algo"])
+                    self.streamAlgo(cam, algostr)
 
             except BrokenPipeError:
                 pass
@@ -102,7 +102,7 @@ class CamHandler(BaseHTTPRequestHandler):
             stream.truncate()
             # cam.stop() called above
 
-    def streamAlgo(self, cam, algoselector, algoCfg):
+    def streamAlgo(self, cam, algoselector):
         global s_first
         (algoselector + " algo streaming")
         cam.start()
@@ -110,6 +110,7 @@ class CamHandler(BaseHTTPRequestHandler):
             camframe = cam.next()
             try:
                 target,frame = algo.processFrame(camframe, algoselector,
+                                            cfg=s_config["algo"],
                                             display=True, debug=False)
                 if target != None:
                     logging.info("Target!!! ------------------")

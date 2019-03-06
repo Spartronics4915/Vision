@@ -76,7 +76,7 @@ class PiVideoStream:
 
         # parameter configuration -----
         self.config = getattr(config, self.args.config) # reads named dict
-        self.picam = picam.PiCam(self.config)
+        self.picam = picam.PiCam(self.config["picam"])
 
     def parseArgs(self):
         """
@@ -152,8 +152,8 @@ class PiVideoStream:
 
     def processFrame(self, image):
         logging.debug("  (multi threaded)")
-        target, frame = algo.processFrame(image, self.config,
-                                        algo=self.args.algo,
+        target, frame = algo.processFrame(image, algo=self.args.algo,
+                                        cfg=self.config["algo"],
                                         display=self.args.display,
                                         debug=self.args.debug)
 

@@ -44,40 +44,38 @@ range1 = np.array([70,255,255])
 
 #   TODO: Change all algo's to return a target
 
-def emptyAlgo(frame):
+def emptyAlgo(frame,cfg):
     return (None,frame)
 
-def hsvAlgo(frame):
+def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
-def processFrame(frame, algo=None, display=0,debug=0):
+def processFrame(frame, algo=None, cfg=None, display=0, debug=0):
     if algo == None or algo == "default":
-        return defaultAlgo(frame, display, debug)
+        return defaultAlgo(frame, cfg, display, debug)
     elif algo == "rect":
-        return rectDebugAlgo(frame, display, debug)
+        return rectDebugAlgo(frame, cfg, display, debug)
     elif algo == "empty" or algo == "bypass":
-        return emptyAlgo(frame)
+        return emptyAlgo(frame, cfg)
     elif algo == "mask":
-        return maskAlgo(frame)
+        return maskAlgo(frame, cfg)
     elif algo == "realPNP":
-        return realPNP(frame,display,debug)
+        return realPNP(frame, cfg, display, debug)
     elif algo == "heading":
-        return headingAlgo(frame,display,debug)
+        return headingAlgo(frame,cfg, display, debug)
     elif algo == "hsv":
-        return hsvAlgo(frame)
+        return hsvAlgo(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
-        return defaultAlgo(frame)
+        return defaultAlgo(frame, cfg, display, debug)
 
-def maskAlgo(frame):
+def maskAlgo(frame, cfg):
     # Show what is shown by the opencv HSV values
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
     mask = cv2.inRange(frame, range0, range1)
-
     return None,mask
 
-def rectDebugAlgo(frame,display=1,debug=0):
+def rectDebugAlgo(frame, cfg, display=1, debug=0):
     # Used to find all relevent imformation about rectangles on screen
     # TODO: Implement some form of threading / process optimisation
     # TODO: Phoenix documentation
@@ -112,12 +110,13 @@ def rectDebugAlgo(frame,display=1,debug=0):
 
     return None,visImg
 
-def defaultAlgo(frame,display=0,debug=0):
-    return realPNP(frame, display, debug)
+def defaultAlgo(frame, cfg, display=0, debug=0):
+    return realPNP(frame, cfg, display, debug)
 
-def headingAlgo(frame, display, debug):
-    # Intrestingly, with this algo, it also requires proper different configs in runPiCam (lower res)
-    rects = rectUtil.findRects(frame,200,display,debug)
+def headingAlgo(frame, cfg, display, debug):
+    # Intrestingly, with this algo, it also requires proper different 
+    #  configs in runPiCam (lower res)
+    rects = rectUtil.findRects(frame, 200, display, debug)
     success,leftPair,rightPair = rectUtil.pairRectangles(rects, wantedTargets=1,
                                                          debug=debug)
 
@@ -152,7 +151,7 @@ def headingAlgo(frame, display, debug):
         return None, frame
 
 
-def realPNP(frame, display, debug):
+def realPNP(frame, cfg, display, debug):
     # TODO: Remove debug from all function calls, and use logger.debug()
     # nb: caller is responsible for threading (see runPiCam.py)
     # Spew

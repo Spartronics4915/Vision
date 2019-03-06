@@ -17,6 +17,7 @@ class PiCam:
             }
 
         self.resolution = self.config["resolution"]
+        self.framerate = self.config["framerate"]
         self.stream = None
         self.rawCapture = None
 
