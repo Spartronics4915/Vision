@@ -47,7 +47,7 @@ noled.update({
     "name": "noled",
 })
 noled["picam"].update({
-    "resolution": (640, 480),
+    "resolution": (320, 240),
     "iso": 400,
     "brightness": 40,
     "contrast": 100,

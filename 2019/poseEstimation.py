@@ -80,7 +80,7 @@ g = (0, f[1]-sinAlpha*5.5, f[2]-cosAlpha*5.5)
 a = (0, b[1]+cosAlpha*2, b[2]+sinAlpha*2)
 e = (0, f[1]-cosAlpha*2, f[2]+sinAlpha*2)
 s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
-s_firstTime = False
+s_firstTime = True
 
 # s_modelPts:
 # array([[ 0.       ,  5.93629528,  0.50076001],
@@ -133,7 +133,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         camMat = cameraMatrix
     else:
         y,x,_ = im.shape  # shape is rows, cols (y, x)
-        if False:
+        if True:
             # couch-potato formulation
             fx = x
             fy = x
@@ -150,8 +150,8 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
                     ], dtype = "double"
                     )
     if s_firstTime:
-        logging.debug("Camera Matrix :\n {0}".format(camMat))
-        s_firstTime = false
+        logging.info("Camera Matrix :\n {0}".format(camMat))
+        s_firstTime = False
 
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,

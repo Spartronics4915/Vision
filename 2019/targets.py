@@ -7,6 +7,7 @@ from networktables import NetworkTables
 import time
 import comm
 import logging
+import math
 
 class Target:
     """
@@ -70,6 +71,11 @@ class TargetPNP(Target):
             arrayValue.extend(self.leftTarget)
         if self.rightTarget != None:
             arrayValue.extend(self.rightTarget)
+        if len(arrayValue) == 3:
+            arrayValue[2] = math.degrees(arrayValue[2])
+        elif len(arrayValue) == 6:
+            arrayValue[2] = math.degrees(arrayValue[2])
+            arrayValue[5] = math.degrees(arrayValue[5])
         arrayValue.append(int(1000*self.deltaclock))
         return "TargetPNP: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue)
 
