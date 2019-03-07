@@ -29,8 +29,8 @@ class Target:
             # Used when setValue *is* construction, NB: if there
             # are > 1 live targets in the codebase, this isn't
             # valid.
-            self.deltaclock = self.clock - self.lastUpdate
-            self.lastUpdate = self.clock
+            self.deltaclock = self.clock - Target.lastUpdate
+            Target.lastUpdate = self.clock
         else:
             self.deltaclock = 0
             self.lastUpdate = self.clock
