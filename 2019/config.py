@@ -41,7 +41,7 @@ greenled["picam"].update({
     "brightness": 20,
     "contrast": 100,
     "flip": True,
-    "rotate": 90,
+    "rotation": 90,
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
@@ -71,7 +71,7 @@ noled["picam"].update({
     "brightness": 40,
     "contrast": 100,
     "flip": False,
-    "rotate": 0,
+    "rotation": 0,
     "exposure_mode": "off", #"fixedfps",
     "exposure_compensation": 0, # [-25, 25]
 })
