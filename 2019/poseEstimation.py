@@ -101,7 +101,7 @@ s_firstTime = True
 # return: None if we fail or (dx,dy,dtheta) required to move a robot at
 # the origin # to the target.
 
-def estimatePose(im, imgPts, cameraMatrix=None, display=False):
+def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
     """
     Given an imput image and image points, guess where we are
 
@@ -131,9 +131,11 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
     global s_firstTime
     if cameraMatrix != None:
         camMat = cameraMatrix
+        camnm = "<passed-in>"
     else:
         y,x,_ = im.shape  # shape is rows, cols (y, x)
-        if True:
+        camnm = cfg["pnpCam"]
+        if camnm == "couch":
             # couch-potato formulation
             fx = x
             fy = x
@@ -150,7 +152,7 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
                     ], dtype = "double"
                     )
     if s_firstTime:
-        logging.info("Camera Matrix :\n {0}".format(camMat))
+        logging.info("Camera Matrix '{}':\n {}".format(camnm, camMat))
         s_firstTime = False
 
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
