@@ -157,7 +157,7 @@ def realPNP(frame, cfg, display, debug):
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             ipts = [np.int32(pts)]
-            cv2.polylines(visImg, ipts, True, (255,0,0))
+            cv2.polylines(visImg, ipts, True, (0,255,0))
     else:
         # Avoid a NoneType error
         visImg = frame

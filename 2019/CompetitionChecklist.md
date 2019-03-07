@@ -119,18 +119,27 @@ Also note that the the disk must be in Read-Write mode to make this change.
 
   * In opencv, the main way rectangles are identified from a frame lies in a HSV range.
     The range is built as an upper, and a lower array, and in principal says:
-        "Every Pixel that has an HSV NOT within this range, throw it out"
-    These part of the tuning process is responsible for the identification of green color
+        "Every Pixel that has an HSV color NOT within this range, throw it out"
+    This part of the tuning process is primarily responsible for the proper identification of green color
 
   * Which values should be changed under what conditions?
     * H
       * Stands for 'Hue'. On the HSV cake, this is arguably the most important value, 
         as it identifies the range of colors that we will initally begin to look at
+      * Typically, the Hue value should not be changed much. Widening the Hue value starts to subtract
+        from the main purpose of having a green LED ring vs a red one.
+      * From the wikipedia article:
+          * "...starting at the red primary at 0°, passing through the green primary at 120° and the 
+          blue primary at 240°, and then wrapping back to red at 360"
+
     * S and V
       * S stands for 'Saturation', V for 'value'. Saturation and Value are harder to identify as humans, as these
         are values that are not uses in conventional representation of colors. Oversimplified, 
         saturation represents how much 'white' is added to the pure color. Typically, S and V are oppisates, where one
         value will be non 0, and the other value will be 0, because they represent oppisate shades.
+      * The tuning for S and V will typically come about from very oversaturated frames, which will only happen if the camera settings are     confgured improperly. A majority of the time these values will not be touched at all, but it is important to understand
+        their use.
+      
   
 
 
