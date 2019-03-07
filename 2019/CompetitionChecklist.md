@@ -107,6 +107,32 @@ Also note that the the disk must be in Read-Write mode to make this change.
   uv4l_raspicam`. And perhaps remove all video devices before rebooting: 
   `sudo rm /dev/video*` (only works if the drive is read-write).
 
+## Vision Camera
+
+### Tuning Processes and Benchmarks
+
+* For each competition lighting enviroment, the camera needs to have certain 
+  values modified in order to provide more accurate targets for that enviroment. 
+  Tuning is seperated into two relems: HSV, and Camera configs
+
+#### HSV
+
+  * In opencv, the main way rectangles are identified from a frame lies in a HSV range.
+    The range is built as an upper, and a lower array, and in principal says:
+        "Every Pixel that has an HSV NOT within this range, throw it out"
+    These part of the tuning process is responsible for the identification of green color
+
+  * Which values should be changed under what conditions?
+    * H
+      * Stands for 'Hue'. On the HSV cake, this is arguably the most important value, 
+        as it identifies the range of colors that we will initally begin to look at
+    * S and V
+      * S stands for 'Saturation', V for 'value'. Saturation and Value are harder to identify as humans, as these
+        are values that are not uses in conventional representation of colors. Oversimplified, 
+        saturation represents how much 'white' is added to the pure color. Typically, S and V are oppisates, where one
+        value will be non 0, and the other value will be 0, because they represent oppisate shades.
+  
+
 
 
 
