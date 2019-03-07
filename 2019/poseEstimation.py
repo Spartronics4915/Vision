@@ -51,7 +51,7 @@ import logging
 #                  |
 #                  z
 #                  |
-#      <-----y-----+
+#      <-----y-----+ (targets on the x=0 plane)
 #
 # imgPts as numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")1
 #   where (a) means (ax, ay) in pixel coords
@@ -61,8 +61,9 @@ import logging
 # 3D model points in robot-oriented coordinates. (x: forward, y: left, z: up).
 # Origin is chosen to be the midpoint between b and f.
 #
+# From the game specs:
 #  let bf = 8"
-#  Let ab = 2", bc = 5.5".
+#  Let ab = 2", bc = 5.5" (tape is 2x5.5)
 #  Let alpha = 14.5, be the angle between bc and bv (vertical)
 #   sin(alpha) = cv / bc = ab / ax
 #   cos(alpha) = bv / bc = ab / bx
@@ -79,6 +80,7 @@ g = (0, f[1]-sinAlpha*5.5, f[2]-cosAlpha*5.5)
 a = (0, b[1]+cosAlpha*2, b[2]+sinAlpha*2)
 e = (0, f[1]-cosAlpha*2, f[2]+sinAlpha*2)
 s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
+s_firstTime = True
 
 # s_modelPts:
 # array([[ 0.       ,  5.93629528,  0.50076001],
@@ -99,7 +101,7 @@ s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 # return: None if we fail or (dx,dy,dtheta) required to move a robot at
 # the origin # to the target.
 
-def estimatePose(im, imgPts, cameraMatrix=None, display=False):
+def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
     """
     Given an imput image and image points, guess where we are
 
@@ -126,12 +128,14 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
     >>> estimatePose(img,np.array([[269, 204],[301,212],[279,301],[429,211],[461,203],[451,299]],dtype='double'))
     (50, 0, 0), img
     """
-
+    global s_firstTime
     if cameraMatrix != None:
         camMat = cameraMatrix
+        camnm = "<passed-in>"
     else:
         y,x,_ = im.shape  # shape is rows, cols (y, x)
-        if False:
+        camnm = cfg["pnpCam"]
+        if camnm == "couch":
             # couch-potato formulation
             fx = x
             fy = x
@@ -141,14 +145,16 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             fx = 1.35*x*3.6/3.76
             fy = 1.35*y*3.6/2.74
             cx,cy = (fx/2,fy/2)
-
         camMat = np.array([
                     [fx, 0, cx],
                     [0, fy, cy],
                     [0, 0, 1]
                     ], dtype = "double"
                     )
-    logging.debug("Camera Matrix :\n {0}".format(camMat))
+    if s_firstTime:
+        logging.info("Camera Matrix '{}':\n {}".format(camnm, camMat))
+        s_firstTime = False
+
     distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
@@ -179,16 +185,16 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
 
         # First transform target world points to camera coordinates.
         # In opencv x is to the right, y is down and z is fwd.
-        targetPts = np.array([
-            (0.0, 0.0, 0.0), # origin
-            (1.0, 0.0, 0.0), # point "into" wall from pov of robot
-            (0.0, 0.0, 1.0)  # point up
-        ])
+        targetPts = np.concatenate((np.array([
+                            (0.0, 0.0, 0.0), # origin
+                            (5.0, 0.0, 0.0), # point "into" wall from pov of robot
+                            (0.0, 0.0, 1.0)  # point up
+                        ]), s_modelPts))
         (rotmat,_) = cv2.Rodrigues(rotVec) # produces 3x3 rotation matrix
         camPts = []
         xlateVec = xlateVec.reshape(3,) # so we can add to rotpt below
-        for p in targetPts:
-            rotpt = rotmat.dot(p) # (3,3)dot(3,1) -> (3,)
+        for tgp in targetPts:
+            rotpt = rotmat.dot(tgp) # (3,3)dot(3,1) -> (3,)
             campt = rotpt + xlateVec
             camPts.append(campt)
 
@@ -214,16 +220,17 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
         theta = math.acos(perpUnit.dot([1.,0.,0.])) 
 
         if display:
-            # draw red circles around our target (image) points
-            for p in imgPts:
-                cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
+            if False:
+                # draw red circles around our target (image) points
+                for p in imgPts:
+                    cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
+                    
 
             # Project two target points onto the image plane.
             # We use this to draw a line sticking out of origin of coordsys
-            worldPts = np.array([(0.0, 0.0, 0.0), (-10.0,0.0,0.0)])
-            (projPts, _) = cv2.projectPoints(worldPts,
+            (projPts, _) = cv2.projectPoints(targetPts,
                                         rotVec, xlateVec, camMat, distCoeffs)
-            # print("shape of projPts:" + str(projPts.shape)) 
+            #print("shape of projPts:" + str(projPts.shape)) 
             #    returns (2, 1, 2)
             # print(str(projPts)) 
             #  returns  [[[ 125  153]]
@@ -237,10 +244,10 @@ def estimatePose(im, imgPts, cameraMatrix=None, display=False):
             cv2.circle(im, org, 3, (255,0,0), -1)
             cv2.line(im, org, perp, (255,255,0), 2) # cyan line
 
-        # in the form x,y, theta
-        logging.debug("X 'point': " + str(robotPts[0][0]))
-        logging.debug("Y 'point': " + str(robotPts[0][1]))
-        logging.debug("Theta 'number': " + str(theta))
+            for i in range(3,projPts.shape[0]):
+                p = (int(projPts[i][0][0]), int(projPts[i][0][1]))
+                cv2.circle(im, p, 3, (0, 255,0), -1)
+                
 
         return (robotPts[0][0], robotPts[0][1], theta), im
 

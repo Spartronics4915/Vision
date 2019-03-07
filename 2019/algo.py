@@ -210,7 +210,7 @@ def realPNP(frame, cfg, display, debug):
             logging.debug("Passing an orderedPoints of: " + str(orderedPoints))
 
         # now estimatePose accepts optional camera matrix
-        target,frame = poseEstimation.estimatePose(visImg, orderedPoints,
+        target,frame = poseEstimation.estimatePose(visImg, orderedPoints, cfg,
                                             cameraMatrix=None, display=display)
 
         if not lTarget:
