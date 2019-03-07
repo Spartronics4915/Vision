@@ -10,6 +10,8 @@
 import numpy as np
 import copy
 
+# ------ Base -------
+
 _base = {
     "picam": {
         "resolution": (320, 240),
@@ -28,6 +30,7 @@ _base = {
         "pnpCam": "pi"
     }
 }
+# ------ Debugging/At Home Copy -------
 
 greenled = copy.deepcopy(_base)
 greenled.update({
@@ -42,7 +45,22 @@ greenled["picam"].update({
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
+# ------ AMV Copy -------
+greenledAMV = copy.deepcopy(_base)
+greenledAMV.update({
+    "name": "greenledAMV",
+});
+greenledAMV["picam"].update({
+    "iso": 400,  # 100-800 (higher numbers are brighter)
+    "brightness": 20,
+    "contrast": 100,
+    "flip": True,
+    "rotate": 90,
+    "exposure_mode": "fireworks",
+    "exposure_compensation": -25, # [-25, 25]
+})
 
+# ------ Dana's Copy -------
 noled = copy.deepcopy(_base)
 noled.update({
     "name": "noled",
