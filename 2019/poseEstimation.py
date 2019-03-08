@@ -47,18 +47,20 @@ import logging
 #   /    / |                  \    \
 #  d    /  |                   \    h
 #      c   v                    g
-#                  ^
+#                  +------x---------->
 #                  |
-#                  z
+#                  y
 #                  |
-#      <-----y-----+ (targets on the x=0 plane)
+#                  | 
+#                  v
+#                   (targets on the z=0 plane)
 #
 # imgPts as numpy.array([(a), (b), (c), (f), (e), (g)]), dtype="double")1
 #   where (a) means (ax, ay) in pixel coords
 #   nb: don't need d and h
 #
 # World Coordinate Convention
-# 3D model points in robot-oriented coordinates. (x: forward, y: left, z: up).
+# 3D model points in robot-oriented coordinates. (x: right, y: down, z: in).
 # Origin is chosen to be the midpoint between b and f.
 #
 # From the game specs:
@@ -73,12 +75,12 @@ alpha = math.radians(14.5)
 cosAlpha = math.cos(alpha)
 sinAlpha = math.sin(alpha)
 
-b = (0, 4, 0) # y is + to the left
-f = (0, -4, 0) # y is - to the right
-c = (0, b[1]+sinAlpha*5.5, b[2]-cosAlpha*5.5)
-g = (0, f[1]-sinAlpha*5.5, f[2]-cosAlpha*5.5)
-a = (0, b[1]+cosAlpha*2, b[2]+sinAlpha*2)
-e = (0, f[1]-cosAlpha*2, f[2]+sinAlpha*2)
+b = (-4,0,0) # x is right
+f = (4,0,0) 
+c = (b[0]-sinAlpha*5.5, b[1]+cosAlpha*5.5,0)
+g = (f[0]+sinAlpha*5.5, f[1]+cosAlpha*5.5,0)
+a = (b[0]-cosAlpha*2, b[1]-sinAlpha*2,0)
+e = (f[0]+cosAlpha*2, f[1]-sinAlpha*2,0)
 s_modelPts = np.array([a, b, c, f, e, g], dtype="double")
 s_firstTime = True
 
@@ -140,8 +142,13 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             fx = x
             fy = x
             cx,cy = (x/2, y/2)
-        else:
+        elif camnm == "theory":
             # we employ picam1 specs to compute fx
+            fx = x*3.6/3.76
+            fy = y*3.6/2.74
+            cx,cy = (fx/2,fy/2)
+        else:
+            # theory plus rotate 90?
             fx = 1.35*x*3.6/3.76
             fy = 1.35*y*3.6/2.74
             cx,cy = (fx/2,fy/2)
@@ -183,14 +190,18 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
         #logging.debug("Rotation Vector:\n {0}".format(rotVec))
         #logging.debug("Translation Vector:\n {0}".format(xlateVec))
 
-        # First transform target world points to camera coordinates.
+        # First transform target *world* points to camera coordinates.
         # In opencv x is to the right, y is down and z is fwd.
         targetPts = np.concatenate((np.array([
-                            (0.0, 0.0, 0.0), # origin
-                            (5.0, 0.0, 0.0), # point "into" wall from pov of robot
-                            (0.0, 0.0, 1.0)  # point up
+                            (0, 0, 0), # origin
+                            (0, 0, 12), # away
+                            (0, 0, -12),# toward
+                            (0, -12, 0),# up
+                            (12, 0, 0)  # right
                         ]), s_modelPts))
         (rotmat,_) = cv2.Rodrigues(rotVec) # produces 3x3 rotation matrix
+
+
         camPts = []
         xlateVec = xlateVec.reshape(3,) # so we can add to rotpt below
         for tgp in targetPts:
@@ -198,33 +209,33 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             campt = rotpt + xlateVec
             camPts.append(campt)
 
-        # Next we convert our camera coordinates:
+        # camPerp is a vector in camera space
+        camPerp = camPts[1] - camPts[0] 
+
+        # next we compute theta in camera coords
         #   x is right
         #   y is down
         #   z is into the screen
+        perpVec = camPts[1] - camPts[0] # origin to perp point vector
+        perpVec[1] = 0 # don't care about y component of angle
+        perpUnit = perpVec / np.linalg.norm(perpVec, 2, -1)
+        # dot of 2 unit-vectors is cos of angle
+        theta = math.acos(perpUnit.dot([0.,0.,1.])) 
+        if perpUnit[0] > 0: # cos of small angles is always positive
+            theta *= -1
+
         # to robot coords:
         #   x is into the screen
         #   y is left
         #   z is up
         robotPts = []
         for p in camPts:
-            robotPts.append(np.array([p[2], -p[0], p[1]]))
-
-        # we return the robot-relative x,y,z coords of target
-        # as well as the angle between the robot heading and
-        # targetPerp in the x/y plane.  (robot heading is (1,0,0))
-        perpVec = robotPts[1] - robotPts[0] # origin to perp point vector
-        perpVec[2] = 0 # don't care about height
-        perpUnit = perpVec / np.linalg.norm(perpVec, 2, -1)
-        # dot of 2 unit-vectors is cos of angle
-        theta = math.acos(perpUnit.dot([1.,0.,0.])) 
+            robotPts.append(np.array([p[2], -p[0], -p[1]]))
 
         if display:
-            if False:
-                # draw red circles around our target (image) points
+            if False: # draw red circles around our target (image) points
                 for p in imgPts:
                     cv2.circle(im, (int(p[0]), int(p[1])), 3, (0,0,255), -1)
-                    
 
             # Project two target points onto the image plane.
             # We use this to draw a line sticking out of origin of coordsys
@@ -240,15 +251,34 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             # a[0][0][0] is 125
             # a[1][0][1] is 126
             org = (int(projPts[0][0][0]), int(projPts[0][0][1]))
-            perp = (int(projPts[1][0][0]), int(projPts[1][0][1]))
-            cv2.circle(im, org, 3, (255,0,0), -1)
-            cv2.line(im, org, perp, (255,255,0), 2) # cyan line
+            away = (int(projPts[1][0][0]), int(projPts[1][0][1]))
+            toward = (int(projPts[2][0][0]), int(projPts[2][0][1]))
+            up = (int(projPts[3][0][0]), int(projPts[3][0][1]))
+            right = (int(projPts[4][0][0]), int(projPts[4][0][1]))
+            cv2.circle(im, org, 5, (0,0,255), -1)
+            # 
+            # human (sgi) camera (rh) coords:
+            #   red is +x
+            #   green is +y
+            #   blue is -z
+            #   cyan is +z
+            cv2.line(im, org, away, (255,255,0), 2) # cyan
+            cv2.line(im, org, toward, (255,0,0), 2) # blue
+            cv2.line(im, org, up, (0,255,0), 2) # green
+            cv2.line(im, org, right, (0,0,255), 2) # red
 
-            for i in range(3,projPts.shape[0]):
+            for i in range(5,projPts.shape[0]):
                 p = (int(projPts[i][0][0]), int(projPts[i][0][1]))
                 cv2.circle(im, p, 3, (0, 255,0), -1)
-                
 
+            if True:
+                print("%5.2f, %5.2f, %.1f" %
+                 (robotPts[0][0], robotPts[0][1], math.degrees(theta)),
+                 end="\r")
+
+        # we return the robot-relative x,y,z coords of target
+        # as well as the angle between the robot heading and
+        # targetPerp in the x/y plane.  (robot heading is (1,0,0))
         return (robotPts[0][0], robotPts[0][1], theta), im
 
 if __name__ ==  "__main__":

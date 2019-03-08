@@ -112,7 +112,9 @@ class CamHandler(BaseHTTPRequestHandler):
                                             cfg=s_config["algo"],
                                             display=True, debug=False)
             if target != None:
-                logging.info(str(target))
+                logging.debug(str(target))
+            else:
+                logging.info("no target");
 
             if s_comm != None:
                 if target != None:

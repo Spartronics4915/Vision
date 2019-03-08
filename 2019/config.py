@@ -55,7 +55,7 @@ greenledAMV["picam"].update({
     "brightness": 20,
     "contrast": 100,
     "flip": True,
-    "rotate": 90,
+    "rotation": 90,
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
@@ -66,7 +66,7 @@ noled.update({
     "name": "noled",
 })
 noled["picam"].update({
-    "resolution": (320, 240),
+    "resolution": (640, 480),
     "iso": 400,
     "brightness": 40,
     "contrast": 100,
