@@ -41,7 +41,7 @@ greenled["picam"].update({
     "brightness": 20,
     "contrast": 100,
     "flip": True,
-    "rotation": 90,
+    "rotation": 0,
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
@@ -55,7 +55,7 @@ greenledAMV["picam"].update({
     "brightness": 20,
     "contrast": 100,
     "flip": True,
-    "rotation": 90,
+    "rotation": 0,
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
