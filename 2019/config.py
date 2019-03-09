@@ -59,7 +59,7 @@ greenledAMV["picam"].update({
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
-noled["algo"].update({
+greenledAMV["algo"].update({
     "pnpCam": "couch"
 })
 

@@ -8,6 +8,7 @@ import time
 import comm
 import logging
 import math
+import doctest
 
 class Target:
     """
@@ -58,6 +59,19 @@ class TargetPNP(Target):
     TargetPNP:
         Vision/Reverse/solvePNP [dxL,dyL,dthetaL,dxR,dyR,dthetaR,dtime]
                                 [dxL,dyL,dthetaL,dtime]
+
+    Regression testing for self.send() method
+
+    Doctest
+    ------
+
+    >>> a = TargetPNP((1,2,0.5),(0,0,0))
+    >>> output = a.send()
+    >>> print(str(a.leftTarget) + str(a.rightTarget))
+    (1, 2, 0.5)(0, 0, 0)
+    >>> print(output)
+
+
     """
     def __init__(self, left, right, orientation="Reverse"):
         super().__init__()
@@ -99,7 +113,7 @@ class TargetPNP(Target):
         if self.rightTarget != None:
             arrayValue.extend(self.rightTarget)
         arrayValue.append(self.deltaclock)
-        # logging.info("send: " + str(arrayValue))
+        #logging.info("send: " + str(arrayValue))
         comm.PutNumberArray(self.subkey, arrayValue)
 
 class TargetHeadingsAndHeightOffset(Target):
@@ -130,5 +144,12 @@ class TargetHeadingsAndHeightOffset(Target):
         comm.PutNumberArray(self.subkey, arrayValue)
 
 
+if __name__ == "__main__":
+    # Debug logging
+    logFmt = "%(name)-8s %(levelname)-6s %(message)s"
+    dateFmt = "%H:%M"
+    logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
 
-    
+    logging.info("Began logger")
+
+    doctest.testmod()

@@ -167,7 +167,7 @@ def realPNP(frame, cfg, display, debug):
 
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
-    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=2,debug=1)
 
     if success == False:
         # Logger debugs happened in pairRectangles
