@@ -59,6 +59,9 @@ greenledAMV["picam"].update({
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
+noled["algo"].update({
+    "pnpCam": "couch"
+})
 
 # ------ Dana's Copy -------
 noled = copy.deepcopy(_base)
@@ -81,7 +84,7 @@ noled["algo"].update({
     "pnpCam": "couch"
 })
 
-default = greenled
+default = greenledAMV
 
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
