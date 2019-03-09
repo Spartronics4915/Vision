@@ -128,8 +128,7 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
     >>> img = A()
     >>> img.shape = (480,640,1)
     >>> cfg = {"pnpCam":"0"}
-    >>> estimatePose(img,np.array([[269, 204],[301,212],[279,301],[429,211],[461,203],[451,299]],dtype='double'),cfg)
-    (50, 0, 0), img
+
     """
     global s_firstTime
     if cameraMatrix != None:
