@@ -18,6 +18,7 @@
     - [install node 10.x and extensions](#install-node-10x-and-extensions)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
+    - [optional - install rpi-webrtc-streamer (for streaming video via picamera)](#optional---install-rpi-webrtc-streamer-for-streaming-video-via-picamera)
     - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
         - [install rpi-webrtc-streamer (for streaming video)](#install-rpi-webrtc-streamer-for-streaming-video)
         - [install uv4l (for streaming video via picamera)](#install-uv4l-for-streaming-video-via-picamera)
@@ -427,6 +428,18 @@ sudo python3 -m pip install picamera
 >>> import cv2
 >>> import picamera
 ```
+### optional - install rpi-webrtc-streamer (for streaming video via picamera)
+
+* Follow instructions [here](https://github.com/kclyu/rpi-webrtc-streamer-deb).
+* _don't_ install web frontend support, the native-peer-connection is built-in.
+* after installing edit `/opt/rws/etc/media_config.conf`. Setup the max 
+  bitrate (1500000) here. Same with default resolution.
+* optionally edit `/opt/rws/etc/webrtc_streamer.conf`. (default server is here).
+* verify with `http://{yourraspi}:8889/native-peerconnection/index.html`.
+  You may need internet access for this phase, as the default web site refers
+  to internet resources.
+* make sure the version of Dashboard you're using has the rpi-webrtc-streamer 
+  support.
 
 ### optional - install support for h264 feed
 
