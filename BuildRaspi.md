@@ -31,6 +31,7 @@
     - [no camera functionality](#no-camera-functionality)
     - [uv4l service is starting on reboot and we don't want it to](#uv4l-service-is-starting-on-reboot-and-we-dont-want-it-to)
     - [frcvision webpage doesn't appear at http://frcvision.local](#frcvision-webpage-doesnt-appear-at-httpfrcvisionlocal)
+    - [webrtc isn't working](#webrtc-isnt-working)
     - [uv4l webpage doesn't appear](#uv4l-webpage-doesnt-appear)
     - [vision services aren't available](#vision-services-arent-available)
     - [vision services can't connect to robot](#vision-services-cant-connect-to-robot)
@@ -820,6 +821,23 @@ Test with `raspistill -p "0,0,640,480"`.
     tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
     # and this shows someone connected to the port
     tcp        0      0 10.49.15.11:80          192.168.0.4:52793       ESTABLISHED
+    ```
+
+### webrtc isn't working
+
+* is the correct server running?  Are there any indications of badness in
+  the logs?
+* can we `traceroute 10.49.15.5`  (ie to the driverstation)
+* does stun protocol work?
+
+    ```bash
+    #start the stun-server on driverstation
+    node-stun-server
+    ```
+
+    ```bash
+    #contact the stun-server from the client
+    node-stun-server -s 10.49.15.5 (ie driverstation)
     ```
 
 ### uv4l webpage doesn't appear
