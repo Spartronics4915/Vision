@@ -29,12 +29,12 @@ button:hover
 
 button[disabled] 
 {
-    color: #ccc;
+    background-color: #335;
 }
 
 button[disabled]:hover 
 {
-    background-color: #cca;
+    background-color: #338;
 }
 
 a
