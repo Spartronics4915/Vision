@@ -305,6 +305,15 @@ More information on configuration wifi can be found [here](https://www.raspberry
   while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
   ```
 
+  If your "working disk" is much larger than your target disk, you can
+  reduce the time it takes to perform the duplication through the use
+  of [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup)
+  coupled with a usb-mounted target microsd card.
+
+  ```bash
+  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
+  ```
+
   And to create a duplicate, reverse the process:
 
   ```sh
