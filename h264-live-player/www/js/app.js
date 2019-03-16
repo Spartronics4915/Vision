@@ -4,6 +4,7 @@ class App
     {
 		document.addEventListener("DOMContentLoaded",
 				this._onReady.bind(this), false);
+        window.onbeforeunload = this._onBeforeUnload.bind(this);
     }
 
     _onReady()
@@ -12,6 +13,11 @@ class App
 		this.uri = "ws://" + document.location.host;
 		this.wsavc = new WSAvcPlayer(this.canvas, "webgl", 1, 35);
         this.wsavc.connect(this.uri); // takes time, no callback
+    }
+
+    _onBeforeUnload()
+    {
+        this.disconnectWS();
     }
 
 	playStream()
