@@ -9,10 +9,31 @@ class App
 
     _onReady()
     {
-		this.canvas = document.getElementById("videocanvas");
+        this.statusEl = document.getElementById("status");
+		this.canvasEl = document.getElementById("videocanvas");
 		this.uri = "ws://" + document.location.host;
-		this.wsavc = new WSAvcPlayer(this.canvas, "webgl", 1, 35);
+		this.wsavc = new WSAvcPlayer(this.canvasEl, "webgl", 1, 35);
         this.wsavc.connect(this.uri); // takes time, no callback
+        this._onIdle();
+    }
+
+    _onIdle()
+    {
+        if(this.wsavc)
+        {
+            let txt = "undefined state";
+            let st= this.wsavc.readyState();
+            if(st != undefined)
+            {
+                txt = ["Connecting", "Open", 
+                       "Closing", "Closed"][st];
+            }
+            this.statusEl.innerHTML = txt;
+        }
+        else
+            this.statusEl.innerHTML = "no connection";
+
+        setTimeout(this._onIdle.bind(this), 3000);
     }
 
     _onBeforeUnload()
@@ -27,6 +48,8 @@ class App
             this.wsavc.playStream();
             this.playing = true;
 		}
+        if(document.activeElement)
+            document.activeElement.blur();
 	}
 
 	stopStream()
@@ -36,6 +59,8 @@ class App
 			this.wsavc.stopStream();
 			this.playing = false;
 		}
+        if(document.activeElement)
+            document.activeElement.blur();
 	}
 
 	disconnectWS()
@@ -43,9 +68,21 @@ class App
 		if(this.wsavc)
 		{
 			this.stopStream();
-			this.wsavc.disconnect();
+            setTimeout( function() {
+                this.wsavc.disconnect();
+            }.bind(this), 1000);
 		}
+        if(document.activeElement)
+            document.activeElement.blur();
 	}
+
+    resetWS()
+    {
+		if(this.wsavc)
+            this.wsavc.resetStream();
+        if(document.activeElement)
+            document.activeElement.blur();
+    }
 
     logMsg(msg)
     {
