@@ -18,7 +18,7 @@ class ServerBase
         this.readStream =  null;
     }
 
-    getFeed()
+    getFeed(config)
     {
         throw new Error("to be implemented by subclasses");
     }
@@ -28,11 +28,11 @@ class ServerBase
         console.log("endFeed isn't implemented by subclass");
     }
 
-    _startFeed()
+    _startFeed(cfg)
     {
         if(this.readStream == null)
         {
-            var readStream = this.getFeed(); // invokes subclass implementation
+            var readStream = this.getFeed(cfg); // invokes subclass method
             readStream = readStream.pipe(new Splitter(NALseparator));
             readStream.on("data", this._broadcast.bind(this));
             this.readStream = readStream;
@@ -79,13 +79,13 @@ class ServerBase
 
     _onClientMsg(data) 
     {
-        var cmd = "" + data; 
-        var action = data.split(' ')[0];
+        var args = data.split(' ');
+        var action = args[0];
         console.log("Incoming action '%s'", action);
         switch(action)
         {
         case "REQUESTSTREAM":
-            this._startFeed();
+            this._startFeed(data);
             break;
         case "STOPSTREAM":
             this._stopFeed(); // was pause
@@ -100,9 +100,9 @@ class ServerBase
 
     _onClientClose()
     {
-        this._stopFeed();
+        console.log('Client closed');
+        this._stopFeed(true/*force*/);
     }
 }
-
 
 module.exports = ServerBase;

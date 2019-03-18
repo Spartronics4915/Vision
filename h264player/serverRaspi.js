@@ -17,17 +17,22 @@ class RaspiServer extends ServerBase
         this.streamer = null;
     }
 
-    getFeed(cmd) 
+    getFeed(data) 
     {
         if(!this.streamer || this.streamer.killed)
         {
-            var args = ["-t", "0", 
+            // expect REQUESTSTREAM raspivid -t 0 -b 2000000 -o - -w 640...
+            var args = data.split(" ").slice(2); // skip first two args
+            if(args.length == 0)
+            {
+                args = ["-t", "0", 
                         "-b", this.options.bitrate,
                         "-o", "-", 
                         "-w", this.options.width, 
                         "-h", this.options.height, 
                         "-fps", this.options.fps, 
                         "-pf", "baseline"];
+            }
             console.log("raspivid", args.join(" "));
             this.streamer = spawn("raspivid", args); // child process
             this.streamer.on("exit", function(code) {

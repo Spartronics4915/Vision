@@ -15,4 +15,5 @@ app.use(express.static(__dirname + '/www'));
 const server  = http.createServer(app);
 const silence = new WebStreamerServer(server);
 
+console.log("appRaspi listening on port 8080");
 server.listen(8080);
