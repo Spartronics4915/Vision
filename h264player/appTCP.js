@@ -11,17 +11,13 @@ const app                = express();
 * to create a raw tcp h264 streamer
 */
 
-  //public website
-app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/vendor/dist'));
-
+//public website
+app.use(express.static(__dirname + '/www'));
 const server  = http.createServer(app);
-
 const feed    = new RemoteTCPFeedRelay(server, {
-  feed_ip   : "172.19.20.165",
-  feed_port : 5001,
+    feed_ip   : "172.19.20.165",
+    feed_port : 5001,
 });
-
 
 server.listen(8080);
 

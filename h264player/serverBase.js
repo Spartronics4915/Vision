@@ -18,14 +18,14 @@ class ServerBase
         this.readStream =  null;
     }
 
-    get_feed()
+    getFeed()
     {
         throw new Error("to be implemented by subclasses");
     }
 
-    end_feed()
+    endFeed()
     {
-        console.log("end_feed isn't implemented by subclass");
+        console.log("endFeed isn't implemented by subclass");
     }
 
     _startFeed()
@@ -79,7 +79,8 @@ class ServerBase
 
     _onClientMsg(data) 
     {
-        var cmd = "" + data, action = data.split(' ')[0];
+        var cmd = "" + data; 
+        var action = data.split(' ')[0];
         console.log("Incoming action '%s'", action);
         switch(action)
         {

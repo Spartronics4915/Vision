@@ -1,10 +1,10 @@
 "use strict";
 
-const util      = require('util');
-const spawn     = require('child_process').spawn;
-const merge     = require('mout/object/merge');
-const Server    = require('./server');
-class RpiServer extends Server 
+const util = require('util');
+const spawn = require('child_process').spawn;
+const merge = require('mout/object/merge');
+const ServerBase = require('./serverBase');
+class RaspiServer extends ServerBase
 {
     constructor(server, opts) 
     {
@@ -17,7 +17,7 @@ class RpiServer extends Server
         this.streamer = null;
     }
 
-    get_feed() 
+    getFeed(cmd) 
     {
         if(!this.streamer || this.streamer.killed)
         {
@@ -40,7 +40,7 @@ class RpiServer extends Server
         return this.streamer.stdout;
     }
 
-    end_feed(force)
+    endFeed(force)
     {
         if(this.streamer)
         {
@@ -55,4 +55,4 @@ class RpiServer extends Server
     }
 }
 
-module.exports = RpiServer;
+module.exports = RaspiServer;
