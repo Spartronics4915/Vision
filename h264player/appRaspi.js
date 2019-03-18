@@ -7,7 +7,7 @@
 
 const http = require('http');
 const express = require('express');
-const WebStreamerServer = require('./raspiServer');
+const WebStreamerServer = require('./serverRaspi');
 const app = express();
 
 //public website

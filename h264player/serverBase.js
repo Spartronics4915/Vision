@@ -32,7 +32,7 @@ class ServerBase
     {
         if(this.readStream == null)
         {
-            var readStream = this.get_feed(); // invokes subclass get_feed
+            var readStream = this.getFeed(); // invokes subclass implementation
             readStream = readStream.pipe(new Splitter(NALseparator));
             readStream.on("data", this._broadcast.bind(this));
             this.readStream = readStream;
@@ -48,7 +48,7 @@ class ServerBase
                 this.readStream.end();
                 this.readStream = null;
             }
-            this.end_feed(force);
+            this.endFeed(force);
         }
     }
 
