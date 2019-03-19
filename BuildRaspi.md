@@ -18,10 +18,10 @@
     - [install node 10.x and extensions](#install-node-10x-and-extensions)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
-    - [optional - install rpi-webrtc-streamer (for streaming video via picamera)](#optional---install-rpi-webrtc-streamer-for-streaming-video-via-picamera)
     - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
-        - [install rpi-webrtc-streamer (for streaming video)](#install-rpi-webrtc-streamer-for-streaming-video)
-        - [install uv4l (for streaming video via picamera)](#install-uv4l-for-streaming-video-via-picamera)
+        - [install h264player](#install-h264player)
+        - [install rpi-webrtc-streamer (deprecated)](#install-rpi-webrtc-streamer-deprecated)
+        - [install uv4l (deprecated)](#install-uv4l-deprecated)
     - [pull git repository](#pull-git-repository)
     - [misc](#misc)
         - [mount usb thumbdrive](#mount-usb-thumbdrive)
@@ -438,18 +438,6 @@ sudo python3 -m pip install picamera
 >>> import cv2
 >>> import picamera
 ```
-### optional - install rpi-webrtc-streamer (for streaming video via picamera)
-
-* Follow instructions [here](https://github.com/kclyu/rpi-webrtc-streamer-deb).
-* _don't_ install web frontend support, the native-peer-connection is built-in.
-* after installing edit `/opt/rws/etc/media_config.conf`. Setup the max 
-  bitrate (1500000) here. Same with default resolution.
-* optionally edit `/opt/rws/etc/webrtc_streamer.conf`. (default server is here).
-* verify with `http://{yourraspi}:8889/native-peerconnection/index.html`.
-  You may need internet access for this phase, as the default web site refers
-  to internet resources.
-* make sure the version of Dashboard you're using has the rpi-webrtc-streamer 
-  support.
 
 ### optional - install support for h264 feed
 
@@ -458,15 +446,88 @@ native H264 encoder.  This is far superior to most current usb2 webcams
 and offers a number of controls not usually present in a webcam.
 A raspi has two CSI connection points, but can apparently support
 only a single picam connected at the point nearest the HDMI.
-There are two validated solutions for h264 feeds. The first, uv4l,
-is a closed-source option that seems well-enough proven.  Unfortunately,
-its documentation could be better and we were unable to diagnose problems
-that arose during our first encounter with the FRC Field Management System (FMS).
-Another option, rpi-webrtc-streamer (rws), is open source and seems to have
-more diagnostics. Until we have proof that rws is more stable in FMS both
-options should be considered equivalent.
 
-#### install rpi-webrtc-streamer (for streaming video)
+H264 is a very efficient video solution on raspberry pi due to
+its GPU-based implementation.  The hard part is delivering
+the resulting video stream to a web browser for integration with our
+Dashboard.  We have explored three technologies for this and currently 
+suggest that `h264player is the preferred solution`.
+
+* `h264player` uses tcp-based websockets to deliver the
+    raspivid stream to a browser. No fancy STUN negotiations
+    take place, but to make the pixels visible in the browser
+    we employ a javascript h264 decoder. Once the pixels
+    are decoded, we rely on an opengl YUV canvas for their display.
+    The more modern html5 video element and media streams aren't employed
+    by this approach and so its major downside is that it consumes extra 
+    load on the driver station.
+* `webRTC` is the newest and shiniest of streaming techs.
+    It resolved the biggest issue for broad-deployment of
+    streaming through a complex routing negotiation system
+    called ICE, which requires external STUN and/or TURN
+    services. It was built to integrate well with web browsers
+    using a native inbuilt h264 decoder.  But it failed for us
+    in the context of the FRC Field Management System. Since we
+    have very little time operating in that environment it is
+    very difficult to diagnose and resolve the problem. Another difficulty
+    we encountered related to the fragility of the disconnect/reconnect
+    process.  In dual camera setup, we found it necessary to work around
+    this difficulty (esp with uv4l) by keeping two streams open throughout
+    the match.
+* `rtsp` is an older tech for streaming that doesn't
+    appear to "gel" with web browsers.  It does appear to have
+    the same advantages (over webrtc) that h264player does in terms
+    of traffic routing. An open source app, VLC,  has support for
+    decoding and displaying an rtsp feed. On the raspi side, several
+    rtsp options are available with gstreamer being the likely candidate.
+    For our purposes, interacting with 3rd party app windows would
+    present an awkward driverstation experience especially for multicamera
+    switching based on network table events.
+
+#### install h264player
+
+Support for h264player is checked in to our Vision repository
+[here](https://github.com/Spartronics4915/Vision/tree/master/h264player).
+To install the support, you simply pull the Vision repository to your raspi
+and wire it into the FRCVision application like so:
+
+```bash
+% mkdir ~/spartronics
+% cd spartronics
+% git clone https://github.com/Spartronics4915/Vision
+% cd Vision/2019
+% cp startH264player.sh ~
+```
+
+Here are the contents of startH264player.sh:
+
+```bash
+#!/bin/bash -f
+cd /home/pi/spartronics/Vision/h264player
+node appRaspi.js
+```
+
+Note that h264player requires `node` and the installation details are
+found [here](#install-node-10x-and-extensions). Next, we edit `~/runCamera` 
+to look like this:
+
+```bash
+#!/bin/sh
+echo "Waiting 2 seconds..."
+sleep 2
+exec ./startH264player.sh
+#export PYTHONUNBUFFERED=1
+#exec ./startSleeper.py
+```
+
+Note that we'ver reduced the waiting time from 5 to 2 seconds. This was
+done in order to increase the responsivenss of camera-switching triggered
+by driver actions and is a consequence of the _big hammer_ approach for
+clean shutdowns employed by our variant of `h264player/serverBase.js,serverRaspi.js`.
+The startSleeper.py is commented out but offers a simple way to validate
+the FRC application supervisor or to temporarily disable h264player.
+
+#### install rpi-webrtc-streamer (deprecated)
 
 * download webrtc.deb image from [here](https://github.com/kclyu/rpi-webrtc-streamer-deb)
 * a newer server build can be found
@@ -496,7 +557,7 @@ prove that it solves webrtc connectivity issues.
   the frcvision platform.  As with uv4l, you may need to disable
   the rws service with `sudo systemcontrol disable rws`.
 
-#### install uv4l (for streaming video via picamera)
+#### install uv4l (deprecated)
 
 * follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation).
 You can ignore instructions regarding TC358743, but make sure that you
@@ -562,8 +623,8 @@ server-option = --webrtc-hw-vcodec-maxbitrate=3000
 
 ### pull git repository
 
-* `mkdir -p src/spartronics`
-* `cd src/spartronics`
+* `mkdir -p spartronics`
+* `cd spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
 
 ### misc
