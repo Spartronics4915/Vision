@@ -155,7 +155,7 @@ node appRaspi.js
 
 A number of startSomething.sh scripts can be found in our repository
 and it's quite simple to manually edit ~/runCamera to launch the desired
-script. Here's an example we a few options commented out.
+script. Here's an example with a few options commented out.
 
 ```bash
 #!/bin/sh
