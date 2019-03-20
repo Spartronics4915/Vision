@@ -135,35 +135,37 @@ while 1:
     print("tock");
 ```
 
-Here's a way to load a standard git-based Vision solution:
+Here's a shell script (`startVision.sh`) to load a standard git-based 
+Vision solution:
 
 ``` bash
-#!/usr/bin/env python3
-import os
-os.chdir("Vision/2019")
-import runPiCam
-runPiCam.main()
+#!/bin/bash
+cd /home/pi/spartronics/Vision/2019
+exec ./runPiCam.py --robot roborio --config greenled_dbcam8
 ```
 
-Here's the drivercam recipe to run uv4l via a shell script:
+Here's a shell script (`startH264player.sh`) to start the h264player:
 
 ``` bash
 #!/bin/bash -f
-uv4l -f \
- --driver raspicam \
- --vflip=yes \
- --hflip=yes \
- --auto-video_nr \
- --enable-server \
- --server-option '--enable-webrtc-audio=0' \
- --server-option '--webrtc-receive-audio=0' \
- --server-option '--webrtc-preferred-vcodec=3' \
- --server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
- --server-option '--webrtc-enable-hw-codec'
+cd /home/pi/spartronics/Vision/h264player
+node appRaspi.js
 ```
 
-Note that the hflip and vflip settings depend upon the orientation
-of the camera mount on the robot.
+A number of startSomething.sh scripts can be found in our repository
+and it's quite simple to manually edit ~/runCamera to launch the desired
+script. Here's an example we a few options commented out.
+
+```bash
+#!/bin/sh
+### TYPE: upload-python
+echo "Waiting 2 seconds..."
+sleep 2
+exec ./startVision.sh
+#exec ./startH264player.sh
+#export PYTHONUNBUFFERED=1
+#python ./startSleeper.py
+```
 
 Note that if you _manually_ copy or create a file on the raspi for this
 purpose that it must be _executable_.  You can make a file executable
