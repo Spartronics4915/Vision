@@ -36,7 +36,7 @@ if __name__ == '__main__':
     args.setdefault('--square_size', 1.0)
     args.setdefault('--threads', 4)
     if not img_mask:
-        img_mask = '../data/left??.jpg'  # default
+        img_mask = 'dbcam8/*/chessboard.*.jpg'  # default
     else:
         img_mask = img_mask[0]
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         os.mkdir(debug_dir)
     square_size = float(args.get('--square_size'))
 
-    pattern_size = (9, 6)
+    pattern_size = (7, 7)
     pattern_points = np.zeros((np.prod(pattern_size), 3), np.float32)
     pattern_points[:, :2] = np.indices(pattern_size).T.reshape(-1, 2)
     pattern_points *= square_size
@@ -76,7 +76,7 @@ if __name__ == '__main__':
             cv.imwrite(outfile, vis)
 
         if not found:
-            print('chessboard not found')
+            print('chessboard not found in ' + fn)
             return None
 
         print('           %s... OK' % fn)
@@ -121,7 +121,8 @@ if __name__ == '__main__':
 
         # crop and save the image
         x, y, w, h = roi
-        dst = dst[y:y+h, x:x+w]
+        if w != 0 and h != 0:
+            dst = dst[y:y+h, x:x+w]
 
         print('Undistorted image written to: %s' % outfile)
         cv.imwrite(outfile, dst)
