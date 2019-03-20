@@ -14,7 +14,7 @@ import copy
 
 _base = {
     "picam": {
-        "resolution": (320, 240),
+        "resolution": (640, 480), # (320,240) has less range
         "framerate": 60,
         "sensormode": 0,  # auto-calc based on res and framerate
     },
@@ -45,6 +45,13 @@ greenled["picam"].update({
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
+
+greenled_dbcam8 = copy.deepcopy(greenled)
+greenled_dbcam8["algo"].update({
+    "pnpCam": "dbcam8"
+})
+
+
 # ------ AMV Copy -------
 greenledAMV = copy.deepcopy(_base)
 greenledAMV.update({
@@ -68,17 +75,24 @@ noled.update({
 noled["picam"].update({
     "resolution": (640, 480),
     "iso": 400,
-    "brightness": 40,
+    "brightness": 0,
     "contrast": 100,
     "flip": False,
     "rotation": 0,
-    "exposure_mode": "off", #"fixedfps",
+    "exposure_mode": "auto", #"fixedfps",
     "exposure_compensation": 0, # [-25, 25]
 })
 noled["algo"].update({
-    "hsvRange0": np.array([0,0,100]),
+    "hsvRange0": np.array([0,0,90]),
     "hsvRange1": np.array([255,255,255]),
-    "pnpCam": "couch"
+    "pnpCam": "dbcam8"
+})
+
+dbcam8 = noled
+
+dbcam7 = copy.deepcopy(noled)
+dbcam7["algo"].update({
+    "pnpCam": "dbcam7"
 })
 
 default = greenled
