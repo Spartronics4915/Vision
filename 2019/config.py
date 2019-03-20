@@ -68,17 +68,17 @@ noled.update({
 noled["picam"].update({
     "resolution": (640, 480),
     "iso": 400,
-    "brightness": 40,
+    "brightness": 0,
     "contrast": 100,
     "flip": False,
     "rotation": 0,
-    "exposure_mode": "off", #"fixedfps",
+    "exposure_mode": "auto", #"fixedfps",
     "exposure_compensation": 0, # [-25, 25]
 })
 noled["algo"].update({
     "hsvRange0": np.array([0,0,100]),
     "hsvRange1": np.array([255,255,255]),
-    "pnpCam": "couch"
+    "pnpCam": "dbcam8"
 })
 
 default = greenled
