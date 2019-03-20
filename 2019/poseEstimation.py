@@ -158,7 +158,8 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             # from calibration
             (fx,fy) = (573.046, 593.765)
             (cx,cy) = (332.130, 285.449)
-            distCoeffs = np.array([-0.159,  3.382,  0.0234, 0.0013 -20.5])
+            # distCoeffs = np.array([-0.159,  3.382,  0.0234, 0.0013 -20.5])
+            #  calibration delivered bogus distCoeffs
         else:
             # theory plus rotate 90?
             fx = 1.35*x*3.6/3.76

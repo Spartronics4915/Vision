@@ -14,7 +14,7 @@ import copy
 
 _base = {
     "picam": {
-        "resolution": (320, 240),
+        "resolution": (640, 480), # (320,240) has less range
         "framerate": 60,
         "sensormode": 0,  # auto-calc based on res and framerate
     },
@@ -76,9 +76,14 @@ noled["picam"].update({
     "exposure_compensation": 0, # [-25, 25]
 })
 noled["algo"].update({
-    "hsvRange0": np.array([0,0,100]),
+    "hsvRange0": np.array([0,0,90]),
     "hsvRange1": np.array([255,255,255]),
     "pnpCam": "dbcam8"
+})
+
+dbcam7 = copy.deepcopy(noled)
+dbcam7["algo"].update({
+    "pnpCam": "dbcam7"
 })
 
 default = greenled
