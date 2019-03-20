@@ -45,6 +45,13 @@ greenled["picam"].update({
     "exposure_mode": "fireworks",
     "exposure_compensation": -25, # [-25, 25]
 })
+
+greenled_dbcam8 = copy.deepcopy(greenled)
+greenled_dbcam8["algo"].update({
+    "pnpCam": "dbcam8"
+})
+
+
 # ------ AMV Copy -------
 greenledAMV = copy.deepcopy(_base)
 greenledAMV.update({
