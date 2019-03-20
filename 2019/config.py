@@ -81,6 +81,8 @@ noled["algo"].update({
     "pnpCam": "dbcam8"
 })
 
+dbcam8 = noled
+
 dbcam7 = copy.deepcopy(noled)
 dbcam7["algo"].update({
     "pnpCam": "dbcam7"
