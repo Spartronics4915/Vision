@@ -5,6 +5,7 @@
 - [Introduction](#introduction)
 - [Theory of operation](#theory-of-operation)
 - [Prepare for Competition](#prepare-for-competition)
+    - [official pre-built pi image](#official-pre-built-pi-image)
     - [read-only-raspberry-pi](#read-only-raspberry-pi)
     - [disable wireless (wifi and bluetooth)](#disable-wireless-wifi-and-bluetooth)
     - [duplicate working microSD card](#duplicate-working-microsd-card)
@@ -14,9 +15,13 @@
     - [on first boot](#on-first-boot)
     - [rename/renumber your raspi](#renamerenumber-your-raspi)
     - [install python extensions](#install-python-extensions)
+    - [install node 10.x and extensions](#install-node-10x-and-extensions)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
-    - [optional - install uv4l (for streaming video via picamera)](#optional---install-uv4l-for-streaming-video-via-picamera)
+    - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
+        - [install h264player](#install-h264player)
+        - [install rpi-webrtc-streamer (deprecated)](#install-rpi-webrtc-streamer-deprecated)
+        - [install uv4l (deprecated)](#install-uv4l-deprecated)
     - [pull git repository](#pull-git-repository)
     - [misc](#misc)
         - [mount usb thumbdrive](#mount-usb-thumbdrive)
@@ -26,12 +31,12 @@
     - [no camera functionality](#no-camera-functionality)
     - [uv4l service is starting on reboot and we don't want it to](#uv4l-service-is-starting-on-reboot-and-we-dont-want-it-to)
     - [frcvision webpage doesn't appear at http://frcvision.local](#frcvision-webpage-doesnt-appear-at-httpfrcvisionlocal)
+    - [webrtc isn't working](#webrtc-isnt-working)
     - [uv4l webpage doesn't appear](#uv4l-webpage-doesnt-appear)
     - [vision services aren't available](#vision-services-arent-available)
     - [vision services can't connect to robot](#vision-services-cant-connect-to-robot)
 
 <!-- /TOC -->
-
 
 ## Introduction
 
@@ -39,8 +44,9 @@ The Raspberry Pi (raspi) is an inexpensive and entirely adequate processor
 capable of both video capture and processing.  Outfitting a raspi to
 integrate well with FRC network tables and competition requirements is
 a non-trivial system-administration task and so the FRC folks have
-kindly provided the community with a canned raspi _image_ that can be
-installed onto a raspi and get you running in under 20 minutes.
+kindly provided the community with a canned 
+[raspi disk image](https://github.com/wpilibsuite/FRCVision-pi-gen/releases) 
+that can be installed onto a raspi and get you running in under 20 minutes.
 
 Among the built-in conveneniences offered by the FRCVision-rPi image:
 
@@ -50,19 +56,19 @@ Among the built-in conveneniences offered by the FRCVision-rPi image:
   read-write access.  During competition, the read-only mode reduces the
   chance that the disk will be corrupted by during robot start & stop.
 * An easy-admin webapi that allows you to:
-  * configure IP addressing (DHCP vs static IP)
-  * configure team number
-  * establish which camera script runs on the robot
-  * configure camera ports and binding
-  * toggle between read-write and read-only mode
-  * to monitor the state of the raspi (cpu, network traffic, etc).
+    * configure IP addressing (DHCP vs static IP)
+    * configure team number
+    * establish which camera script runs on the robot
+    * configure camera ports and binding
+    * toggle between read-write and read-only mode
+    * to monitor the state of the raspi (cpu, network traffic, etc).
 * A service architecture that ensures that your camera/vision server
   program is always running.
 * Clutter-reduction:  elimination of a variety of utilities on the default
   raspi image that consume precious space or cycles including:
-  * wolfram mathematica
-  * x windows and associated desktop tools
-* WIFI disabling:  disallowed during FRC competition and disabled in
+    * wolfram mathematica
+    * x windows and associated desktop tools
+* WIFI disabling: disallowed during FRC competition and disabled in
   FRCVision-rPi (this is an inconvenience at first).
 
 ## Theory of operation
@@ -122,7 +128,6 @@ network traffic.
 
 ``` bash
 #!/usr/bin/env python3
-
 import time
 while 1:
     time.sleep(5)
@@ -131,43 +136,44 @@ while 1:
     print("tock");
 ```
 
-Here's a way to load a standard git-based Vision solution:
+Here's a shell script (`startVision.sh`) to load a standard git-based 
+Vision solution:
 
 ``` bash
-#!/usr/bin/env python3
-
-import os
-os.chdir("Vision/2019")
-import runPiCam
-runPiCam.main()
+#!/bin/bash
+cd /home/pi/spartronics/Vision/2019
+exec ./runPiCam.py --robot roborio --config greenled_dbcam8
 ```
 
-Here's the drivercam recipe to run uv4l via a shell script:
+Here's a shell script (`startH264player.sh`) to start the h264player:
 
 ``` bash
 #!/bin/bash -f
-uv4l -f \
- --driver raspicam \
- --vflip=yes \
- --hflip=yes \
- --auto-video_nr \
- --enable-server \
- --server-option '--enable-webrtc-audio=0' \
- --server-option '--webrtc-receive-audio=0' \
- --server-option '--webrtc-preferred-vcodec=3' \
- --server-option '--webrtc-hw-vcodec-maxbitrate=3000' \
- --server-option '--webrtc-enable-hw-codec'
+cd /home/pi/spartronics/Vision/h264player
+node appRaspi.js
 ```
 
-Note that the hflip and vflip settings depend upon the orientation
-of the camera mount on the robot.
+A number of startSomething.sh scripts can be found in our repository
+and it's quite simple to manually edit ~/runCamera to launch the desired
+script. Here's an example with a few options commented out.
+
+```bash
+#!/bin/sh
+### TYPE: upload-python
+echo "Waiting 2 seconds..."
+sleep 2
+exec ./startVision.sh
+#exec ./startH264player.sh
+#export PYTHONUNBUFFERED=1
+#python ./startSleeper.py
+```
 
 Note that if you _manually_ copy or create a file on the raspi for this
 purpose that it must be _executable_.  You can make a file executable
 via: `chmod +x yourfile`.  And verify that it is executable via
 `ls -l yourfile`.  Here is a before and after:
 
-```
+```bash
 # before
 % ls -l yourfile
 -rw-r--r-- 1 pi pi 17201 Feb  2 13:37 yourfile
@@ -180,16 +186,24 @@ via: `chmod +x yourfile`.  And verify that it is executable via
 
 ### official pre-built pi image
 
-Once we've built-out a canonical raspberry pi, we can create a disk
-image that should be used to build out new microsd cards.  This should
-be made available in the release section of our Vision github following
-[these instructions](https://stackoverflow.com/questions/47584988/how-to-upload-tar-gz-and-jar-files-as-github-assets-using-python-requests).  
-Note that this disk image will reflect a specific machine identity 
-([see here](#duplicate-working-microsd-card)) (ie: its static ip).  After cloning 
-this disk image, you'll need to boot your new raspi and reconfigure its static ip.  
-The distinction between driver and vision cameras is characterized by static ip __and__ the 
-camera process that runs after each reboot.  For driver camera, we use the uv4l script and 
-for vision camera we employ python plus `runPiCam.py`.
+Once we've built-out _our variation_ of a standard raspberry pi (see below),
+we can create a disk image that should be used to build out new microsd cards.
+In order to minimize the time to duplicate the image, its best to work with
+an 8BG sdcard.  Our customizations could be made available in the release
+section of our Vision github following
+[these instructions](https://stackoverflow.com/questions/47584988/how-to-upload-tar-gz-and-jar-files-as-github-assets-using-python-requests),
+however there appears to be a limit on the size of such tarballs and
+we have yet to complete this task.  To get around this limitation
+FRC has elected to "zip" the image.  Interestingly, disk-duplication
+utilities liek Etcher are able to handle .zip-ed images.
+
+Note that any disk image will reflect a specific machine identity
+([see here](#duplicate-working-microsd-card)) (ie: its static ip).  After
+cloning this disk image, you'll need to boot your new raspi and reconfigure
+its static ip.  The distinction between driver and vision cameras is
+characterized by static ip __and__ the camera process that runs after each
+reboot.  For driver camera, we use the uv4l script and for vision camera
+we employ python plus `runPiCam.py`.
 
 ### read-only-raspberry-pi
 
@@ -198,9 +212,13 @@ for vision camera we employ python plus `runPiCam.py`.
 
 ``` bash
 # make it read-only
-sudo /bin/mount -o remount,ro / && sudo /bin/mount -o remount,ro /boot
+ro
 # make it read-write
-sudo /bin/mount -o remount,rw / && sudo /bin/mount -o remount,rw /boot
+rw
+# ro is an alias for:
+# sudo /bin/mount -o remount,ro / && sudo /bin/mount -o remount,ro /boot
+# rw is an alias for:
+# sudo /bin/mount -o remount,rw / && sudo /bin/mount -o remount,rw /boot
 ```
 
 ### disable wireless (wifi and bluetooth)
@@ -302,6 +320,15 @@ More information on configuration wifi can be found [here](https://www.raspberry
   while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
   ```
 
+Note well: if your "working disk" is much larger than your target disk, you can
+reduce the time it takes to perform the duplication through the use of 
+a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
+your master pi.
+
+  ```bash
+  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
+  ```
+
   And to create a duplicate, reverse the process:
 
   ```sh
@@ -309,6 +336,10 @@ More information on configuration wifi can be found [here](https://www.raspberry
   #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
   sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
   ```
+
+__Unfortunately__, this particular script wasn't able to successfully duplicate
+an FRC vision system, perhaps because the number of mount points and file systems
+is unusual.
 
 ## Config Details
 
@@ -353,11 +384,11 @@ a few examples:
         * `Advanced`
             * Consider raising GPU memory to 256MB
 * update and cleanup (recover diskspace)
+
     ```sh
     sudo apt-get update
     sudo apt-get upgrade
-    sudo apt-get install
-    sudo apt-get install python3-pip git
+    sudo apt-get install python3-pip git vim tree lsof
     sudo apt-get clean
     sudo apt-get autoremove
     ```
@@ -371,9 +402,12 @@ You can establish DHCP addressing with a static IP fallback via the
 
 To change your raspi name, you must log-in manually.  Note that using
 the raspi-config tool is __insufficient__ for this task due to frc
-conventions.
+conventions. Also note that this step may not be needed since we
+generally prefer to rely on ip addresses (since we have multiple
+raspis to manage).
 
 ```sh
+# renaming your raspi may not be necessary
 # first the usual step
 sudo hostnamectl set-hostname drivecamfront
 
@@ -396,12 +430,22 @@ ff02::2        ip6-allrouters
 sudo python3 -m pip install picamera
 ```
 
+### install node 10.x and extensions
+
+    ```bash
+    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -1
+    sudo apt-get install -y nodejs
+    sudo npm install -g node-stun # for diagnosing p2p networking
+    ```
+
 ### validate camera
 
 * `vcgencmd get_camera` should report this:
+
     ```sh
     supported=1 detected=1
     ```
+
 * `raspistill -v -o test.jpg`. This will only work if you remove the picamera
   from the Connected Camera list on the Vision Settings tab. See
   [troubleshooting](#troubleshooting) if you have problems.
@@ -410,20 +454,141 @@ sudo python3 -m pip install picamera
 
 ### verify opencv/python and picamera
 
-
 ``` python
 % python3
 >>> import cv2
 >>> import picamera
 ```
 
-### optional - install uv4l (for streaming video via picamera)
+### optional - install support for h264 feed
 
 The sub-$25 pi camera can operate at up to 90 fps and includes a
 native H264 encoder.  This is far superior to most current usb2 webcams
 and offers a number of controls not usually present in a webcam.
 A raspi has two CSI connection points, but can apparently support
 only a single picam connected at the point nearest the HDMI.
+
+H264 is a very efficient video solution on raspberry pi due to
+its GPU-based implementation.  The hard part is delivering
+the resulting video stream to a web browser for integration with our
+Dashboard.  We have explored three technologies for this and currently 
+suggest that `h264player is the preferred solution`.
+
+* `h264player` uses tcp-based websockets to deliver the
+    raspivid stream to a browser. No fancy STUN negotiations
+    take place, but to make the pixels visible in the browser
+    we employ a javascript h264 decoder. Once the pixels
+    are decoded, we rely on an opengl YUV canvas for their display.
+    The more modern html5 video element and media streams aren't employed
+    by this approach and so its major downside is that it consumes extra 
+    load on the driver station.
+* `webRTC` is the newest and shiniest of streaming techs.
+    It resolved the biggest issue for broad-deployment of
+    streaming through a complex routing negotiation system
+    called ICE, which requires external STUN and/or TURN
+    services. It was built to integrate well with web browsers
+    using a native inbuilt h264 decoder.  But it failed for us
+    in the context of the FRC Field Management System. Since we
+    have very little time operating in that environment it is
+    very difficult to diagnose and resolve the problem. Another difficulty
+    we encountered related to the fragility of the disconnect/reconnect
+    process.  In dual camera setup, we found it necessary to work around
+    this difficulty (esp with uv4l) by keeping two streams open throughout
+    the match.
+* `rtsp` is an older tech for streaming that doesn't
+    appear to "gel" with web browsers.  It does appear to have
+    the same advantages (over webrtc) that h264player does in terms
+    of traffic routing. An open source app, VLC,  has support for
+    decoding and displaying an rtsp feed. On the raspi side, several
+    rtsp options are available with gstreamer being the likely candidate.
+    For our purposes, interacting with 3rd party app windows would
+    present an awkward driverstation experience especially for multicamera
+    switching based on network table events.
+
+#### install h264player
+
+Support for h264player is checked in to our Vision repository
+[here](https://github.com/Spartronics4915/Vision/tree/master/h264player).
+To install the support, you simply pull the Vision repository to your raspi
+and wire it into the FRCVision application like so:
+
+```bash
+% mkdir ~/spartronics
+% cd spartronics
+% git clone https://github.com/Spartronics4915/Vision
+% cd Vision/2019
+% cp startH264player.sh ~
+```
+
+Here are the contents of startH264player.sh:
+
+```bash
+#!/bin/bash -f
+cd /home/pi/spartronics/Vision/h264player
+node appRaspi.js
+```
+
+Note that h264player requires `node` and the installation details are
+found [here](#install-node-10x-and-extensions). Next, we edit `~/runCamera` 
+to look like this:
+
+```bash
+#!/bin/sh
+echo "Waiting 2 seconds..."
+sleep 2
+exec ./startH264player.sh
+#export PYTHONUNBUFFERED=1
+#exec ./startSleeper.py
+```
+
+Note that we'ver reduced the waiting time from 5 to 2 seconds. This was
+done in order to increase the responsivenss of camera-switching triggered
+by driver actions and is a consequence of the _big hammer_ approach for
+clean shutdowns employed by our variant of `h264player/serverBase.js,serverRaspi.js`.
+The startSleeper.py is commented out but offers a simple way to validate
+the FRC application supervisor or to temporarily disable h264player.
+
+#### install rpi-webrtc-streamer (deprecated)
+
+* download webrtc.deb image from [here](https://github.com/kclyu/rpi-webrtc-streamer-deb)
+  and installed via `sudo dpkg -i rws_xxx_armhf.deb`.
+* a newer server build can be found
+  [here](https://github.com/kclyu/rpi-webrtc-streamer/files/2930354/webrtc-streamer.gz)
+  and can combined with the released distro via
+  [these instructions](https://github.com/kclyu/rpi-webrtc-streamer/issues/66).
+* newer version of the website _and configs_ can be found in the github 
+  [here](https://github.com/kclyu/rpi-webrtc-streamer).  As with rpi-webrtc-streamer,
+  the latest config files should be copied atop the installed versions under
+  `/opt/rws/etc`.  The next-gen version of the native peer connection (np2)
+  can be copied to /opt/rws/web-root.
+* configure server ports via `/opt/rws/etc/webrtc_streamer.conf`. Default
+  ports of 8888 and 8889 should be fine.
+* configure [stun_server](https://en.wikipedia.org/wiki/STUN) server.  Since
+  we have no access to the internet, we wish to connect to a stun server
+  on the FMS network.  Our only option for this is to install a stun
+  server on the driver station and will only be worth doing if we can
+  prove that it solves webrtc connectivity issues. Here's a typical
+  value: `ice_server_urls_0=stun:10.49.15.5,stun:192.168.0.7`.
+* configure max_bitrate via `/opt/rws/etc/media_config.conf`. A value between
+  1500000-2000000 appears to work well in a dual-drivecam configuration.
+* make sure that webrtc_streamer can write to its log file:
+
+    ```bash
+    cd /opt/rws
+    cp -r log /var/tmp/rmslogs
+    chmod 777 /var/tmp/rmslogs
+    sudo ln -s /var/tmp/rmslogs ./log
+    ```
+
+* restart the server via `sudo systemcontrol restart rws`. Or better
+  yet, only start the server via the vision application script of
+  the frcvision platform.  As with uv4l, you may want to disable
+  the rws service with `sudo systemcontrol disable rws`.
+* verify functionality
+  * manually start server: `cd /opt/rws; ./webrtc-streamer`
+  * point a browser at its webserver via http://{piaddr}:8889/np2
+
+#### install uv4l (deprecated)
 
 * follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation).
 You can ignore instructions regarding TC358743, but make sure that you
@@ -456,7 +621,6 @@ This makes it less prone to startup conflicts with frcvision's services.
 * to use frcvision for auto-starting you can disable the service:
 * point Dashboard's layout file to the IP address+port.
 
-
 * edit `/etc/uv4l/uv4l-raspicam.conf`
 
 ``` bash
@@ -487,10 +651,11 @@ server-option = --webrtc-receive-audio=no
 server-option = --webrtc-hw-vcodec-maxbitrate=3000
 ```
 
+
 ### pull git repository
 
-* `mkdir -p src/spartronics`
-* `cd src/spartronics`
+* `mkdir -p spartronics`
+* `cd spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
 
 ### misc
@@ -669,6 +834,7 @@ Test with `raspistill -p "0,0,640,480"`.
   If that fails to resolve the problem upload the tick-tock script above to
   fully disable multiCameraServer.
 * is another program using it? uv4l? your python script?
+
   ```bash
     # this will show you if a uv4l process is running
     % ps -ef | fgrep uv4l
@@ -683,35 +849,48 @@ Test with `raspistill -p "0,0,640,480"`.
     # and this finds the program associated with a pid
     %  ps -ef | grep yourpid
   ```
+
 * is there a problem with the video device?
-  ```bash
-    # this lists video devices
-    % ls -l /dev/video*
+
+    ```bash
+    cd /dev
+    ls -l | grep video  # look for devices owned by group video
     ```
+
     It should look like this:
+
     ```console
-    crw-rw-rw- 1 root video 81, 0 Jan 28 11:02 /dev/video0
+    crw-rw---- 1 root video    29,   0 Mar 12 20:34 fb0
+    crw-rw---- 1 root video   245,   0 Mar 12 20:34 vchiq
+    crw-rw---- 1 root video   249,   0 Mar 12 20:34 vcio
+    crw-rw---- 1 root video   246,   0 Mar 12 20:34 vcsm
+    crw-rw---- 1 root video    81,   0 Mar 12 20:34 video0
     ```
+
     If you see something else, try:
+
     ```bash
     % sudo rm /dev/video0
     % sudo reboot
-  ```
+    ```
 
 ### uv4l service is starting on reboot and we don't want it to
 
 * make sure that the service is disabled (described above).
 * look at the running services via:
+
     ```bash
     % systemctl list-units --type=service
     ```
 
 ### frcvision webpage doesn't appear at http://frcvision.local
+
 * are there more than one raspis on the network?  Then you
     should be using static IP addresses and using the ip address
     as the URL.  Make sure only one is on the network, then
     try again.  You can configure static ip addressing via
     the Network Status page.  Here's a typical setup:
+
     ```bash
     #  Configure IPv4 Address
     Static
@@ -724,7 +903,9 @@ Test with `raspistill -p "0,0,640,480"`.
     # DNS Server
     8.8.8.8
     ```
+
 * is configServer running?
+
     ```bash
     % ps -ef | grep configServer
     # should produce:
@@ -732,7 +913,9 @@ Test with `raspistill -p "0,0,640,480"`.
     root       299   294  0 Jan28 ?        00:29:24 /usr/local/sbin/configServer
     pi       15895 15900  0 10:46 pts/1    00:00:00 grep --color=auto configServer
     ```
+
 * is someone listening on port 80?
+
     ```bash
     % netstat -an | grep :80
     # this shows that a process is listening on port 80
@@ -741,18 +924,38 @@ Test with `raspistill -p "0,0,640,480"`.
     tcp        0      0 10.49.15.11:80          192.168.0.4:52793       ESTABLISHED
     ```
 
+### webrtc isn't working
+
+* is the correct server running?  Are there any indications of badness in
+  the logs?
+* can we `traceroute 10.49.15.5`  (ie to the driverstation)
+* does stun protocol work?
+
+    ```bash
+    #start the stun-server on driverstation
+    node-stun-server
+    ```
+
+    ```bash
+    #contact the stun-server from the client
+    node-stun-server -s 10.49.15.5 (ie driverstation)
+    ```
+
 ### uv4l webpage doesn't appear
+
 Test by pointing your browser to `http://frcvision.local:8080` (or static IP)
 
 * is someone listening on port 8080?
 
    If not, try starting uv4l manually:
+
    ```bash
    % uv4l --driver raspicam --auto-video_nr  -- more parameters here --
    ```
-   * if that fails have you installed all the correct uv4l components?
+
+    * if that fails have you installed all the correct uv4l components?
      Have you verified that the camera is working?
-   * if a manual restart works, then it's an issue of getting it to
+    * if a manual restart works, then it's an issue of getting it to
      start after every reboot.
 * uv4l doesn't auto-launch after reboot
 
@@ -765,7 +968,6 @@ Test by pointing your browser to `http://frcvision.local:8080` (or static IP)
   You can upload the uv4l shell script via the
   `Uploaded Python file` option even if it's not a
   python script. Consult the example above for syntax.
-
 
 ### vision services aren't available
 

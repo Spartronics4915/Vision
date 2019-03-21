@@ -131,6 +131,8 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
 
     """
     global s_firstTime
+
+    distCoeffs = np.zeros((4,1)) # start: no lens distortion, may be overridden
     if cameraMatrix != None:
         camMat = cameraMatrix
         camnm = "<passed-in>"
@@ -147,6 +149,17 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             fx = x*3.6/3.76
             fy = y*3.6/2.74
             cx,cy = (fx/2,fy/2)
+        elif camnm == "dbcam8":
+            # from calibration
+            (fx,fy) = (656.176, 654.445)
+            (cx,cy) = (350.305, 222.377)
+            distCoeffs = np.array([0.117,  0.191,  0.012, 0.020, -1.12])
+        elif camnm == "dbcam7":
+            # from calibration
+            (fx,fy) = (573.046, 593.765)
+            (cx,cy) = (332.130, 285.449)
+            # distCoeffs = np.array([-0.159,  3.382,  0.0234, 0.0013 -20.5])
+            #  calibration delivered bogus distCoeffs
         else:
             # theory plus rotate 90?
             fx = 1.35*x*3.6/3.76
@@ -162,7 +175,6 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
         logging.info("Camera Matrix '{}':\n {}".format(camnm, camMat))
         s_firstTime = False
 
-    distCoeffs = np.zeros((4,1)) # Assuming no lens distortion
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
                                         flags=cv2.SOLVEPNP_ITERATIVE)
@@ -255,17 +267,22 @@ def estimatePose(im, imgPts, cfg, cameraMatrix=None, display=False):
             toward = (int(projPts[2][0][0]), int(projPts[2][0][1]))
             up = (int(projPts[3][0][0]), int(projPts[3][0][1]))
             right = (int(projPts[4][0][0]), int(projPts[4][0][1]))
-            cv2.circle(im, org, 5, (0,0,255), -1)
             # 
             # human (sgi) camera (rh) coords:
             #   red is +x
             #   green is +y
             #   blue is -z
             #   cyan is +z
-            cv2.line(im, org, away, (255,255,0), 2) # cyan
-            cv2.line(im, org, toward, (255,0,0), 2) # blue
-            cv2.line(im, org, up, (0,255,0), 2) # green
-            cv2.line(im, org, right, (0,0,255), 2) # red
+            try:
+                cv2.circle(im, org, 5, (0,0,255), -1)
+                cv2.line(im, org, away, (255,255,0), 2) # cyan
+                cv2.line(im, org, toward, (255,0,0), 2) # blue
+                cv2.line(im, org, up, (0,255,0), 2) # green
+                cv2.line(im, org, right, (0,0,255), 2) # red
+            except Exception as e:
+                # line drawing can throw execeptions for bogus 
+                # values
+                pass
 
             for i in range(5,projPts.shape[0]):
                 p = (int(projPts[i][0][0]), int(projPts[i][0][1]))
