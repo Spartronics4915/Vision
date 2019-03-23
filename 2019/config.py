@@ -69,6 +69,23 @@ greenledAMV["picam"].update({
 greenledAMV["algo"].update({
     "pnpCam": "couch"
 })
+# ------ GP Copy -------
+greenledGP = copy.deepcopy(_base)
+greenledGP.update({
+    "name": "greenledGP",
+});
+greenledGP["picam"].update({
+    "iso": 400,  # 100-800 (higher numbers are brighter)
+    "brightness": 20,
+    "contrast": 100,
+    "flip": True,
+    "rotation": 0,
+    "exposure_mode": "fireworks",
+    "exposure_compensation": -25, # [-25, 25]
+})
+greenledGP["algo"].update({
+    "pnpCam": "GPCalib"
+})
 
 # ------ Dana's Copy -------
 noled = copy.deepcopy(_base)
@@ -98,7 +115,7 @@ dbcam7["algo"].update({
     "pnpCam": "dbcam7"
 })
 
-default = greenledAMV
+default = greenledGP
 
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
