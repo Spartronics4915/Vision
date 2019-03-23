@@ -15,6 +15,7 @@ class ServerBase
         }, options);
         this.wss = new WebSocketServer({ server });
         this.wss.on('connection', this._newClient.bind(this));
+        this.wss.on("error", this._wsError.bind(this));
         this.readStream =  null;
     }
 
@@ -26,6 +27,11 @@ class ServerBase
     endFeed()
     {
         console.log("endFeed isn't implemented by subclass");
+    }
+
+    _wsError(err)
+    {
+        console.error("websocket error: ", err);
     }
 
     _startFeed(cfg)

@@ -19,38 +19,31 @@ const server  = http.createServer(app);
 const silence = new WebStreamerServer(server);
 
 // find our IPv4 address
-Object.keys(ifaces).forEach(
-	function (ifname) 
-	{
-		ifaces[ifname].forEach(
-			function(iface) 
-			{
-				if(iface.family == "IPv4" && iface.internal == false)
-				{
-					if(ip == undefined)
-					{
-						ip = iface.address;
-						return;
-					}
-					else
-					{
-						console.log("multiple ip addresses, ignoring: " +
-								iface.address);
-					}
-				}
-		});
-	});
+console.log("interfaces:\n");
+for(let ifname of Object.keys(ifaces))
+{
+    for(let iface of ifaces[ifname])
+    {
+        console.log(`${ifname} ${iface.family} ip:${iface.address}`);
+        if(iface.family == "IPv4" && iface.internal == false)
+        {
+            if(ip == undefined)
+            {
+                ip = iface.address;
+            }
+            else
+            {
+                console.log("multiple ip addresses, ignoring: " +
+                        iface.address);
+            }
+        }
+    }
+}
 
 try
 {
-    console.log("interfaces:\n" + JSON.stringify(ifaces, null, 2));
     console.log(`appRaspi listening on ${ip}:8080`);
-    server.on("error", function(err) 
-        { 
-            console.log("hey---------------" + err);
-            throw err; 
-        });
-    server.listen(8080, ip);
+    server.listen(8080, ip); // 
 }
 
 catch(err)
