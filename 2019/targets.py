@@ -65,11 +65,10 @@ class TargetPNP(Target):
     Doctest
     ------
 
-    >>> a = TargetPNP((1,2,0.5),(0,0,0))
+    >>> a = TargetPNP((1,2,0.5),(10,10,10))
     >>> output = a.send()
     >>> print(str(a.leftTarget) + str(a.rightTarget))
-    (1, 2, 0.5)(0, 0, 0)
-    >>> print(output)
+    (1, 2, 0.5)(10, 10, 10)
 
 
     """
