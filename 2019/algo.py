@@ -157,7 +157,7 @@ def realPNP(frame, cfg, display, debug):
         for r in rects:
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             ipts = [np.int32(pts)]
-            cv2.polylines(visImg, ipts, True, (255,0,0))
+            cv2.polylines(visImg, ipts, True, (0,255,0))
     else:
         # Avoid a NoneType error
         visImg = frame
@@ -167,7 +167,7 @@ def realPNP(frame, cfg, display, debug):
 
     # Leftpair is allways leftmost
     # XXX: rightPair is not always the rightmost
-    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=1,debug=1)
+    success,leftPair,rightPair = rectUtil.pairRectangles(rects,wantedTargets=2,debug=1)
 
     if success == False:
         # Logger debugs happened in pairRectangles

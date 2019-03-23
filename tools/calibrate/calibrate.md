@@ -1,7 +1,8 @@
 # Intro
 
-Chessboard squares are .837in
+Chessboard squares are 0.837in
 
+GP chessboard are 0.765625in
 
 # Characterizations
 
@@ -167,4 +168,15 @@ camera matrix:
 distortion coefficients:  [ 0.09312516  0.12398181  0.013299    0.00610443 -1.96394712]
 ```
 
+## GP caracterizations
 
+### testall
+
+'''
+camera matrix:
+ [[590.54959996   0.         315.41847547]
+ [  0.         590.05763758 256.9355729 ]
+ [  0.           0.           1.        ]]
+distortion coefficients:  [ 0.12962853 -0.60001742  0.00922773 -0.00687773  0.80724983]
+
+'''

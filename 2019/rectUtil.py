@@ -382,6 +382,8 @@ def computeHeightError(height,targetPxHeight=89):
         (81 + 83) / 2 = 
         *82*
         in pixels is going to be about 58 inches away
+
+    Based on data measured on 2019/03/06, when we are 25 in away, the height in px is 210
     '''
     # Now we simply do a calculation for 55 inches.
     # NOTE: In reality, the hight we are dividing by should be the WANTED distance away from the target.
@@ -389,7 +391,7 @@ def computeHeightError(height,targetPxHeight=89):
     #       The current division is simply a proof of concept / framework. These numbers should be recalculated
     #       with a wanted 'target' distance (55 inches is not the wanted target distance)
 
-    return height / targetPxHeight
+    return 1-(height / targetPxHeight)
 
 def points2center(points):
     """
