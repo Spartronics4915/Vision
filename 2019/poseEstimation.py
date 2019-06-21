@@ -20,9 +20,6 @@
 #       for picam1, 640x480: fx=640*3.6/3.76=>612.77px, fy: 480*3.6/2.74=>630.66
 #       for picam1, 320x240: fx=320*3.6/3.76=>306.38px, fy: 240*3.6/2.74=>315.32
 #
-# https://docs.opencv.org/2.4/doc/tutorials/calib3d/camera_calibration/camera_calibration.html
-#   Darwin's initial Camera Callibration results (not sure what capture size was used)
-#       fx = 441.201212, fy = 428.9449  (ie: pixels aren't exactly square)
 #
 #     "If for both axes a common focal length is used with a given a aspect ratio
 #      (usually 1), then f_y=f_x*a and in the upper formula we will have a single
