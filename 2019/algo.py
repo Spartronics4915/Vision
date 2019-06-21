@@ -74,7 +74,7 @@ def maskAlgo(frame, cfg):
 
 def rectDebugAlgo(frame, cfg, display=1, debug=0):
     # Used to find all relevent imformation about rectangles on screen
-    logging.warning("running rectDebugAlgo on frame, not hsv");
+    logging.warning("running rectDebugAlgo on frame, not hsv")
     mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"]) # Our HSV filtering
     rects = rectUtil.findRects(frame, 200, cfg, display, debug)
 

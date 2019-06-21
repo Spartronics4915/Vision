@@ -1,6 +1,7 @@
 #! /usr/bin/ python3
 
 # TODO: Explain the problem in ASCI art 
+# TODO: Make a majoirty of the methods in this file 2019 specific
 # XXX: Returns a maximum of 2 pairs.
 # Helpful link explaining how cv2 generates angles:
 # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
