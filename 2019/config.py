@@ -115,27 +115,30 @@ dbcam7["algo"].update({
     "pnpCam": "dbcam7"
 })
 
-default = greenledGP
-
 # ------ Declan 2019 Summer Debug Copy -------
 dGarage = copy.deepcopy(_base)
 dGarage.update({
     "name": "dGarage",
-})
-
+    });
 dGarage["picam"].update({
-    "iso": 400,  # 100-800 (higher numbers are brighter)
+    "iso": 0,  # 100-800 (higher numbers are brighter)
     "brightness": 20,
-    "contrast": 100,
+    "contrast": 90,
     "flip": True,
     "rotation": 0,
-    "exposure_mode": "fireworks",
+    "exposure_mode": "off", # An exposure mode of 'off' override an iso of 0
     "exposure_compensation": -25, # [-25, 25]
+    "awb_mode": "off",
+    "awb_gains": (2, 2) # 1.25781, 1.70703
+})
+dGarage["algo"].update({
+    "pnpCam": "couch",
+    "hsvRange0": np.array([40,150,170]),
+    "hsvRange1": np.array([80,255,255])
 })
 
-dGarage["algo"].update({
-    "pnpCam": "couch"
-})
+default = dGarage
+
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 #
