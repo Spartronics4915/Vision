@@ -70,7 +70,7 @@ def findRects(frame, minsize, cfg, display=0, debug=0):
     for r in rects:
         sz = r[1]
         area = sz[0] * sz[1]
-        if area > 200:
+        if area > minsize:
             sizedRects.append(r)
 
     return sizedRects
