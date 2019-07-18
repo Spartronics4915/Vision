@@ -79,6 +79,7 @@ def rectDebugAlgo(frame, cfg, display=1, debug=0):
     rects = rectUtil.findRects(frame, 200, cfg, display, debug)
 
     if display:
+        visImg = frame
         # Draw each rect + properties of it
         for r in rects:
             # combine original image with mask, for visualization
