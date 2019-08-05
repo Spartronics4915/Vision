@@ -16,7 +16,8 @@ _base = {
     "picam": {
         "resolution": (640, 480), # (320,240) has less range
         "framerate": 60,
-        "sensormode": 0,  # auto-calc based on res and framerate
+        "sensormode": 7,    # auto-calc based on res and framerate
+                            # Fixes auto wb 'hidden' settings
     },
     "algo": {
         # Deprecated 2018 values:
@@ -121,7 +122,7 @@ dGarage.update({
     "name": "dGarage",
     });
 dGarage["picam"].update({
-    "iso": 0,  # 100-800 (higher numbers are brighter)
+    "iso": 100, 
     "brightness": 20,
     "contrast": 90,
     "flip": True,
@@ -129,7 +130,7 @@ dGarage["picam"].update({
     "exposure_mode": "off", # An exposure mode of 'off' override an iso of 0
     "exposure_compensation": -25, # [-25, 25]
     "awb_mode": "off",
-    "awb_gains": (2, 2) # 1.25781, 1.70703
+    "awb_gains": (1.18359, 1.48438) # Known good gains values. These will most likely have to be found through 'auto' awb mode 
 })
 dGarage["algo"].update({
     "pnpCam": "couch",
