@@ -122,8 +122,9 @@ dGarage.update({
     "name": "dGarage",
     });
 dGarage["picam"].update({
-    "iso": 100, 
-    "brightness": 20,
+    "iso": 100,         # Between 0 - 800
+                        # Note that a setting of 0 still has an effect
+    "brightness": 20,  
     "contrast": 90,
     "flip": True,
     "rotation": 0,
@@ -163,6 +164,7 @@ default = dGarage
 #       iso call which should be made (and allowed to settle) before
 #       setting the mode to off.
 #  exposure_speed: read-only microseconds, relates to shutter-speed
+#                   note this value tends to drift torwards a few values
 #  flash_mode:
 #  frame:
 #  framerate: pertains to video-port captures. Coupled with resolution
