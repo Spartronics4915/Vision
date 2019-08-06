@@ -125,8 +125,10 @@ class TargetHeadingsAndHeightOffset(Target):
 
     def __str__(self):
         arrayValue = []
-        arrayValue.extend(self.headings)
-        arrayValue.extend(self.hError)
+        # Look into what happens when headings or hError are tuples, ect
+        # .extend was throwing an error with the float64 numpy object, so .append is a temporary fix
+        arrayValue.append(self.headings)
+        arrayValue.append(self.hError)
         arrayValue.append(int(1000*self.deltaclock))
         return "Headings-n-Heights: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue) 
 
