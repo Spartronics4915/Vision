@@ -135,6 +135,9 @@ def headingAlgo(frame, cfg, display, debug):
 
         heightError = rectUtil.computeHeightError(targetAvgHeight)
 
+        if (display):
+            # frame.size is in the form (y,x,channel)
+            cv2.line(frame,(int(targetCenter[0]),0),(int(targetCenter[0]),frame.size[0]), (255,255,255), 3) 
 
         # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
         return targets.TargetHeadingsAndHeightOffset(angleOffset,heightError),frame
