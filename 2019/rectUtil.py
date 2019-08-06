@@ -319,7 +319,7 @@ def sortPoints2PNP(leftPoints, rightPoints):
 
     return np.array(orderedPoints,dtype="double")
 
-def computeTargetAngleOffSet(frame,center,RPICAMFOV=45):
+def computeTargetAngleOffSet(frame,center,RPICAMFOV=53):
     # Only need the center of the target for this caluclation, not all points  
     """
     Crudely calculate the angle offset of the center of a target.
@@ -342,11 +342,11 @@ def computeTargetAngleOffSet(frame,center,RPICAMFOV=45):
 
     centerX = center[0]
 
-    if centerX < x/2:
+    if centerX < (x/2):
         # Left side of screen 
-        centerDegOffset = -(centerX / pixelToDegRatio)
+        centerDegOffset = -((RPICAMFOV/2) - (centerX / pixelToDegRatio))
 
-    elif centerX > x/2:
+    elif centerX > (x/2):
         # Right side of screen
         centerDegOffset = (centerX - x/2) / pixelToDegRatio 
 
