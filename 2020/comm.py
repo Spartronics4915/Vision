@@ -1,4 +1,3 @@
-#
 # comm:
 #   manages our connection to the robot
 #
@@ -20,6 +19,7 @@ class Control:
 
 theComm = None
 
+# Abstractions to ensure that a Comm has been created 
 def PutString(key, value):
     if theComm != None:
         theComm.sd.putString("Vision/"+key, value)

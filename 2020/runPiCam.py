@@ -39,6 +39,7 @@ class PiVideoStream:
         logging.basicConfig(level=logLevel,
                             format="%(asctime)s %(levelname)-6s: %(message)s",
                             datefmt="%m/%d %H:%M:%S",
+                            # This file is avible to write to, even when the pi is in 'read-only' mode
                             filename="/tmp/runPiCam.log",
                             filemode="a")
         logging.info("--------------------New run------------------")

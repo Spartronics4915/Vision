@@ -1,5 +1,5 @@
 #
-#   manages our characterization of a vision target and its
+# manages our characterization of a vision target and its
 #   communication via networktables
 #
 
@@ -23,6 +23,7 @@ class Target:
     lastUpdate = 0  # Nb: class variable, shared across instances
 
     def __init__(self, updateDelta=True):
+        # XXX: Bad subkey default. Should be related to an algo
         self.subkey = "Target"
         self.autoSend = False
         self.clock = time.monotonic()
@@ -54,97 +55,8 @@ class Target:
         comm.PutString(self.subkey,
                 "{0};{1}".format(str(self.value), str(self.deltaclock)))
 
-class TargetPNP(Target):
-    """
-    TargetPNP:
-        Vision/Reverse/solvePNP [dxL,dyL,dthetaL,dxR,dyR,dthetaR,dtime]
-                                [dxL,dyL,dthetaL,dtime]
-
-    Regression testing for self.send() method
-
-    Doctest
-    ------
-
-    >>> a = TargetPNP((1,2,0.5),(10,10,10))
-    >>> output = a.send()
-    >>> print(str(a.leftTarget) + str(a.rightTarget))
-    (1, 2, 0.5)(10, 10, 10)
-
-
-    """
-    def __init__(self, left, right, orientation="Reverse"):
-        super().__init__()
-        self.subkey = orientation+"/solvePNP"
-        self.leftTarget = left
-        self.rightTarget = right
-
-    def __str__(self):
-        arrayValue = []
-        if self.leftTarget != None:
-            arrayValue.extend(self.leftTarget)
-        if self.rightTarget != None:
-            arrayValue.extend(self.rightTarget)
-        if len(arrayValue) == 3:
-            arrayValue[2] = math.degrees(arrayValue[2])
-        elif len(arrayValue) == 6:
-            arrayValue[2] = math.degrees(arrayValue[2])
-            arrayValue[5] = math.degrees(arrayValue[5])
-        arrayValue.append(int(1000*self.deltaclock))
-        return "TargetPNP: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue)
-
-    # here: value is presumed to be a tuple of length 2
-    def setValue(self, value, forceupdate=True):
-        if len(value) == 1:
-            self.leftTarget = value
-            self.rightTarget = None
-        elif len(value) == 2:
-            self.leftTarget,self.rightTarget = value
-        else:
-            logging.error("TargetPNP: invalid setValue")
-        super().setValue(value, forceupdate)
-
-    def send(self):
-        # solvePNP convention for target:
-        #     all numbers, 3 per target, 1 timestamp
-        arrayValue = []
-        if self.leftTarget != None:
-            arrayValue.extend(self.leftTarget)
-        if self.rightTarget != None:
-            arrayValue.extend(self.rightTarget)
-        arrayValue.append(self.deltaclock)
-        #logging.info("send: " + str(arrayValue))
-        comm.PutNumberArray(self.subkey, arrayValue)
-
-class TargetHeadingsAndHeightOffset(Target):
-
-    def __init__(self,headings,hError, orientation="Reverse"):
-        super().__init__()
-        self.subkey = orientation+"/heading"
-        self.headings = headings
-        self.hError = hError
-
-    def __str__(self):
-        arrayValue = []
-        # Look into what happens when headings or hError are tuples, ect
-        # .extend was throwing an error with the float64 numpy object, so .append is a temporary fix
-        arrayValue.append(self.headings)
-        arrayValue.append(self.hError)
-        arrayValue.append(int(1000*self.deltaclock))
-        return "Headings-n-Heights: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue) 
-
-    # Currently no override to the super.setValue()
-
-    def send(self):
-        # TargetHeadings convention for target:
-        #     all numbers, 2 per target, 1 timestamp
-        arrayValue = []
-        arrayValue.extend(self.headings)
-        arrayValue.extend(self.hError)
-        arrayValue.append(self.deltaclock)
-        # logging.info("send: " + str(arrayValue))
-        comm.PutNumberArray(self.subkey, arrayValue)
-
-
+# Currently no doctests, however if needed un-comment
+'''
 if __name__ == "__main__":
     # Debug logging
     logFmt = "%(name)-8s %(levelname)-6s %(message)s"
@@ -154,3 +66,4 @@ if __name__ == "__main__":
     logging.info("Began logger")
 
     doctest.testmod()
+'''

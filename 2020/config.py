@@ -1,4 +1,4 @@
-#
+# Representing configurations as 2D Python dictionaries
 # vision parameter groups (aka configs)
 #
 # given the name of a config (eg "greenled") access via:
@@ -14,10 +14,10 @@ import copy
 
 _base = {
     "picam": {
-        "resolution": (640, 480), # (320,240) has less range
+        "resolution": (640, 480), 
         "framerate": 60,
-        "sensormode": 7,    # auto-calc based on res and framerate
-                            # Fixes auto wb 'hidden' settings
+        "sensormode": 7,    # Fixes auto wb 'hidden' settings
+                            
     },
     "algo": {
         # Assuming retro-reflective tape
@@ -26,7 +26,32 @@ _base = {
         "pnpCam": "pi"
     }
 }
-# ------ Debugging/At Home Copy -------
+
+# ------ Test config -------
+testConfig = copy.deepcopy(_base)
+testConfig.update({
+    "name": "testConfig",
+})
+# Camera-Specific Settings
+testConfig["picam"].update({
+    "resolution": (640, 480),
+    "iso": 400,
+    "brightness": 0,
+    "contrast": 100,
+    "flip": False,
+    "rotation": 0,
+    "exposure_mode": "auto", #"fixedfps",
+    "exposure_compensation": 0, # [-25, 25]
+})
+# Algo-Specific settings
+# TODO: Change the outer/innter-most setting of algo 
+testConfig["algo"].update({
+    "algo": "empty", # Chose proper algo streaming
+    "display":0,# 1 if streaming
+    "hsvRangeLow": np.array([0,0,90]),
+    "hsvRangeHigh": np.array([255,255,255]),
+    "pnpCam": "dbcam8"
+})
 
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html

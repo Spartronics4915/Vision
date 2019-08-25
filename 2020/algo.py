@@ -36,9 +36,10 @@ import targets
 #   close the color is to black.  We want colors as far away from black
 #   as possible, thus the high range.
 
-#   TODO: Change all algo's to return a target
-
-def processFrame(frame, algo=None, cfg=None, display=0, debug=0):
+def processFrame(frame, cfg=None):
+    # Nb: in runPiCam, the algo-specific config is passed into processFrame.
+    #   Thus, we only need to get the "algo" value out of the passed object.
+    algo = cfg["algo"]
     if algo == None or algo == "default":
         return defaultAlgo(frame, cfg, display, debug)
     elif algo == "empty" or algo == "bypass":
@@ -51,16 +52,16 @@ def processFrame(frame, algo=None, cfg=None, display=0, debug=0):
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg, display, debug)
 
-def defaultAlgo(frame, cfg, display=0, debug=0):
+def defaultAlgo(frame, cfg):
     return hsvAlgo(frame, cfg)
 
 def maskAlgo(frame, cfg):
     # Show what is shown by the opencv HSV values
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"])
+    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
     return None,mask
 
-def emptyAlgo(frame,cfg):
+def emptyAlgo(frame, cfg):
     return (None,frame)
 
 def hsvAlgo(frame,cfg):
