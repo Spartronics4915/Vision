@@ -47,7 +47,7 @@ testConfig["picam"].update({
 # TODO: Change the outer/innter-most setting of algo 
 testConfig["algo"].update({
     "algo": "empty", # Chose proper algo streaming
-    "display":0,# 1 if streaming
+    "display": False,# 1 if streaming
     "hsvRangeLow": np.array([0,0,90]),
     "hsvRangeHigh": np.array([255,255,255]),
     "pnpCam": "dbcam8"

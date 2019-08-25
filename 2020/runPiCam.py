@@ -63,6 +63,15 @@ class PiVideoStream:
         # parameter configuration -----
         self.config = getattr(config, self.args.config) # reads named dict
         self.picam = picam.PiCam(self.config["picam"])
+        self.algoConfig = self.config["algo"]
+        # Updating config with passed commands
+        # XXX: Need logic to check if these values exist in the chosen config
+        #      Unsure if an error will be thrown
+        if (self.args.display):
+            self.algoConfig["display"] = True
+
+        if (self.args.algo is not None):
+            self.algoConfig["algo"] = self.args.algo
 
     def parseArgs(self):
         """
@@ -77,11 +86,10 @@ class PiVideoStream:
                             help="threads: (0-4) [2]",
                             default=2, type=int)
         parser.add_argument("--algo", dest="algo",
-                            help="(empty, default)",
-                            default="default")
+                            help="(empty, default)",)
         parser.add_argument("--display", dest="display",
-                            help="display [0]",
-                            default=0, type=int)
+                            help="display [0,1]",
+                            action=store_true)
         parser.add_argument("--robot", dest="robot",
                             help="robot (localhost, roborio) [localhost]",
                             default="localhost")
@@ -133,11 +141,10 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
+        # ?
         logging.debug("  (multi threaded)")
-        target, frame = algo.processFrame(image, algo=self.args.algo,
-                                        cfg=self.config["algo"],
-                                        display=self.args.display,
-                                        debug=self.args.debug)
+
+        target, frame = algo.processFrame(image, cfg=self.config["algo"])
 
         if target != None:
             logging.debug("Target value is: " + str(target))
