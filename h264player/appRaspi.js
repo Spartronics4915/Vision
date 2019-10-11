@@ -42,8 +42,8 @@ for(let ifname of Object.keys(ifaces))
 
 try
 {
-    console.log(`appRaspi listening on ${ip}:8080`);
-    server.listen(8080, ip); // 
+    console.log(`appRaspi listening on ${ip}:5805`);
+    server.listen(5805, ip); // 
 }
 
 catch(err)
