@@ -430,7 +430,7 @@ def points2center(points):
                 C         G
 
     '''
-    center = (lTopRightPt+xDelta/2,lTopRightPt[1])
+    center = (lTopRightPt[0]+xDelta/2,lTopRightPt[1])
 
     return center
 
