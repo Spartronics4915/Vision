@@ -67,6 +67,7 @@ class PiVideoStream:
         # Updating config with passed commands
         # XXX: Need logic to check if these values exist in the chosen config
         #      Unsure if an error will be thrown
+        # Overriding config values with passed values
         if (self.args.display):
             self.algoConfig["display"] = True
 
@@ -90,6 +91,7 @@ class PiVideoStream:
         parser.add_argument("--display", dest="display",
                             help="display [0,1]",
                             action=store_true)
+        # Should robot be moved to configs?
         parser.add_argument("--robot", dest="robot",
                             help="robot (localhost, roborio) [localhost]",
                             default="localhost")
@@ -141,13 +143,11 @@ class PiVideoStream:
                 break
 
     def processFrame(self, image):
-        # ?
+        # called on each frame in the video
         logging.debug("  (multi threaded)")
 
         target, frame = algo.processFrame(image, cfg=self.config["algo"])
 
-        if target != None:
-            logging.debug("Target value is: " + str(target))
         if self.commChan:
             if target != None:
                 self.commChan.UpdateVisionState("Aquired")

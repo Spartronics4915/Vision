@@ -12,10 +12,8 @@ TODO: Better Varible Names
 
 import numpy as np
 import cv2
-import poseEstimation
 import time
 import traceback
-import rectUtil
 import logging
 import targets
 
@@ -41,7 +39,7 @@ def processFrame(frame, cfg=None):
     #   Thus, we only need to get the "algo" value out of the passed object.
     algo = cfg["algo"]
     if algo == None or algo == "default":
-        return defaultAlgo(frame, cfg, display, debug)
+        return defaultAlgo(frame, cfg)
     elif algo == "empty" or algo == "bypass":
         return emptyAlgo(frame, cfg)
     elif algo == "mask":
@@ -50,7 +48,7 @@ def processFrame(frame, cfg=None):
         return hsvAlgo(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
-        return defaultAlgo(frame, cfg, display, debug)
+        return defaultAlgo(frame, cfg)
 
 def defaultAlgo(frame, cfg):
     return hsvAlgo(frame, cfg)
