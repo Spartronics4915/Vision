@@ -23,11 +23,13 @@ class Target:
     lastUpdate = 0  # Nb: class variable, shared across instances
 
     def __init__(self, updateDelta=True):
-        # XXX: Bad subkey default. Should be related to an algo
-        self.subkey = "Target"
+        # Member Varables
+        self.subkey = "baseTarget"
         self.autoSend = False
         self.clock = time.monotonic()
         self.value = None
+
+        # Deltaclock computation
         if updateDelta:
             # Used when setValue *is* construction, NB: if there
             # are > 1 live targets in the codebase, this isn't
