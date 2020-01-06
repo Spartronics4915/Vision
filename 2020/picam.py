@@ -13,7 +13,7 @@ class PiCam:
             self.config = {
                 "resolution": (640,480),
                 "framerate": 60,
-                "sensormode": 0,
+                "sensormode": 7,
             }
 
         self.resolution = self.config["resolution"]

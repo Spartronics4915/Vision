@@ -14,7 +14,7 @@
 ## Difference from 2019
 
 * *Config Changes* - Config objects have been more forcefully implemented in `algo.py`, the objective moving forward is to have more and more data accessible through config objects.
-* *Debug Messages* - The precise way debugging is going to be used is still in limbo.
+* *Debug Messages* - The precise way debugging is going to be implemented is still in limbo.
 * *Lack of 2019-specific code* - `targets.py`, `algo.py`, `rectUtil.py`, `poseEstimation.py`, and `config.py` have all been stripped of 2019-specfici code. In some cases that means removing the files, in others it means simply cutting chunks. Untill kickoff, this directory is designed to be a blank slate, improving on infrastructure from 2019.
 * *Planned Threading Changes* - Theading is planned to play a larger role in this version of the codebase. Stay tuned.
 * *Parsed Agument Changes* - Parsed arguments are now more tightly entertwined with configurations. When arguments are parsed the chosen `config` is updated with the parsed values. Parsed arguments supeceed `config` values. 
