@@ -90,7 +90,7 @@ class PiVideoStream:
                             help="(empty, default)",)
         parser.add_argument("--display", dest="display",
                             help="display [0,1]",
-                            action=store_true)
+                            default=0, type=int)
         # Should robot be moved to configs?
         parser.add_argument("--robot", dest="robot",
                             help="robot (localhost, roborio) [localhost]",

@@ -53,6 +53,7 @@ testConfig["algo"].update({
     "pnpCam": "dbcam8"
 })
 
+default = testConfig
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 #
