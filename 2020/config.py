@@ -28,6 +28,7 @@ _base = {
 }
 
 # ------ Test config -------
+# Shows most-if not all-of the possible values used in configs
 testConfig = copy.deepcopy(_base)
 testConfig.update({
     "name": "testConfig",
@@ -53,7 +54,34 @@ testConfig["algo"].update({
     "pnpCam": "dbcam8"
 })
 
-default = testConfig
+# ------ Test config -------
+# Shows most-if not all-of the possible values used in configs
+moduleTestConfig = copy.deepcopy(_base)
+moduleTestConfig.update({
+    "name": "testConfig",
+})
+# Camera-Specific Settings
+moduleTestConfig["picam"].update({
+    "resolution": (640, 480),
+    "iso": 400,
+    "brightness": 0,
+    "contrast": 100,
+    "flip": False,
+    "rotation": 0,
+    "exposure_mode": "auto", #"fixedfps",
+    "exposure_compensation": 0, # [-25, 25]
+})
+# Algo-Specific settings
+# TODO: Change the outer/innter-most setting of algo 
+moduleTestConfig["algo"].update({
+    "algo": "empty", # Chose proper algo streaming
+    "display": False,# 1 if streaming
+    "hsvRangeLow": np.array([0,0,90]),
+    "hsvRangeHigh": np.array([255,255,255]),
+    "pnpCam": "dbcam8"
+})
+
+default = moduleTestConfig
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 #
