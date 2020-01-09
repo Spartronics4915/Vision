@@ -105,12 +105,12 @@ class CamHandler(BaseHTTPRequestHandler):
     def streamAlgo(self, cam, algoselector):
         global s_first
         (algoselector + " algo streaming")
+        # Setting the value inside the config
+        s_config["algo"]["algo"] = algoselector
         cam.start()
         while True:
             camframe = cam.next()
-            target,frame = algo.processFrame(camframe, algoselector,
-                                            cfg=s_config["algo"],
-                                            display=True, debug=False)
+            target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
             if target != None:
                 logging.debug(str(target))
             else:
