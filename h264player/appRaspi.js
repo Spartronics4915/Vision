@@ -2,9 +2,9 @@
 
 /**
 * Run this on a raspberry pi 
-* then browse (using google chrome/firefox) to http://[pi ip]:8080/
+* then browse (using google chrome/firefox) to http://[pi ip]:5085/
 */
-
+const port = 5805; // legal port for competition FMS
 const os = require('os');
 const ifaces = os.networkInterfaces();
 const http = require('http');
@@ -64,8 +64,8 @@ for(let ifname of Object.keys(ifaces))
 
 try
 {
-    console.log(`appRaspi listening on ${ip}:5805`);
-    server.listen(5805, ip); // 
+    console.log(`appRaspi listening on ${ip}:${port}`);
+    server.listen(port, ip); // 
 }
 
 catch(err)
