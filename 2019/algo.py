@@ -74,21 +74,21 @@ def maskAlgo(frame, cfg):
 
 def rectDebugAlgo(frame, cfg, display=1, debug=0):
     # Used to find all relevent imformation about rectangles on screen
-    logging.warning("running rectDebugAlgo on frame, not hsv");
+    logging.warning("running rectDebugAlgo on frame, not hsv")
     mask = cv2.inRange(frame, cfg["hsvRange0"], cfg["hsvRange1"]) # Our HSV filtering
     rects = rectUtil.findRects(frame, 200, cfg, display, debug)
 
     if display:
+        visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
         # Draw each rect + properties of it
         for r in rects:
             # combine original image with mask, for visualization
-            visImg = cv2.bitwise_and(frame, frame, mask=mask) # Only run in display
 
             pts = cv2.boxPoints(r)  # Turning the rect into 4 points to draw
             boxPts = [np.int32(pts)]
 
             # Draw the box
-            #cv2.drawContours(visImg,boxPts, 0,(0,0,255),2)
+            cv2.drawContours(visImg,boxPts, 0,(0,0,255),2)
             # Draw a line through the center of the rect
             #cv2.line(visImg,(frame.shape[1],r[0][1],(0,r[0][1]),(0,255,0)))
             # Draw a line between Two points in the rectangle
@@ -135,6 +135,9 @@ def headingAlgo(frame, cfg, display, debug):
 
         heightError = rectUtil.computeHeightError(targetAvgHeight)
 
+        if (display):
+            # frame.size is in the form (y,x,channel)
+            cv2.line(frame,(int(targetCenter[0]),0),(int(targetCenter[0]),frame.size[0]), (255,255,255), 3) 
 
         # tgval = rectUtil.computeTargetOffsetAndHeightErrors(lPts,rPts)
         return targets.TargetHeadingsAndHeightOffset(angleOffset,heightError),frame

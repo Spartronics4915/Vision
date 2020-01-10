@@ -25,6 +25,7 @@ class Target:
     def __init__(self, updateDelta=True):
         self.subkey = "Target"
         self.autoSend = False
+        # In seconds
         self.clock = time.monotonic()
         self.value = None
         if updateDelta:
@@ -39,8 +40,11 @@ class Target:
 
     def setValue(self, value, forceupdate=True):
         if forceupdate or value != self.value:
+            # Get the current time
             self.clock = time.monotonic()
+            # Subtract the current time from the time of the last push
             self.deltaclock = self.clock - self.lastUpdate
+            # Assign a time to this current push
             self.lastUpdate = self.clock
             self.value = value  # expect a tuple or list
             if self.autoSend:
@@ -125,8 +129,10 @@ class TargetHeadingsAndHeightOffset(Target):
 
     def __str__(self):
         arrayValue = []
-        arrayValue.extend(self.headings)
-        arrayValue.extend(self.hError)
+        # Look into what happens when headings or hError are tuples, ect
+        # .extend was throwing an error with the float64 numpy object, so .append is a temporary fix
+        arrayValue.append(self.headings)
+        arrayValue.append(self.hError)
         arrayValue.append(int(1000*self.deltaclock))
         return "Headings-n-Heights: " + ("{:.2f}, "*len(arrayValue)).format(*arrayValue) 
 

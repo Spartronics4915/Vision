@@ -1,6 +1,7 @@
 #! /usr/bin/ python3
 
 # TODO: Explain the problem in ASCI art 
+# TODO: Make a majoirty of the methods in this file 2019 specific
 # XXX: Returns a maximum of 2 pairs.
 # Helpful link explaining how cv2 generates angles:
 # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
@@ -69,7 +70,7 @@ def findRects(frame, minsize, cfg, display=0, debug=0):
     for r in rects:
         sz = r[1]
         area = sz[0] * sz[1]
-        if area > 200:
+        if area > minsize:
             sizedRects.append(r)
 
     return sizedRects
@@ -318,8 +319,9 @@ def sortPoints2PNP(leftPoints, rightPoints):
 
     return np.array(orderedPoints,dtype="double")
 
-def computeTargetAngleOffSet(frame,center,RPICAMFOV=45):
+def computeTargetAngleOffSet(frame,center,RPICAMFOV=53):
     # Only need the center of the target for this caluclation, not all points  
+    # TODO: Can also return te
     """
     Crudely calculate the angle offset of the center of a target.
  
@@ -341,11 +343,13 @@ def computeTargetAngleOffSet(frame,center,RPICAMFOV=45):
 
     centerX = center[0]
 
-    if centerX < x/2:
+    # 0,0 is top left cornor of the screen
+    if centerX < (x/2):
         # Left side of screen 
-        centerDegOffset = -(centerX / pixelToDegRatio)
+        # Range is between -22deb and 0deb
+        centerDegOffset = -((RPICAMFOV/2) - (centerX / pixelToDegRatio))
 
-    elif centerX > x/2:
+    elif centerX > (x/2):
         # Right side of screen
         centerDegOffset = (centerX - x/2) / pixelToDegRatio 
 
@@ -426,7 +430,7 @@ def points2center(points):
                 C         G
 
     '''
-    center = (lTopRightPt+xDelta/2,lTopRightPt[1])
+    center = (lTopRightPt[0]+xDelta/2,lTopRightPt[1])
 
     return center
 

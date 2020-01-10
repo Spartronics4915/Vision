@@ -1,4 +1,4 @@
-#
+# Representing configurations as 2D Python dictionaries
 # vision parameter groups (aka configs)
 #
 # given the name of a config (eg "greenled") access via:
@@ -14,86 +14,26 @@ import copy
 
 _base = {
     "picam": {
-        "resolution": (640, 480), # (320,240) has less range
+        "resolution": (640, 480), 
         "framerate": 60,
-        "sensormode": 7,    # auto-calc based on res and framerate
-                            # Fixes auto wb 'hidden' settings
+        "sensormode": 7,    # Fixes auto wb 'hidden' settings
+                            
     },
     "algo": {
-        # Deprecated 2018 values:
-        # "hsvRange0": np.array([0,150,150]),
-        #              np.array([50,150,100]),
-        # Deprecated 2019 values:
-        # "hsvRange1": np.array([50, 255, 255]),
-        #              np.array([70,255,255]),
+        # Assuming retro-reflective tape
         "hsvRange0": np.array([30,150,170]),
         "hsvRange1": np.array([90,255,255]),
         "pnpCam": "pi"
     }
 }
-# ------ Debugging/At Home Copy -------
 
-greenled = copy.deepcopy(_base)
-greenled.update({
-    "name": "greenled",
-});
-greenled["picam"].update({
-    "iso": 400,  # 100-800 (higher numbers are brighter)
-    "brightness": 20,
-    "contrast": 100,
-    "flip": True,
-    "rotation": 0,
-    "exposure_mode": "fireworks",
-    "exposure_compensation": -25, # [-25, 25]
+# ------ Test config -------
+testConfig = copy.deepcopy(_base)
+testConfig.update({
+    "name": "testConfig",
 })
-
-greenled_dbcam8 = copy.deepcopy(greenled)
-greenled_dbcam8["algo"].update({
-    "pnpCam": "dbcam8"
-})
-
-
-# ------ AMV Copy -------
-greenledAMV = copy.deepcopy(_base)
-greenledAMV.update({
-    "name": "greenledAMV",
-});
-greenledAMV["picam"].update({
-    "iso": 400,  # 100-800 (higher numbers are brighter)
-    "brightness": 20,
-    "contrast": 100,
-    "flip": True,
-    "rotation": 0,
-    "exposure_mode": "fireworks",
-    "exposure_compensation": -25, # [-25, 25]
-})
-greenledAMV["algo"].update({
-    "pnpCam": "couch"
-})
-# ------ GP Copy -------
-greenledGP = copy.deepcopy(_base)
-greenledGP.update({
-    "name": "greenledGP",
-});
-greenledGP["picam"].update({
-    "iso": 400,  # 100-800 (higher numbers are brighter)
-    "brightness": 20,
-    "contrast": 100,
-    "flip": True,
-    "rotation": 0,
-    "exposure_mode": "fireworks",
-    "exposure_compensation": -25, # [-25, 25]
-})
-greenledGP["algo"].update({
-    "pnpCam": "GPCalib"
-})
-
-# ------ Dana's Copy -------
-noled = copy.deepcopy(_base)
-noled.update({
-    "name": "noled",
-})
-noled["picam"].update({
+# Camera-Specific Settings
+testConfig["picam"].update({
     "resolution": (640, 480),
     "iso": 400,
     "brightness": 0,
@@ -103,44 +43,17 @@ noled["picam"].update({
     "exposure_mode": "auto", #"fixedfps",
     "exposure_compensation": 0, # [-25, 25]
 })
-noled["algo"].update({
-    "hsvRange0": np.array([0,0,90]),
-    "hsvRange1": np.array([255,255,255]),
+# Algo-Specific settings
+# TODO: Change the outer/innter-most setting of algo 
+testConfig["algo"].update({
+    "algo": "empty", # Chose proper algo streaming
+    "display": False,# 1 if streaming
+    "hsvRangeLow": np.array([0,0,90]),
+    "hsvRangeHigh": np.array([255,255,255]),
     "pnpCam": "dbcam8"
 })
 
-dbcam8 = noled
-
-dbcam7 = copy.deepcopy(noled)
-dbcam7["algo"].update({
-    "pnpCam": "dbcam7"
-})
-
-# ------ Declan 2019 Summer Debug Copy -------
-dGarage = copy.deepcopy(_base)
-dGarage.update({
-    "name": "dGarage",
-    });
-dGarage["picam"].update({
-    "iso": 100,         # Between 0 - 800
-                        # Note that a setting of 0 still has an effect
-    "brightness": 20,  
-    "contrast": 90,
-    "flip": True,
-    "rotation": 0,
-    "exposure_mode": "off", # An exposure mode of 'off' override an iso of 0
-    "exposure_compensation": -25, # [-25, 25]
-    "awb_mode": "off",
-    "awb_gains": (1.18359, 1.48438) # Known good gains values. These will most likely have to be found through 'auto' awb mode 
-})
-dGarage["algo"].update({
-    "pnpCam": "couch",
-    "hsvRange0": np.array([40,150,170]),
-    "hsvRange1": np.array([80,255,255])
-})
-
-default = dGarage
-
+default = testConfig
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 #
