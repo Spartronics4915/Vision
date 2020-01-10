@@ -204,6 +204,10 @@ its static ip.  The distinction between driver and vision cameras is
 characterized by static ip __and__ the camera process that runs after each
 reboot.  For driver camera, we use the uv4l script and for vision camera
 we employ python plus `runPiCam.py`.
+[This link](https://liudr.wordpress.com/2016/03/25/back-up-and-clone-raspberry-pi) 
+shows how to squeeze a bigger partition onto a smaller disk (but it requires windows).
+NB: the older version of the software is available from warez sites and seems
+simpler than the more modern version.
 
 ### read-only-raspberry-pi
 
@@ -379,8 +383,10 @@ a few examples:
             * set keyboard locale (US-UTF8...)
             * time-zone (America/Los Angeles)
             * enable camera (interfaces))
+            * set time manually if needed
+            `sudo date --set 1998-11-02; sudo date --set 21:08:00`
         * `Interfacing Options`
-            * Enable connection to Raspberry Pi Camera
+            * Enable connection to Raspberry Pi Camera (pi3/2019)
         * `Advanced`
             * Consider raising GPU memory to 256MB
 * update and cleanup (recover diskspace)
@@ -430,12 +436,16 @@ ff02::2        ip6-allrouters
 sudo python3 -m pip install picamera
 ```
 
-### install node 10.x and extensions
+### install node and extensions
 
     ```bash
-    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -1
-    sudo apt-get install -y nodejs
-    sudo npm install -g node-stun # for diagnosing p2p networking
+    sudo apt-get install nodejs # version should be > 10.0
+    sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
+    npm config set registry http://registry.npmjs.org/
+ 
+    
+    sudo npm install -g express  # used by h264server
+    #  (deprecated) sudo npm install -g node-stun # diagnosing p2p networking
     ```
 
 ### validate camera
