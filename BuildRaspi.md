@@ -204,6 +204,10 @@ its static ip.  The distinction between driver and vision cameras is
 characterized by static ip __and__ the camera process that runs after each
 reboot.  For driver camera, we use the uv4l script and for vision camera
 we employ python plus `runPiCam.py`.
+[This link](https://liudr.wordpress.com/2016/03/25/back-up-and-clone-raspberry-pi) 
+shows how to squeeze a bigger partition onto a smaller disk (but it requires windows).
+NB: the older version of the software is available from warez sites and seems
+simpler than the more modern version.
 
 ### read-only-raspberry-pi
 
@@ -350,18 +354,19 @@ a raspi that can be used as a base-image. If you already have a base-image avail
 use it skip these steps. In that case, remember to set the static IP and drive
 script appropriate for the raspi's role on the robot.
 
-### make sure you have a raspi 3 with picam
+### make sure you have a raspi 3 or 4 with picam
 
 You can buy raspis and raspi cameras at a number of sites, here are
 a few examples:
 
 * [pi3](https://www.amazon.com/gp/product/B01CD5VC92)
+* [pi4](https://www.amazon.com/gp/product/B07TD42S27)
 * [camera](https://www.amazon.com/gp/product/B00FGKYHXA)
 * [night-vision camera](https://www.amazon.com/dp/B06XYDCN5N)
 
 ### build microSD card (minimum 8GB)
 
-* follow instructions [here](https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027241-using-the-raspberry-pi-for-frc)
+* follow instructions [here](https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/using-the-raspberry-pi-for-frc.html)
 
 ### on first boot
 
@@ -379,8 +384,10 @@ a few examples:
             * set keyboard locale (US-UTF8...)
             * time-zone (America/Los Angeles)
             * enable camera (interfaces))
+            * set time manually if needed
+            `sudo date --set 1998-11-02; sudo date --set 21:08:00`
         * `Interfacing Options`
-            * Enable connection to Raspberry Pi Camera
+            * Enable connection to Raspberry Pi Camera (pi3/2019)
         * `Advanced`
             * Consider raising GPU memory to 256MB
 * update and cleanup (recover diskspace)
@@ -393,7 +400,7 @@ a few examples:
     sudo apt-get autoremove
     ```
 
-See also: https://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027798-the-raspberry-pi-frc-console
+See also: https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/the-raspberry-pi-frc-console.html
 
 ### rename/renumber your raspi
 
@@ -424,19 +431,25 @@ ff02::2        ip6-allrouters
 # after editing this file, reboot the machine and potentially the router
 ```
 
+### change password from raspberry to spartronics
+
+```sh
+% passwd
+```
+
 ### install python extensions
 
 ``` bash
 sudo python3 -m pip install picamera
+sudo python3 -m pip install pynetworktables
 ```
 
-### install node 10.x and extensions
+### install node and extensions
 
-    ```bash
-    curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -1
-    sudo apt-get install -y nodejs
-    sudo npm install -g node-stun # for diagnosing p2p networking
-    ```
+```bash
+sudo apt-get install nodejs # version should be > 10.0
+sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
+```
 
 ### validate camera
 
@@ -458,6 +471,7 @@ sudo python3 -m pip install picamera
 % python3
 >>> import cv2
 >>> import picamera
+>>> import networktables
 ```
 
 ### optional - install support for h264 feed
@@ -516,8 +530,20 @@ and wire it into the FRCVision application like so:
 % mkdir ~/spartronics
 % cd spartronics
 % git clone https://github.com/Spartronics4915/Vision
-% cd Vision/2019
+% cd Vision/h264player
 % cp startH264player.sh ~
+```
+
+Note that moving from one version of FRCVision to another, we may need
+to update the node_modules associated with the h264player.  Here's how:
+
+```bash
+% cd ~/spartronics/Vision/h264player
+% rm -rf node_modules
+% npm install  # may produce version warnings which should be okay
+# ./startH265player.sh  # may produce version errors, etc.  if so then:
+% npm upgrade express 
+# and try again (etc)
 ```
 
 Here are the contents of startH264player.sh:
@@ -541,8 +567,8 @@ exec ./startH264player.sh
 #exec ./startSleeper.py
 ```
 
-Note that we'ver reduced the waiting time from 5 to 2 seconds. This was
-done in order to increase the responsivenss of camera-switching triggered
+Note that we'ver reduce the waiting time from 5 to 2 seconds. This was
+done in order to increase the responsiveness of camera-switching triggered
 by driver actions and is a consequence of the _big hammer_ approach for
 clean shutdowns employed by our variant of `h264player/serverBase.js,serverRaspi.js`.
 The startSleeper.py is commented out but offers a simple way to validate
@@ -550,107 +576,13 @@ the FRC application supervisor or to temporarily disable h264player.
 
 #### install rpi-webrtc-streamer (deprecated)
 
-* download webrtc.deb image from [here](https://github.com/kclyu/rpi-webrtc-streamer-deb)
-  and installed via `sudo dpkg -i rws_xxx_armhf.deb`.
-* a newer server build can be found
-  [here](https://github.com/kclyu/rpi-webrtc-streamer/files/2930354/webrtc-streamer.gz)
-  and can combined with the released distro via
-  [these instructions](https://github.com/kclyu/rpi-webrtc-streamer/issues/66).
-* newer version of the website _and configs_ can be found in the github 
-  [here](https://github.com/kclyu/rpi-webrtc-streamer).  As with rpi-webrtc-streamer,
-  the latest config files should be copied atop the installed versions under
-  `/opt/rws/etc`.  The next-gen version of the native peer connection (np2)
-  can be copied to /opt/rws/web-root.
-* configure server ports via `/opt/rws/etc/webrtc_streamer.conf`. Default
-  ports of 8888 and 8889 should be fine.
-* configure [stun_server](https://en.wikipedia.org/wiki/STUN) server.  Since
-  we have no access to the internet, we wish to connect to a stun server
-  on the FMS network.  Our only option for this is to install a stun
-  server on the driver station and will only be worth doing if we can
-  prove that it solves webrtc connectivity issues. Here's a typical
-  value: `ice_server_urls_0=stun:10.49.15.5,stun:192.168.0.7`.
-* configure max_bitrate via `/opt/rws/etc/media_config.conf`. A value between
-  1500000-2000000 appears to work well in a dual-drivecam configuration.
-* make sure that webrtc_streamer can write to its log file:
-
-    ```bash
-    cd /opt/rws
-    cp -r log /var/tmp/rmslogs
-    chmod 777 /var/tmp/rmslogs
-    sudo ln -s /var/tmp/rmslogs ./log
-    ```
-
-* restart the server via `sudo systemcontrol restart rws`. Or better
-  yet, only start the server via the vision application script of
-  the frcvision platform.  As with uv4l, you may want to disable
-  the rws service with `sudo systemcontrol disable rws`.
-* verify functionality
-  * manually start server: `cd /opt/rws; ./webrtc-streamer`
-  * point a browser at its webserver via http://{piaddr}:8889/np2
+We experimented with this tech and it failed us during competetions.
+Please refer to file history for more details.
 
 #### install uv4l (deprecated)
 
-* follow instructions for _stretch_ [here](https://www.linux-projects.org/uv4l/installation).
-You can ignore instructions regarding TC358743, but make sure that you
-install these:
-
-```sh
-sudo apt-get install uv4l uv4l-raspicam uv4l-server uv4l-webrtc
-```
-
-Here are the packages required (note raspidisp not required). You
-can discover packages installed on the raspi via: `dpkg -l | grep uv4l`.
-
-``` text
-ii  uv4l             1.9.17   armhf   User space Video4Linux Framework Core
-ii  uv4l-decoder2    1.3      armhf   Video Hardware Decoder support for the
-ii  uv4l-demos       1.15     armhf   UV4L Framework examples and demos.
-ii  uv4l-encoder     1.20     armhf   Video Hardware Encoder support for the
-ii  uv4l-raspicam    1.9.63   armhf   CSI Camera Board driver for any Raspberry Pi.
-ii  uv4l-renderer    1.10     armhf   Video Renderer for the WebRTC Extension
-ii  uv4l-server      1.1.12   armhf   Streaming Server module for UV4L with
-ii  uv4l-webrtc      1.91     armhf   WebRTC extension for the
-
-```
-
-After installation and reboot, and after verifying and troubleshooting the
-camera functionality, make sure that uv4l isn't running as a service.
-This makes it less prone to startup conflicts with frcvision's services.
-
-* disable service `sudo systemctl disable uv4l_raspicam.service`
-* to use frcvision for auto-starting you can disable the service:
-* point Dashboard's layout file to the IP address+port.
-
-* edit `/etc/uv4l/uv4l-raspicam.conf`
-
-``` bash
-# -------------------
-# there are a variety of raspicam driver settings
-driver = raspicam
-auto-video_nr = yes
-
-# -------------------
-# there are a number of camera exposure settings that can
-# be fiddled with
-# these depend on camera mount
-hflip = yes
-vflip = yes
-
-# auto-exposure might get in the way?
-exposure = auto
-
-# -------------------
-server-option = --port=8080
-
-# -------------------
-# WebRTC options govern h264 streaming, we wish to obtain maximum
-# quality for minimum bandwidth.
-#  bitrate is the primary quality knob
-server-option = --enable-webrtc-audio=no
-server-option = --webrtc-receive-audio=no
-server-option = --webrtc-hw-vcodec-maxbitrate=3000
-```
-
+We experimented with this tech and it failed us during competetions.
+Please refer to file history for more details.
 
 ### pull git repository
 
@@ -740,18 +672,17 @@ tcp6       0      0 :::22                   :::*                    LISTEN
 
 ``` text
 >>> print(cv2.getBuildInformation())
-
-General configuration for OpenCV 3.4.4 =====================================
-  Version control:               08163c0
+General configuration for OpenCV 3.4.7 =====================================
+  Version control:               v2020.1.1
 
   Platform:
-    Timestamp:                   2019-01-14T05:26:19Z
-    Host:                        Linux 4.15.0-1035-azure x86_64
+    Timestamp:                   2019-12-31T20:55:19Z
+    Host:                        Linux 4.15.0-1064-azure x86_64
     Target:                      Linux 1 arm
-    CMake:                       3.7.2
+    CMake:                       3.13.4
     CMake generator:             Unix Makefiles
     CMake build tool:            make
-    Configuration:               RelWithDebugInfo
+    Configuration:               Release
 
   CPU/HW features:
     Baseline:                    VFPV3 NEON
@@ -761,65 +692,84 @@ General configuration for OpenCV 3.4.4 =====================================
   C/C++:
     Built as dynamic libs?:      YES
     C++11:                       YES
-    C++ Compiler:                /__w/1/s/deps/02-extract/raspbian9/bin/arm-raspbian9-linux-gnueabihf-g++  (ver 6.3.0)
-    C++ flags (Release):         -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-narrowing -Wno-delete-non-virtual-dtor -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -fvisibility-inlines-hidden -O3 -DNDEBUG  -DNDEBUG
-    C++ flags (Debug):           -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-narrowing -Wno-delete-non-virtual-dtor -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -fvisibility-inlines-hidden -g -Og -DDEBUG -D_DEBUG
-    C Compiler:                  /__w/1/s/deps/02-extract/raspbian9/bin/arm-raspbian9-linux-gnueabihf-gcc
-    C flags (Release):           -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-narrowing -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -O3 -DNDEBUG  -DNDEBUG
-    C flags (Debug):             -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-narrowing -Wno-comment -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfp16-format=ieee -fvisibility=hidden -g -Og -DDEBUG -D_DEBUG
-    Linker flags (Release):      -rdynamic
-    Linker flags (Debug):        -rdynamic
+    C++ Compiler:                /__w/1/s/work/2019-12-31-FRCVision/raspbian10/bin/arm-raspbian10-linux-gnueabihf-g++  (ver 8.3.0)
+    C++ flags (Release):         -isystem /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/include/arm-linux-gnueabihf  -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfpu=neon -fvisibility=hidden -fvisibility-inlines-hidden -O3 -DNDEBUG  -DNDEBUG
+    C++ flags (Debug):           -isystem /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/include/arm-linux-gnueabihf  -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wundef -Winit-self -Wpointer-arith -Wshadow -Wsign-promo -Wuninitialized -Winit-self -Wsuggest-override -Wno-delete-non-virtual-dtor -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfpu=neon -fvisibility=hidden -fvisibility-inlines-hidden -g -Og -DDEBUG -D_DEBUG
+    C Compiler:                  /__w/1/s/work/2019-12-31-FRCVision/raspbian10/bin/arm-raspbian10-linux-gnueabihf-gcc
+    C flags (Release):           -isystem /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/include/arm-linux-gnueabihf  -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfpu=neon -fvisibility=hidden -O3 -DNDEBUG  -DNDEBUG
+    C flags (Debug):             -isystem /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/include/arm-linux-gnueabihf  -Wno-psabi   -fsigned-char -W -Wall -Werror=return-type -Werror=non-virtual-dtor -Werror=address -Werror=sequence-point -Wformat -Werror=format-security -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wundef -Winit-self -Wpointer-arith -Wshadow -Wuninitialized -Winit-self -Wno-comment -Wimplicit-fallthrough=3 -Wno-strict-overflow -fdiagnostics-show-option -pthread -fomit-frame-pointer -ffunction-sections -fdata-sections  -mfpu=neon -fvisibility=hidden -g -Og -DDEBUG -D_DEBUG
+    Linker flags (Release):      -Wl,-rpath -Wl,/__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/opt/vc/lib -rdynamic   -Wl,--gc-sections
+    Linker flags (Debug):        -Wl,-rpath -Wl,/__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/opt/vc/lib -rdynamic   -Wl,--gc-sections
     ccache:                      NO
     Precompiled headers:         NO
     Extra dependencies:          dl m pthread rt
     3rdparty dependencies:
 
   OpenCV modules:
-    To be built:                 calib3d core features2d flann highgui imgcodecs imgproc java java_bindings_generator ml objdetect photo python3 python_bindings_generator shape stitching superres ts video videoio videostab
+    To be built:                 calib3d core dnn features2d flann highgui imgcodecs imgproc java ml objdetect photo python3 shape stitching superres ts video videoio videostab
     Disabled:                    world
     Disabled by dependency:      -
-    Unavailable:                 cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev dnn js python2 viz
+    Unavailable:                 cudaarithm cudabgsegm cudacodec cudafeatures2d cudafilters cudaimgproc cudalegacy cudaobjdetect cudaoptflow cudastereo cudawarping cudev js python2 viz
     Applications:                perf_tests apps
     Documentation:               NO
     Non-free algorithms:         NO
 
   GUI:
-    GTK+:                        NO
+    GTK+:                        YES (ver 3.24.5)
+      GThread :                  YES (ver 2.58.3)
+      GtkGlExt:                  NO
 
   Media I/O:
-    ZLib:                        build (ver 1.2.11)
-    JPEG:                        build-libjpeg-turbo (ver 1.5.3-62)
-    PNG:                         build (ver 1.6.35)
+    ZLib:                        /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/arm-linux-gnueabihf/libz.so (ver 1.2.11)
+    JPEG:                        build-libjpeg-turbo (ver 2.0.2-62)
+    WEBP:                        build (ver encoder: 0x020e)
+    PNG:                         /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/arm-linux-gnueabihf/libpng.so (ver 1.6.36)
+    TIFF:                        build (ver 42 - 4.0.10)
+    JPEG 2000:                   build (ver 1.900.1)
     HDR:                         YES
     SUNRASTER:                   YES
     PXM:                         YES
 
   Video I/O:
+    DC1394:                      NO
+    GStreamer:                   YES
+      base:                      YES (ver 1.14.4)
+      video:                     YES (ver 1.14.4)
+      app:                       YES (ver 1.14.4)
+      riff:                      YES (ver 1.14.4)
+      pbutils:                   YES (ver 1.14.4)
     libv4l/libv4l2:              NO
     v4l/v4l2:                    linux/videodev2.h
 
   Parallel framework:            pthreads
 
-  Trace:                         YES (built-in)
+  Trace:                         YES (with Intel ITT)
 
   Other third-party libraries:
+    Lapack:                      YES (/__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/arm-linux-gnueabihf/libopenblas.so)
     Custom HAL:                  YES (carotene (ver 0.0.1))
+    Protobuf:                    build (3.5.1)
+
+  OpenCL:                        YES (no extra features)
+    Include path:                /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/src/opencv-3.4.7/3rdparty/include/opencl/1.2
+    Link libraries:              Dynamic load
 
   Python 3:
-    Interpreter:                 /usr/bin/python3 (ver 3.5.3)
-    Libraries:
-    numpy:                       /__w/1/s/deps/02-extract/raspbian9/arm-raspbian9-linux-gnueabihf/usr/include/python3.5m/numpy (ver undefined - cannot be probed because of the cross-compilation)
-    packages path:               lib/python3.5/dist-packages
+    Interpreter:                 /usr/bin/python3 (ver 3.7.3)
+    Libraries:                   /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/arm-linux-gnueabihf/libpython3.7m.so (ver 3.7.3)
+    numpy:                       /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/include/python3.7m/numpy (ver undefined - cannot be probed because of the cross-compilation)
+    install path:                lib/python3.7/dist-packages/cv2/python-3.7
 
   Python (for build):            /usr/bin/python3
 
   Java:
-    ant:                         /usr/bin/ant (ver 1.9.9)
-    JNI:                         /__w/1/s/deps/02-extract/jdk/include /__w/1/s/deps/02-extract/jdk/include/linux
+    ant:                         /usr/bin/ant (ver 1.10.5)
+    JNI:                         /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/jvm/jdk-11.0.1/include /__w/1/s/work/2019-12-31-FRCVision/stage3/rootfs/usr/lib/jvm/jdk-11.0.1/include/linux
     Java wrappers:               YES
     Java tests:                  NO
 
-  Install to:                    /__w/1/s/deps/03-build/opencv-build/install
+  Install to:                    /usr/local/frc
+-----------------------------------------------------------------
 ```
 
 ## Troubleshooting

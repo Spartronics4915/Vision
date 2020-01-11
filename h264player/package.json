@@ -5,14 +5,13 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "install": "cd vendor && npm install",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "mout": "^1.1.0",
     "stream-split": "^1.1.0",
     "stream-throttle": "^0.1.3",
