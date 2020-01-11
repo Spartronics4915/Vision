@@ -56,12 +56,12 @@ testConfig["algo"].update({
 
 # ------ Test config -------
 # Shows most-if not all-of the possible values used in configs
-moduleTestConfig = copy.deepcopy(_base)
-moduleTestConfig.update({
-    "name": "testConfig",
+moduleDebuggingConfig = copy.deepcopy(_base)
+moduleDebuggingConfig.update({
+    "name": "Debugging Config used w/ a 2019 module",
 })
 # Camera-Specific Settings
-moduleTestConfig["picam"].update({
+moduleDebuggingConfig["picam"].update({
     "resolution": (640, 480),
     "iso": 400,
     "brightness": 0,
@@ -73,7 +73,7 @@ moduleTestConfig["picam"].update({
 })
 # Algo-Specific settings
 # TODO: Change the outer/innter-most setting of algo 
-moduleTestConfig["algo"].update({
+moduleDebuggingConfig["algo"].update({
     "algo": "empty", # Chose proper algo streaming
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([0,0,90]),
