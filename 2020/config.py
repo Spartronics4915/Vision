@@ -28,6 +28,7 @@ _base = {
 }
 
 # ------ Test config -------
+# Until further notice, assoicated with the 2019 test vision module with a Rpi 3B+ and picam1
 testConfig = copy.deepcopy(_base)
 testConfig.update({
     "name": "testConfig",
@@ -35,6 +36,7 @@ testConfig.update({
 # Camera-Specific Settings
 testConfig["picam"].update({
     "resolution": (640, 480),
+    "framerate" : 90,
     "iso": 400,
     "brightness": 0,
     "contrast": 100,
@@ -50,6 +52,7 @@ testConfig["algo"].update({
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([0,0,90]),
     "hsvRangeHigh": np.array([255,255,255]),
+    # Port poseEstimation to 2020
     "pnpCam": "dbcam8"
 })
 
