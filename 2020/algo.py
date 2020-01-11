@@ -64,3 +64,35 @@ def emptyAlgo(frame, cfg):
 
 def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+
+def generatorHexagonVerticies(frame, cfg):
+    # Change the frame to HSV
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # Filter out the colors we don't need
+    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
+
+    # Get countours
+    cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Looking for the half-hex
+    # We can find multiple half-hexagons
+    for c in cnts:
+
+        # Contour perimiter
+        peri = cv2.arcLength(c, True)
+
+        # approximating a shape around the contours
+        # Can be tuned to allow/disallow hulls
+        # Approx is the number of verticies
+        # Ramer–Douglas–Peucker algorithm
+        approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+
+        if len(approx) == 8:
+            # Found a half-hexagon
+            logging.debug("generatorHexagonVerticies found a half-hexagon")
+            logging.debug("Value of approxPolyDP: " + str(approx))
+    
+    # Only for debugging
+    return (None, mask)
+    
