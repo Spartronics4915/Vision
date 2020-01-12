@@ -150,7 +150,7 @@ class PiVideoStream:
 
         if self.commChan:
             if target != None:
-                self.commChan.UpdateVisionState("Aquired")
+                self.commChan.UpdateVisionState("Acquired")
                 target.send()
             else:
                 self.commChan.UpdateVisionState("Searching")
