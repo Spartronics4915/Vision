@@ -46,6 +46,8 @@ def processFrame(frame, cfg=None):
         return maskAlgo(frame, cfg)
     elif algo == "hsv":
         return hsvAlgo(frame, cfg)
+    elif algo == "verticies":
+        return generatorHexagonVerticies(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg)
@@ -66,18 +68,32 @@ def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
 def generatorHexagonVerticies(frame, cfg):
-    # Change the frame to HSV
+    #logging.debug# Change the frame to HSV
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # Filter out the colors we don't need
     mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
 
+    visImg = None
+
+    if cfg['display'] == 1:
+        visImg = cv2.bitwise_and(frame, frame, mask=mask)
+
     # Get countours
-    cnts = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    img, cnts, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Looking for the half-hex
     # We can find multiple half-hexagons
+
+    # FInd the leftmost and rightmost point
+    # XXX: HACK SHOULD GO IN HEXAGON UTILS
+    leftMostVal = 100000
+    rightMostVal = -10000
+    returnedTarget = None
+    offset = 0
+
     for c in cnts:
+        #logging.debug("Contours of: " + str(c))
 
         # Contour perimiter
         peri = cv2.arcLength(c, True)
@@ -86,13 +102,37 @@ def generatorHexagonVerticies(frame, cfg):
         # Can be tuned to allow/disallow hulls
         # Approx is the number of verticies
         # Ramer–Douglas–Peucker algorithm
-        approx = cv2.approxPolyDP(c, 0.04 * peri, True)
+        approx = cv2.approxPolyDP(c, 0.01 * peri, True)
+
+        # logging.debug("Value of approxPolyDP: " + str(len(approx)))
 
         if len(approx) == 8:
             # Found a half-hexagon
             logging.debug("generatorHexagonVerticies found a half-hexagon")
-            logging.debug("Value of approxPolyDP: " + str(approx))
-    
-    # Only for debugging
-    return (None, mask)
-    
+            if cfg['display'] == 1:
+
+                cv2.drawContours(visImg, [c],-1,(0,0,255),1)
+
+            # x 
+            for c in approx:
+                if c[0][0] < leftMostVal:
+                    leftMostVal = c[0][0]
+
+                # y
+                if c[0][0] > rightMostVal:
+                    rightMostVal = c[0][0]
+
+            logging.debug("leftMostVal: " + str(leftMostVal))
+            logging.debug("rightMostVal: " + str(rightMostVal))
+            center = (leftMostVal + rightMostVal)/2
+
+            offset = center/320
+        # Only for debugging
+
+
+    # TODO: Create a 2020 target class
+    returnedTarget = targets.Target()
+    returnedTarget.setValue(offset)
+
+
+    return (returnedTarget, visImg)
