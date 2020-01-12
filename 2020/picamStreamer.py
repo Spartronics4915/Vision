@@ -107,6 +107,7 @@ class CamHandler(BaseHTTPRequestHandler):
         (algoselector + " algo streaming")
         # Setting the value inside the config
         s_config["algo"]["algo"] = algoselector
+        s_config["algo"]["disply"] = True
         cam.start()
         while True:
             camframe = cam.next()
