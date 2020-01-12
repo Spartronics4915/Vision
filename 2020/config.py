@@ -63,8 +63,9 @@ moduleDebuggingConfig.update({
 # Camera-Specific Settings
 moduleDebuggingConfig["picam"].update({
     "resolution": (640, 480),
+    "framerate": 90,
     "iso": 400,
-    "brightness": 0,
+    "brightness": 40,
     "contrast": 100,
     "flip": False,
     "rotation": 0,
@@ -74,9 +75,9 @@ moduleDebuggingConfig["picam"].update({
 # Algo-Specific settings
 # TODO: Change the outer/innter-most setting of algo 
 moduleDebuggingConfig["algo"].update({
-    "algo": "empty", # Chose proper algo streaming
+    "algo": "verticies", # Chose proper algo streaming
     "display": False,# 1 if streaming
-    "hsvRangeLow": np.array([0,0,90]),
+    "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
     "pnpCam": "dbcam8"
 })
