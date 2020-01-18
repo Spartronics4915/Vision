@@ -82,7 +82,30 @@ moduleDebuggingConfig["algo"].update({
     "pnpCam": "dbcam8"
 })
 
-default = moduleTestConfig
+calibConfig = copy.deepcopy(_base)
+calibConfig.update({
+    "name": "Config to use when calibrating the camera",
+})
+# Camera-Specific Settings
+calibConfig["picam"].update({
+    "resolution": (640, 480),
+    "framerate": 90,
+    "iso": 0,
+    "flip": False,
+    "rotation": 0,
+    "exposure_mode": "auto", #"fixedfps",
+    "exposure_compensation": 0, # [-25, 25]
+})
+# Algo-Specific settings
+# TODO: Change the outer/innter-most setting of algo 
+calibConfig["algo"].update({
+    "algo": "verticies", # Chose proper algo streaming
+    "display": False,# 1 if streaming
+    "hsvRangeLow": np.array([40,50,90]),
+    "hsvRangeHigh": np.array([255,255,255]),
+})
+
+default = moduleDebuggingConfig
 # picam parameters ---------------------------------------------
 # see: https://picamera.readthedocs.io/en/release-1.13/api_camera.html
 #
