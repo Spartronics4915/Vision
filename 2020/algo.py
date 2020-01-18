@@ -17,6 +17,7 @@ import traceback
 import logging
 import targets
 
+from pathlib import Path
 
 # Reasoning behind Current range values:
 #   After changes to exposure of camera (Ridiculously low ISO),
@@ -48,6 +49,8 @@ def processFrame(frame, cfg=None):
         return hsvAlgo(frame, cfg)
     elif algo == "verticies":
         return generatorHexagonVerticies(frame, cfg)
+    elif algo == "calibCap":
+        return calibrationCapture(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg)
@@ -136,3 +139,33 @@ def generatorHexagonVerticies(frame, cfg):
 
 
     return (returnedTarget, visImg)
+
+def calibrationCapture(frame, config):
+    # A pipeline to capture frames (asymetic circles) to be used for clibration
+
+    # TODO: Format for use with /data directory
+    output_dir = Path('calib_imgs')
+
+    output_dir.mkdir(exist_ok=True)
+
+    # Pattern intrensics    
+    pattern_width = 8
+    pattern_height = 27
+    diagonal_dist = 30e-3 # In meters
+    pattern_size = (pattern_width, pattern_height)
+    img_ind = 0
+            
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # cv2.imshow('frame',gray)
+    ret, centers = cv2.findCirclesGrid(gray, pattern_size, None, cv2.CALIB_CB_ASYMMETRIC_GRID)
+    
+    if ret:
+        cv2.imwrite(str(output_dir/'frame-{:04d}.png'.format(img_ind)), gray)
+        img_ind += 1
+        cv2.drawChessboardCorners(frame, pattern_size, centers, ret)
+        # cv2.imshows are here
+        
+    
+    time.sleep(.01)
+    return (None, frame)
