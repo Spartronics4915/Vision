@@ -54,7 +54,7 @@ testConfig["algo"].update({
     "pnpCam": "dbcam8"
 })
 
-# ------ Test config -------
+# ------ Testing configs -------
 # Shows most-if not all-of the possible values used in configs
 moduleDebuggingConfig = copy.deepcopy(_base)
 moduleDebuggingConfig.update({
@@ -79,7 +79,12 @@ moduleDebuggingConfig["algo"].update({
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
-    "pnpCam": "dbcam8"
+    "camIntrensics": {
+        "focalLength" : (639.83052859,639.70771165),
+        "principalPoint" : (322.56252014,250.77160068),
+        "distortionCoeffs" : np.array([ 1.11238973e-01, -1.04070952e+00,  2.61772165e-03,
+         6.55387532e-04,  2.07132619e+00])
+    } 
 })
 
 calibConfig = copy.deepcopy(_base)
@@ -99,10 +104,9 @@ calibConfig["picam"].update({
 # Algo-Specific settings
 # TODO: Change the outer/innter-most setting of algo 
 calibConfig["algo"].update({
-    "algo": "verticies", # Chose proper algo streaming
+    "algo": "calibCap", # Chose proper algo streaming
     "display": False,# 1 if streaming
-    "hsvRangeLow": np.array([40,50,90]),
-    "hsvRangeHigh": np.array([255,255,255]),
+
 })
 
 default = moduleDebuggingConfig
