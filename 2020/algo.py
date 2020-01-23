@@ -52,6 +52,8 @@ def processFrame(frame, cfg=None):
         return generatorHexagonVerticies(frame, cfg)
     elif algo == "calibCap":
         return calibrationCapture(frame, cfg)
+    elif algo == "pnp":
+        return realPNP(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg)
@@ -78,6 +80,8 @@ def generatorHexagonVerticies(frame, cfg):
     # Filter out the colors we don't need
     mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
 
+    # TODO: There's a bug encountered in picamstreamer
+    #       where cv2.imencode fails on an empty image 
     visImg = None
 
     if cfg['display'] == 1:
@@ -135,6 +139,7 @@ def generatorHexagonVerticies(frame, cfg):
 
 
     # TODO: Create a 2020 target class
+    # TODO: Add an option for data recording here
     returnedTarget = targets.Target()
     returnedTarget.setValue(offset)
 
@@ -173,11 +178,10 @@ def calibrationCapture(frame, config):
 
 def realPNP(frame, config):
     # TODO: Doctests
+    # TODO: Try and convert the chamelion 'boundingbox' method to python
+    # -== Target Detection ==-
     goodPoints = None
 
-    # rectUtil.findRects(frame, 200, cfg, display, debug)
-
-    # rectUtil.pairRectangles(rects,wantedTargets=2,debug=1)
 
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
@@ -216,8 +220,8 @@ def realPNP(frame, config):
     # XXX: THIS LOGIC DOES NOT WORK WITH A ROTATED TAGET, EVERYTHING
     #      ASSUMES A HORIZONTAL TARGET
     # 
-    # Point defines
     # Fall out if there is no target detected
+
     if goodPoints is None:
         return (None, img)
 
@@ -226,27 +230,35 @@ def realPNP(frame, config):
     c = None # Rightmost, bottom-most point
     d = None # Rightmost point
 
+    # Sidestepping the strange way numpy organises its lists
+    formattedPoints = []
+    for i in goodPoints:
+        formattedPoints.append(i[0])
+
+
     # Sorts in low -> high
     # Origin of cv2 img is top left
-    xSorted = sorted(goodPoints,key=lambda p:p[0])
-    ySorted = sorted(goodPoints,key=lambda p:p[1])
+    xSorted = sorted(formattedPoints,key=lambda p:p[0])
+    ySorted = sorted(formattedPoints,key=lambda p:p[1])
 
     # bottomMost = (bottomMost point, next point up)
     bottomMost = (ySorted[len(ySorted)-1], ySorted[len(ySorted)-2])
     
     # Sorts in low -> high
     # Now should be the (leftMost, bottomMost point, rightMost, bottomMost point)
-    bottomMost = sorted(bottomMost,key=lambda p:p[10])
+    bottomMost = sorted(bottomMost,key=lambda p:p[0])
 
-    b = bottomMost[0]
-    c = bottomMost[1]
+    b = bottomMost[0].tolist()
+    c = bottomMost[1].tolist()
 
     # Left-Most
-    a = xSorted[0]
+    a = xSorted[0].tolist()
     # Right-Most
-    d = xSorted[len(xSorted)-1]
+    d = xSorted[len(xSorted)-1].tolist()
 
-    xlateVector, rotVec, frame = poseEstimation.estimatePose(visImg, [a,b,c,d], config)
+    imgPts = np.array([a,b,c,d],dtype='int32')
+
+    xlateVector, rotVec, frame = poseEstimation.estimatePose(visImg, imgPts, config)
 
     # Deubg
     logging.debug("Translation Vector: " + str(xlateVector))
