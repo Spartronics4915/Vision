@@ -17,6 +17,7 @@ import traceback
 import logging
 import targets
 
+from pathlib import Path
 
 # Reasoning behind Current range values:
 #   After changes to exposure of camera (Ridiculously low ISO),
@@ -46,6 +47,10 @@ def processFrame(frame, cfg=None):
         return maskAlgo(frame, cfg)
     elif algo == "hsv":
         return hsvAlgo(frame, cfg)
+    elif algo == "verticies":
+        return generatorHexagonVerticies(frame, cfg)
+    elif algo == "calibCap":
+        return calibrationCapture(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg)
@@ -64,3 +69,103 @@ def emptyAlgo(frame, cfg):
 
 def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
+
+def generatorHexagonVerticies(frame, cfg):
+    #logging.debug# Change the frame to HSV
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # Filter out the colors we don't need
+    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
+
+    visImg = None
+
+    if cfg['display'] == 1:
+        visImg = cv2.bitwise_and(frame, frame, mask=mask)
+
+    # Get countours
+    img, cnts, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Looking for the half-hex
+    # We can find multiple half-hexagons
+
+    # FInd the leftmost and rightmost point
+    # XXX: HACK SHOULD GO IN HEXAGON UTILS
+    leftMostVal = 100000
+    rightMostVal = -10000
+    returnedTarget = None
+    offset = 0
+
+    for c in cnts:
+        #logging.debug("Contours of: " + str(c))
+
+        # Contour perimiter
+        peri = cv2.arcLength(c, True)
+
+        # approximating a shape around the contours
+        # Can be tuned to allow/disallow hulls
+        # Approx is the number of verticies
+        # Ramer–Douglas–Peucker algorithm
+        approx = cv2.approxPolyDP(c, 0.01 * peri, True)
+
+        # logging.debug("Value of approxPolyDP: " + str(len(approx)))
+
+        if len(approx) == 8:
+            # Found a half-hexagon
+            logging.debug("generatorHexagonVerticies found a half-hexagon")
+            if cfg['display'] == 1:
+
+                cv2.drawContours(visImg, [c],-1,(0,0,255),1)
+
+            # x 
+            for c in approx:
+                if c[0][0] < leftMostVal:
+                    leftMostVal = c[0][0]
+
+                # y
+                if c[0][0] > rightMostVal:
+                    rightMostVal = c[0][0]
+
+            logging.debug("leftMostVal: " + str(leftMostVal))
+            logging.debug("rightMostVal: " + str(rightMostVal))
+            center = (leftMostVal + rightMostVal)/2
+
+            offset = center/320
+        # Only for debugging
+
+
+    # TODO: Create a 2020 target class
+    returnedTarget = targets.Target()
+    returnedTarget.setValue(offset)
+
+
+    return (returnedTarget, visImg)
+
+def calibrationCapture(frame, config):
+    # A pipeline to capture frames (asymetic circles) to be used for clibration
+
+    # TODO: Format for use with /data directory
+    output_dir = Path('calib_imgs')
+
+    output_dir.mkdir(exist_ok=True)
+
+    # Pattern intrensics    
+    pattern_width = 8
+    pattern_height = 27
+    diagonal_dist = 30e-3 # In meters
+    pattern_size = (pattern_width, pattern_height)
+    img_ind = 0
+            
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # cv2.imshow('frame',gray)
+    ret, centers = cv2.findCirclesGrid(gray, pattern_size, None, cv2.CALIB_CB_ASYMMETRIC_GRID)
+    
+    if ret:
+        cv2.imwrite(str(output_dir/'frame-{:04d}.png'.format(img_ind)), gray)
+        img_ind += 1
+        cv2.drawChessboardCorners(frame, pattern_size, centers, ret)
+        # cv2.imshows are here
+        
+    
+    time.sleep(.01)
+    return (None, frame)

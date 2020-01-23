@@ -10,6 +10,9 @@
 * `picam.py` - thin vaneer atop PiCamera, support for threaded streaming
 * `comm.py` - manage communication with robot via networktables
 * `targets.py` - abstraction for target nettab representation
+* `poseEstimation.py` - 
+* `targetUtils.py` - 
+
 
 ## Difference from 2019
 
