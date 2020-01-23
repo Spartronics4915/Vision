@@ -16,6 +16,7 @@ import time
 import traceback
 import logging
 import targets
+import poseEstimation
 
 from pathlib import Path
 
@@ -169,3 +170,93 @@ def calibrationCapture(frame, config):
     
     time.sleep(.01)
     return (None, frame)
+
+def realPNP(frame, config):
+    # TODO: Doctests
+    goodPoints = None
+
+    # rectUtil.findRects(frame, 200, cfg, display, debug)
+
+    # rectUtil.pairRectangles(rects,wantedTargets=2,debug=1)
+
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # Filter out the colors we don't need
+    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
+
+    visImg = None
+
+    if cfg['display'] == 1:
+        visImg = cv2.bitwise_and(frame, frame, mask=mask)
+
+    # Get countours
+    img, cnts, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Get the shape
+    for c in cnts:
+
+        # Contour perimiter
+        peri = cv2.arcLength(c, True)
+
+        # approximating a shape around the contours
+        # Can be tuned to allow/disallow hulls
+        # Approx is the number of verticies
+        # Ramer–Douglas–Peucker algorithm
+        approx = cv2.approxPolyDP(c, 0.01 * peri, True)
+        # Approx is a list of points that defines the polygon
+
+        # logging.debug("Value of approxPolyDP: " + str(len(approx)))
+
+        if len(approx) == 8:
+            # Only add known good rectangles to out list of good poitns
+            # XXX: Hack for now
+            goodPoints = approx
+
+    # -= Get points in 2019.01.22 'PnP Format' =- #
+    # XXX: THIS LOGIC DOES NOT WORK WITH A ROTATED TAGET, EVERYTHING
+    #      ASSUMES A HORIZONTAL TARGET
+    # 
+    # Point defines
+    # Fall out if there is no target detected
+    if goodPoints is None:
+        return (None, img)
+
+    a = None # Leftmost point
+    b = None # Leftmost, bottom-most point
+    c = None # Rightmost, bottom-most point
+    d = None # Rightmost point
+
+    # Sorts in low -> high
+    # Origin of cv2 img is top left
+    xSorted = sorted(goodPoints,key=lambda p:p[0])
+    ySorted = sorted(goodPoints,key=lambda p:p[1])
+
+    # bottomMost = (bottomMost point, next point up)
+    bottomMost = (ySorted[len(ySorted)-1], ySorted[len(ySorted)-2])
+    
+    # Sorts in low -> high
+    # Now should be the (leftMost, bottomMost point, rightMost, bottomMost point)
+    bottomMost = sorted(bottomMost,key=lambda p:p[10])
+
+    b = bottomMost[0]
+    c = bottomMost[1]
+
+    # Left-Most
+    a = xSorted[0]
+    # Right-Most
+    d = xSorted[len(xSorted)-1]
+
+    xlateVector, rotVec, frame = poseEstimation.estimatePose(visImg, [a,b,c,d], config)
+
+    # Deubg
+    logging.debug("Translation Vector: " + str(xlateVector))
+    logging.debug("Rotation Vector: " + str(rotVec))
+
+    if config['display']:
+        for point in goodPoints:
+            # Draw our point
+            cv2.circle(frame, point, 3, (255,255,0))
+
+    # XXX: For now
+    return (None, frame)
+    pass
