@@ -13,7 +13,7 @@ TODO: Better Varible Names
 import numpy as np
 import cv2
 import time
-import traceback
+import targetUtils
 import logging
 import targets
 import poseEstimation
@@ -74,77 +74,15 @@ def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
 def generatorHexagonVerticies(frame, cfg):
-    #logging.debug# Change the frame to HSV
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Filter out the colors we don't need
-    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
+    # Apply our thresholds to the frame
+    frame = targetUtils.threshholdFrame(frame,cfg)
 
-    # TODO: There's a bug encountered in picamstreamer
-    #       where cv2.imencode fails on an empty image 
-    visImg = None
-
-    if cfg['display'] == 1:
-        visImg = cv2.bitwise_and(frame, frame, mask=mask)
-
-    # Get countours
-    img, cnts, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Looking for the half-hex
-    # We can find multiple half-hexagons
-
-    # FInd the leftmost and rightmost point
-    # XXX: HACK SHOULD GO IN HEXAGON UTILS
-    leftMostVal = 100000
-    rightMostVal = -10000
-    returnedTarget = None
-    offset = 0
-
-    for c in cnts:
-        #logging.debug("Contours of: " + str(c))
-
-        # Contour perimiter
-        peri = cv2.arcLength(c, True)
-
-        # approximating a shape around the contours
-        # Can be tuned to allow/disallow hulls
-        # Approx is the number of verticies
-        # Ramer–Douglas–Peucker algorithm
-        approx = cv2.approxPolyDP(c, 0.01 * peri, True)
-
-        # logging.debug("Value of approxPolyDP: " + str(len(approx)))
-
-        if len(approx) == 8:
-            # Found a half-hexagon
-            logging.debug("generatorHexagonVerticies found a half-hexagon")
-            if cfg['display'] == 1:
-
-                cv2.drawContours(visImg, [c],-1,(0,0,255),1)
-
-            # x 
-            for c in approx:
-                if c[0][0] < leftMostVal:
-                    leftMostVal = c[0][0]
-
-                # y
-                if c[0][0] > rightMostVal:
-                    rightMostVal = c[0][0]
-
-            logging.debug("leftMostVal: " + str(leftMostVal))
-            logging.debug("rightMostVal: " + str(rightMostVal))
-            center = (leftMostVal + rightMostVal)/2
-
-            offset = center/320
-        # Only for debugging
+    # Taget acquisition
+    target, frame = targetUtils.findTarget(frame,cfg)
 
 
-    # TODO: Create a 2020 target class
-    # TODO: Add an option for data recording here
-    returnedTarget = targets.Target()
-    returnedTarget.setValue(offset)
-
-
-    return (returnedTarget, visImg)
+    return (None, frame)
 
 def calibrationCapture(frame, config):
     # A pipeline to capture frames (asymetic circles) to be used for clibration
