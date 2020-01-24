@@ -84,6 +84,15 @@ moduleDebuggingConfig["algo"].update({
         "principalPoint" : (322.56252014,250.77160068),
         "distortionCoeffs" : np.array([ 1.11238973e-01, -1.04070952e+00,  2.61772165e-03,
          6.55387532e-04,  2.07132619e+00])
+        # Alternate camera intrensics (from other team)(For a 720p frame): 
+        #       disortion Coefficients:  (2.9666848459501894e-02, 7.7071617830897565e-01, 0, 
+        #                                                       0, -2.7882844813877661e+00)
+        # Focal Length / Principal Point:
+        #       Fx = 9.7251025460519838*10^2~~ 972.51
+        #       Cx = 538                  ~~ 538
+        #       Fy = 9.7251025460519838*10^2 ~~ 972.51
+        #       Cy = 3.5650000000000000*10^2 ~~ 356.5
+
     } 
 })
 
