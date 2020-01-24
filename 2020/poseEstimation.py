@@ -29,10 +29,10 @@ alpha = math.radians(14.5)
 cosAlpha = math.cos(alpha)
 sinAlpha = math.sin(alpha)
 
-a = (-16.25,      0, 0)
+a = (-19.625,      0, 0)
 b = (-9.819867, -17, 0)
 c = (9.819867,  -17, 0)
-d = (16.25,       0, 0)
+d = (19.625,       0, 0)
 
 # Model Points
 s_modelPts = np.array([a, b, c, d], dtype="double")
@@ -84,7 +84,7 @@ def estimatePose(im, imgPts, cfg):
         logging.warning("Running PnP with no camera intrensics in config!")
         distCoeffs = np.zeros((4,1)) 
         y,x,_ = im.shape
-        # Default to theory camera intresnsics
+        # Default to theory camera intresnsics, which seem to be closest to 
         fx = x*3.6/3.76
         fy = y*3.6/2.74
         cx,cy = (fx/2,fy/2)
