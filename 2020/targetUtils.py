@@ -23,12 +23,13 @@ def findTarget(frame, cfg):
     :param cfg: Config representing our current run at the 'algo' level
     :type cfg: dict
 
-    :return : ???
-    :rtype: ???
+    :return hexagonTarget: the verticies of the target not (yet) in any particular order
+    :rtype: np.ndarray()
 
     Known inputs -> known outputs
     Currently no data frame support findtarget
     >>> import cv2, config
+    >>> logging.info("-=  findTarget Doctest  =-")
     >>> cfg = config.default['algo']
     >>> cfg['display'] = True
     >>> frame = cv2.imread("data/pnpDebugFrame1.png",cv2.IMREAD_GRAYSCALE)
@@ -37,9 +38,9 @@ def findTarget(frame, cfg):
     >>> target, frame = findTarget(frame, cfg)
     >>> logging.info("Points of the target: {}".format(target.tolist()))
     """
-    # TODO: Double check the version of cv2 and the number of returned items for findContours
-    #       Newer version only returns 2?
-    cnts,_  = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # XXX: There is a difference between the return format for findContours between opencv v3 and v4
+    #      v3 returns 3 items (img,cnts,hirearchy) where v4 only returns 2 items (img,cnts)(?) 
+    _,cnts,_  = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for c in cnts:
         # Contour perimiter
@@ -62,10 +63,13 @@ def findTarget(frame, cfg):
             
             hexagonTarget = approx
 
-    # NOTE: Double check the useability of the frame
+    # TODO: Double check the useability of the frame
     # NOTE: The list retured here has three layers:
     #       1. Each point. [0] is first point, [len-1] is last point
-    #       2. An Extra layer 
+    #       2. An Extra layer, only surrounding the point
+    #           - The only object requrested form this layer should be [0]
+    #       3. The final layer, representing the x and y value of each point
+    # NOTE: target.tolist() is no longer an np.ndarray object, it becomes a python list (duh)
     return (hexagonTarget,frame)
 
 def threshholdFrame(frame, cfg):
@@ -78,7 +82,7 @@ def threshholdFrame(frame, cfg):
     :param cfg: Config representing our current run at the 'algo' level
     :type cfg: dict
 
-    :return : mask, after threshholding
+    :return mask: the frame after threshholding
     :rtype: cv2 frame (np.ndarray())
 
     Very hard to doctest, none for now
@@ -97,6 +101,62 @@ def threshholdFrame(frame, cfg):
         mask = cv2.bitwise_and(frame, frame, mask=mask)
 
     return mask
+
+def target2pnpPoints(target, cfg):
+    """
+    Sort the target's points into a 'pnp format' as defined in poseEstimation.py
+
+    :param target: the verticies of the target
+    :type target: np.array()
+
+    :param cfg: Config representing our current run at the 'algo' level
+    :type cfg: dict
+
+    :return targetPnPPoints: an array of target verticies in the agreed-upon 'pnp format'
+    :rtype: np.array()
+
+    >>> import config, cv2
+    >>> logging.info("-=  target2pnpPoints Doctest  =-")
+    >>> target = [[[460, 140]], [[445, 140]], [[392, 234]], [[291, 236]], [[243, 152]], [[231, 155]], [[284, 247]], [[399, 246]]]
+    >>> cfg = config.default
+    >>> target = target2pnpPoints(target, cfg)
+    >>> logging.info("PnP Format: {}".format(target))
+    >>> # logging.info("Points Sorted by Y: {}".format(ySorted))
+    """
+    # Create the empty points
+    a = None
+    b = None
+    c = None
+    d = None
+
+    # low -> high
+    # Sort points by x
+    xSorted = sorted(target,key=lambda p:p[0][0])
+    # Sort points by y
+    ySorted = sorted(target,key=lambda p:p[0][1])
+
+    # We know points a and d are the left-most and right-most points
+    # In other words, the point with the smallest x and the largest x
+
+    # Removes the middle '2nd layer' of the point
+    a = xSorted[0][0]
+    d = xSorted[len(xSorted)-1][0]
+
+    # We know points b and c are the two bottom most points, or the two points with the largest y
+    # Get the two bottom-most points
+    botomMostPoints = (ySorted[len(ySorted)-1],ySorted[len(ySorted)-2])
+
+    # Still haven't removed the 'middle layer'
+    # low -> high
+    bottomMostSrotedX = sorted(target,key=lambda p:p[0][0])
+
+    # Removes the middle layer
+    b = bottomMostSrotedX[0][0]
+    c = bottomMostSrotedX[1][0]
+
+
+    return [a,b,c,d]
+    # return targetPnPPoints
 
 def estimatePosePNP(frame, cfg):
     """

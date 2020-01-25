@@ -97,8 +97,14 @@ def estimatePose(im, imgPts, cfg):
                 ], dtype = "double")
 
     if s_firstTime:
-        logging.info("Camera Matrix '{}'".format(camMat))
+        logging.info("Camera Matrix '{}'\n".format(camMat))
+        logging.info("Disortion Coefficients '{}'\n".format(distCoeffs))
+
+        logging.info("Passing values into solvePnP: \n")
+        logging.info("s_modelPts: {}\n".format(s_modelPts))
+        logging.info("ImgPts: {}\n".format(imgPts))
         s_firstTime = False
+    
 
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
