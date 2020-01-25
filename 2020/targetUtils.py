@@ -13,7 +13,7 @@ import numpy as np
 import cv2
 import logging
 
-def findTarget(frame, cfg):
+def findTarget(frame,mask, cfg):
     """
     Given an imput image and the running configuration, find the 2020 target
 
@@ -35,12 +35,12 @@ def findTarget(frame, cfg):
     >>> frame = cv2.imread("data/pnpDebugFrame1.png",cv2.IMREAD_GRAYSCALE)
     >>> cv2.imshow("Read Frame",frame)
     >>> key = cv2.waitKey() # Good time to check if the read frame is proper
-    >>> target, frame = findTarget(frame, cfg)
+    >>> target, frame = findTarget(frame,frame, cfg)
     >>> logging.info("Points of the target: {}".format(target.tolist()))
     """
     # XXX: There is a difference between the return format for findContours between opencv v3 and v4
     #      v3 returns 3 items (img,cnts,hirearchy) where v4 only returns 2 items (img,cnts)(?) 
-    _,cnts,_  = cv2.findContours(frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    _,cnts,_  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     for c in cnts:
         # Contour perimiter
@@ -97,9 +97,6 @@ def threshholdFrame(frame, cfg):
 
     # TODO: There's a bug encountered in picamstreamer
     #       where cv2.imencode fails on an empty image
-    if cfg['display'] == 1:
-        mask = cv2.bitwise_and(frame, frame, mask=mask)
-
     return mask
 
 def target2pnpPoints(target, cfg):
@@ -148,22 +145,22 @@ def target2pnpPoints(target, cfg):
 
     # Still haven't removed the 'middle layer'
     # low -> high
-    bottomMostSrotedX = sorted(target,key=lambda p:p[0][0])
+    bottomMostSortedX = sorted(botomMostPoints,key=lambda p:p[0][0])
 
     # Removes the middle layer
-    b = bottomMostSrotedX[0][0]
-    c = bottomMostSrotedX[1][0]
+    b = bottomMostSortedX[0][0]
+    c = bottomMostSortedX[1][0]
 
-
-    return [a,b,c,d]
+    # NOTE: PnP input points have to be float32/64
+    return np.array([a,b,c,d],dtype="float32")
     # return targetPnPPoints
 
 def estimatePosePNP(frame, cfg):
     """
-    implements estimatePose() from poseEstimation.py
+    Blank function only used to doctest poseEstimaion
 
-    :param im: frame from which the image points were captured
-    :type im: opencv frame (np.ndarray())
+    :param frame: frame from which the image points were captured
+    :type frame: opencv frame (np.ndarray())
 
     :param cfg: Config representing our current run at the 'algo' level
     :type cameraMatrix: dict
@@ -173,13 +170,32 @@ def estimatePosePNP(frame, cfg):
 
     Known inputs -> known outputs
     These points are based on test images
-    >>> 
+    >>> import cv2, config, poseEstimation
+    >>> logging.info("-=  estimatePosePNP Doctest  =-")
+    >>> cfg = config.default['algo']
+    >>> cfg['display'] = True
+    >>> frame = cv2.imread("data/pnpDebugFrame3.png",cv2.IMREAD_GRAYSCALE)
+
+    >>> # cv2.imshow("Read Frame",frame)
+    >>> # key = cv2.waitKey() # Good time to check if the read frame is proper
+
+    >>> target, frame = findTarget(frame,frame, cfg)
+    >>> pnpTarget = target2pnpPoints(target,cfg)
+    >>> logging.info("{}".format(type(pnpTarget)))
+    >>> xlate,rot,im = poseEstimation.estimatePose(frame,pnpTarget,cfg)
+    >>> logging.info("Translate Vector: {}".format(xlate))
+    
+    >>> # cv2.imshow("Final", im) # Uncomment to see final frame
+    >>> # key = cv2.waitkey()
     """
     pass
 
 def getTargetCenter(frame, cfg):
     pass
 
+def getPitchYawError(frame, cfg):
+    # TBD for closed-loop PID aiming
+    pass
 
 if __name__ == "__main__":
     import doctest

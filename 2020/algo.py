@@ -95,7 +95,6 @@ def calibrationCapture(frame, config):
     # Pattern intrensics    
     pattern_width = 8
     pattern_height = 27
-    diagonal_dist = 30e-3 # In meters
     pattern_size = (pattern_width, pattern_height)
     img_ind = 0
             
@@ -115,98 +114,27 @@ def calibrationCapture(frame, config):
     return (None, frame)
 
 def realPNP(frame, config):
-    # TODO: Doctests
     # TODO: Try and convert the chamelion 'boundingbox' method to python
-    # -== Target Detection ==-
-    goodPoints = None
+    # frame --> visImg (used for drawing) and mask (used for target detection)
 
+    # -== Frame Threshholding ==-
+    mask = targetUtils.threshholdFrame(frame,config)
 
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # Slight renaming, for convention
+    visImg = frame
+    # TODO: Add bitwise and 
+    # -== Target Detection ==- 
+    hexagonTarget, visImg = targetUtils.findTarget(visImg, mask, config)
 
-    # Filter out the colors we don't need
-    mask = cv2.inRange(frame, cfg["hsvRangeLow"], cfg["hsvRangeHigh"])
+    # -== Target Manipulation ==-
+    # TODO: Pretty sure config in unnessissary here
+    imgPts = targetUtils.target2pnpPoints(hexagonTarget,config)
 
-    visImg = None
-
-    if cfg['display'] == 1:
-        visImg = cv2.bitwise_and(frame, frame, mask=mask)
-
-    # Get countours
-    img, cnts, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Get the shape
-    for c in cnts:
-
-        # Contour perimiter
-        peri = cv2.arcLength(c, True)
-
-        # approximating a shape around the contours
-        # Can be tuned to allow/disallow hulls
-        # Approx is the number of verticies
-        # Ramer–Douglas–Peucker algorithm
-        approx = cv2.approxPolyDP(c, 0.01 * peri, True)
-        # Approx is a list of points that defines the polygon
-
-        # logging.debug("Value of approxPolyDP: " + str(len(approx)))
-
-        if len(approx) == 8:
-            # Only add known good rectangles to out list of good poitns
-            # XXX: Hack for now
-            goodPoints = approx
-
-    # -= Get points in 2019.01.22 'PnP Format' =- #
-    # XXX: THIS LOGIC DOES NOT WORK WITH A ROTATED TAGET, EVERYTHING
-    #      ASSUMES A HORIZONTAL TARGET
-    # 
-    # Fall out if there is no target detected
-
-    if goodPoints is None:
-        return (None, img)
-
-    a = None # Leftmost point
-    b = None # Leftmost, bottom-most point
-    c = None # Rightmost, bottom-most point
-    d = None # Rightmost point
-
-    # Sidestepping the strange way numpy organises its lists
-    formattedPoints = []
-    for i in goodPoints:
-        formattedPoints.append(i[0])
-
-
-    # Sorts in low -> high
-    # Origin of cv2 img is top left
-    xSorted = sorted(formattedPoints,key=lambda p:p[0])
-    ySorted = sorted(formattedPoints,key=lambda p:p[1])
-
-    # bottomMost = (bottomMost point, next point up)
-    bottomMost = (ySorted[len(ySorted)-1], ySorted[len(ySorted)-2])
-    
-    # Sorts in low -> high
-    # Now should be the (leftMost, bottomMost point, rightMost, bottomMost point)
-    bottomMost = sorted(bottomMost,key=lambda p:p[0])
-
-    b = bottomMost[0].tolist()
-    c = bottomMost[1].tolist()
-
-    # Left-Most
-    a = xSorted[0].tolist()
-    # Right-Most
-    d = xSorted[len(xSorted)-1].tolist()
-
-    imgPts = np.array([a,b,c,d],dtype='int32')
-
-    xlateVector, rotVec, frame = poseEstimation.estimatePose(visImg, imgPts, config)
+    xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
     # Deubg
-    logging.debug("Translation Vector: " + str(xlateVector))
-    logging.debug("Rotation Vector: " + str(rotVec))
-
-    if config['display']:
-        for point in goodPoints:
-            # Draw our point
-            cv2.circle(frame, point, 3, (255,255,0))
+    logging.debug("Translation Vector: ".format(xlateVector))
+    logging.debug("Rotation Vector: ".format(rotVec))
 
     # XXX: For now
-    return (None, frame)
-    pass
+    return (None, visImg)
