@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     pattern_width = 8
     pattern_height = 27
-    diagonal_dist = 30e-3
+    diagonal_dist = (30e-3*39.37)
     pattern_size = (pattern_width, pattern_height)
 
     horizontal_grid_dist = 2*diagonal_dist/np.sqrt(2)
