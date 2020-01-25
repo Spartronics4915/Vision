@@ -1,6 +1,7 @@
 ## Image Processing Unit Test Data
 ### Half-Hexagon:
-
+All images taken approx 89in away (z) from the camera
+There are no acurate measurements for x and y
 Image num 1:
 [[[460 140]]
 
