@@ -223,7 +223,7 @@ def estimatePose(im, imgPts, cfg):
                 p = (int(projPts[i][0][0]), int(projPts[i][0][1]))
                 cv2.circle(im, p, 3, (0, 255,0), -1)
 
-            if True:
+            if False:
                 print("%5.2f, %5.2f, %.1f" %
                  (robotPts[0][0], robotPts[0][1], math.degrees(theta)),
                  end="\r")
