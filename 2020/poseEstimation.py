@@ -11,31 +11,70 @@ import logging
 #                         ^
 #                         |
 #                         |
-#   a ___                 Θ----->+X          ___ d
+#   a ___ h               Θ----->+X        e ___ d
 #     \  \                                  /  /
 #      \  \                                /  /
 #       \  \                              /  /
 #        \  \                            /  /
 #         \  \                          /  /
-#          \  \                        /  /
-#           \  \ _____________________/  /
+#          \  \  g                  f  /  /
+#           \  \______________________/  /
 #            \__________________________/
 #            b                           c
 
 # Notes About Chameleon's Points
 #       - 4 'Found points' are outer of the target
 
-alpha = math.radians(14.5)
+alpha = math.radians(30)
 cosAlpha = math.cos(alpha)
 sinAlpha = math.sin(alpha)
+tanAlpha = math.tan(alpha)
 
+tapeWidth = 2 # in inches
+# Length of the inner side
+# Length of the outer side 
+outerLength = 13.573
+# Length of side dividing between sections (equal to e-d, f-c, g-b, a-h ) 
+# Also the hypotenuse of the triangle formed between the points f, c, and the outer side
+divideLength = tapeWidth/cosAlpha
+#    f
+#    |\  
+#    | \
+# 2in|  \ 2.309in
+#    |   \
+#    |____\  c
+#    1.154in    
+
+
+# Chamelion Vision Model Points (x,y,z)
 a = (-19.625,      0, 0)
 b = (-9.819867, -17, 0)
 c = (9.819867,  -17, 0)
 d = (19.625,       0, 0)
 
+# Other 4 Model Points
+# Creading e from d 
+e = d
+e[0] - divideLength
+
+# Creating f from c 
+f = c
+f[0] - 1.154    # x
+f[1] + 2        # y
+
+# creating g from b
+g = b
+g[0] + 1.154    # x
+g[1] + 2        # y
+
+# creating h from a
+h = a
+h[0] + divideLength
+
 # Model Points
 s_modelPts = np.array([a, b, c, d], dtype="double")
+# s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
+
 s_firstTime = True
 
 # s_modelPts:
