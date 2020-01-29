@@ -1,22 +1,7 @@
 ## Image Processing Unit Test Data
 ### Half-Hexagon:
-Image num 2:
-[[[628  92]]
-
- [[611  94]]
-
- [[552 195]]
-
- [[436 203]]
-
- [[384 116]]
-
- [[371 119]]
-
- [[429 216]]
-
- [[555 212]]]
-
+All images taken approx 89in away (z) from the camera
+There are no acurate measurements for x and y
 Image num 1:
 [[[460 140]]
 
@@ -33,6 +18,23 @@ Image num 1:
  [[284 247]]
 
  [[399 246]]]
+ 
+Image num 2:
+[[[628  92]]
+
+ [[611  94]]
+
+ [[552 195]]
+
+ [[436 203]]
+
+ [[384 116]]
+
+ [[371 119]]
+
+ [[429 216]]
+
+ [[555 212]]]
 
 Image num 3:
 

@@ -11,31 +11,70 @@ import logging
 #                         ^
 #                         |
 #                         |
-#   a ___                 Θ----->+X          ___ d
+#   a ___ h               Θ----->+X        e ___ d
 #     \  \                                  /  /
 #      \  \                                /  /
 #       \  \                              /  /
 #        \  \                            /  /
 #         \  \                          /  /
-#          \  \                        /  /
-#           \  \ _____________________/  /
+#          \  \  g                  f  /  /
+#           \  \______________________/  /
 #            \__________________________/
 #            b                           c
 
 # Notes About Chameleon's Points
 #       - 4 'Found points' are outer of the target
 
-alpha = math.radians(14.5)
+alpha = math.radians(30)
 cosAlpha = math.cos(alpha)
 sinAlpha = math.sin(alpha)
+tanAlpha = math.tan(alpha)
 
-a = (-16.25,      0, 0)
+tapeWidth = 2 # in inches
+# Length of the inner side
+# Length of the outer side 
+outerLength = 13.573
+# Length of side dividing between sections (equal to e-d, f-c, g-b, a-h ) 
+# Also the hypotenuse of the triangle formed between the points f, c, and the outer side
+divideLength = tapeWidth/cosAlpha
+#    f
+#    |\  
+#    | \
+# 2in|  \ 2.309in
+#    |   \
+#    |____\  c
+#    1.154in    
+
+
+# Chamelion Vision Model Points (x,y,z)
+a = (-19.625,      0, 0)
 b = (-9.819867, -17, 0)
 c = (9.819867,  -17, 0)
-d = (16.25,       0, 0)
+d = (19.625,       0, 0)
+
+# Other 4 Model Points
+# Creading e from d 
+e = d
+e[0] - divideLength
+
+# Creating f from c 
+f = c
+f[0] - 1.154    # x
+f[1] + 2        # y
+
+# creating g from b
+g = b
+g[0] + 1.154    # x
+g[1] + 2        # y
+
+# creating h from a
+h = a
+h[0] + divideLength
 
 # Model Points
 s_modelPts = np.array([a, b, c, d], dtype="double")
+# s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
+
 s_firstTime = True
 
 # s_modelPts:
@@ -84,7 +123,7 @@ def estimatePose(im, imgPts, cfg):
         logging.warning("Running PnP with no camera intrensics in config!")
         distCoeffs = np.zeros((4,1)) 
         y,x,_ = im.shape
-        # Default to theory camera intresnsics
+        # Default to theory camera intresnsics, which seem to be closest to 
         fx = x*3.6/3.76
         fy = y*3.6/2.74
         cx,cy = (fx/2,fy/2)
@@ -97,8 +136,14 @@ def estimatePose(im, imgPts, cfg):
                 ], dtype = "double")
 
     if s_firstTime:
-        logging.info("Camera Matrix '{}'".format(camMat))
+        logging.info("Camera Matrix '{}'\n".format(camMat))
+        logging.info("Disortion Coefficients '{}'\n".format(distCoeffs))
+
+        logging.info("Passing values into solvePnP: \n")
+        logging.info("s_modelPts: {}\n".format(s_modelPts))
+        logging.info("ImgPts: {}\n".format(imgPts))
         s_firstTime = False
+    
 
     (success, rotVec, xlateVec) = cv2.solvePnP(s_modelPts, imgPts, camMat,
                                         distCoeffs,
@@ -217,7 +262,7 @@ def estimatePose(im, imgPts, cfg):
                 p = (int(projPts[i][0][0]), int(projPts[i][0][1]))
                 cv2.circle(im, p, 3, (0, 255,0), -1)
 
-            if True:
+            if False:
                 print("%5.2f, %5.2f, %.1f" %
                  (robotPts[0][0], robotPts[0][1], math.degrees(theta)),
                  end="\r")

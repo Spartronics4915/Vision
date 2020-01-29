@@ -21,3 +21,7 @@
 * *Lack of 2019-specific code* - `targets.py`, `algo.py`, `rectUtil.py`, `poseEstimation.py`, and `config.py` have all been stripped of 2019-specfici code. In some cases that means removing the files, in others it means simply cutting chunks. Untill kickoff, this directory is designed to be a blank slate, improving on infrastructure from 2019.
 * *Planned Threading Changes* - Theading is planned to play a larger role in this version of the codebase. Stay tuned.
 * *Parsed Agument Changes* - Parsed arguments are now more tightly entertwined with configurations. When arguments are parsed the chosen `config` is updated with the parsed values. Parsed arguments supeceed `config` values. 
+
+## Versioning
+
+* Nb: Currently operating under opencv v3 
