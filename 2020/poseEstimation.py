@@ -52,6 +52,11 @@ b = (-9.819867, -17, 0)
 c = (9.819867,  -17, 0)
 d = (19.625,       0, 0)
 
+e = (17.316,       0, 0)
+f = (8.665867,   -15, 0)
+g = (-9.819867,  -15, 0)
+h = (-17.316,      0, 0)
+'''
 # Other 4 Model Points
 # Creading e from d 
 e = d
@@ -70,7 +75,7 @@ g[1] + 2        # y
 # creating h from a
 h = a
 h[0] + divideLength
-
+'''
 # Model Points
 s_modelPts = np.array([a, b, c, d], dtype="double")
 # s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")

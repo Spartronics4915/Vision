@@ -69,8 +69,8 @@ moduleDebuggingConfig["picam"].update({
     "contrast": 100,
     "flip": False,
     "rotation": 0,
-    "exposure_mode": "auto", #"fixedfps",
-    "exposure_compensation": 0, # [-25, 25]
+    "exposure_mode": "off", #"fixedfps",
+    "exposure_compensation": -25, # [-25, 25]
 })
 # Algo-Specific settings
 # TODO: Change the outer/innter-most setting of algo 
