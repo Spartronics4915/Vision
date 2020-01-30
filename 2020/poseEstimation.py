@@ -180,8 +180,8 @@ def estimatePose(im, imgPts, cfg):
                             (0, 0, 0), # origin
                             (0, 0, 12), # away
                             (0, 0, -12),# toward
-                            (0, -12, 0),# up
-                            (12, 0, 0)  # right
+                            (0, 12, 0),# up (changed from 2019 due to SC change)
+                            (12, 0, 0)  # right 
                         ]), s_modelPts))
 
         (rotmat,_) = cv2.Rodrigues(rotVec) # produces 3x3 rotation matrix

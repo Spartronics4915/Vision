@@ -42,6 +42,7 @@ def findTarget(frame,mask, cfg):
     #      v3 returns 3 items (img,cnts,hirearchy) where v4 only returns 2 items (img,cnts)(?) 
     _,cnts,_  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    hexagonTarget = None
     for c in cnts:
         # Contour perimiter
         peri = cv2.arcLength(c, True)
@@ -155,7 +156,7 @@ def target2pnpPoints(target, cfg):
     return np.array([a,b,c,d],dtype="float32")
     # return targetPnPPoints
 
-def taget2pnp8Points(target, cfg):
+def target2pnp8Points(target, cfg):
     """
     Sort the target's points into a 'pnp format' as defined in poseEstimation.py
 
