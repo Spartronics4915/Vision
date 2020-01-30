@@ -13,12 +13,15 @@ import numpy as np
 import cv2
 import logging
 
-def findTarget(frame,mask, cfg):
+def findTarget(frame, mask, cfg):
     """
     Given an imput image and the running configuration, find the 2020 target
 
     :param frame: frame from which the image points were captured
     :type frame: opencv frame (np.ndarray())
+
+    :param mask: the mask generated from thresholding the input frame
+    :type mask: opencv frame (np.ndarray()) (but in a strange colorspace, likely binary)
 
     :param cfg: Config representing our current run at the 'algo' level
     :type cfg: dict
@@ -72,6 +75,40 @@ def findTarget(frame,mask, cfg):
     #       3. The final layer, representing the x and y value of each point
     # NOTE: target.tolist() is no longer an np.ndarray object, it becomes a python list (duh)
     return (hexagonTarget,frame)
+
+def findTargetChameleon(frame, mask, cfg):
+    """
+    Given an imput image and the running configuration, find the 2020 target
+
+    :param frame: frame from which the image points were captured
+    :type frame: opencv frame (np.ndarray())
+
+    :param mask: the mask generated from thresholding the input frame
+    :type mask: opencv frame (np.ndarray()) (but in a strange colorspace, likely binary)
+
+    :param cfg: Config representing our current run at the 'algo' level
+    :type cfg: dict
+
+    :return hexagonTarget: the verticies of the target not (yet) in any particular order
+    :rtype: np.ndarray()
+
+    Known inputs -> known outputs
+    Currently no data frame support findtarget
+    """
+    _,cnts,_  = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_TC89_L1)
+    polyOut = []
+
+    for c in cnts:
+
+        convexHull = cv2.convexHull(c)
+
+        polyOut.append(cv2.approxPolyDP(convexHull, 5, True))
+
+        if cfg['display'] == 1:
+
+            cv2.drawContours(frame, cv2.approxPolyDP(convexHull, 5, True),-1,(0,255,255),1)
+
+    return  (None, frame)
 
 def threshholdFrame(frame, cfg):
     """
