@@ -393,6 +393,15 @@ a few examples:
             * Enable I2C (for camera switcher)
         * `Advanced`
             * Consider raising GPU memory to 256MB
+    * `sudo raspi-config --expand-rootfs` - enlarge filesystem if your 
+      microsd card is larger than 8GB. Before reboot, you must edit the
+      file in /etc/init.d to ensure that the disk is in rw mode before
+      the resize operation occurs. Here are the lines that need to
+      be added:
+      ```sh
+      mount -o remount,rw / && 
+      mount -o remount,rw /boot &&
+      ```
 * change user password 
     ```sh
     % passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
@@ -451,9 +460,7 @@ sudo apt-get install nodejs # version should be > 10.0
 sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
 # to resolve npm install issue: UNABLE_TO_GET_ISSUER_CERT_LOCALLY
 npm config set registry http://registry.npmjs.org/ 
-# if you have trouble with express (ie: in Vision/h264player)
-npm uninstall express
-npm install express --save
+sudo npm install
 ```
 
 ### validate camera
@@ -560,9 +567,10 @@ to update the node_modules associated with the h264player.  Here's how:
 Here are the contents of startH264player.sh:
 
 ```bash
-#!/bin/bash -f
+#!/bin/sh
+echo "Starting h264player ---------------------"
 cd /home/pi/spartronics/Vision/h264player
-node appRaspi.js
+exec node appRaspi.js
 ```
 
 Note that h264player requires `node` and the installation details are
@@ -571,11 +579,15 @@ to look like this:
 
 ```bash
 #!/bin/sh
-echo "Waiting 2 seconds..."
+echo "runCamera waiting 2 seconds ----"
+cat /proc/device-tree/model
+echo "\n"
 sleep 2
-exec ./startH264player.sh
-#export PYTHONUNBUFFERED=1
-#exec ./startSleeper.py
+# source the file
+. ./startH264player.sh
+# Here's an python alternative, should you wish to debug restart mechanisms
+# export PYTHONUNBUFFERED=1
+# exec ./tickTock.py
 ```
 
 Note that we'ver reduce the waiting time from 5 to 2 seconds. This was
