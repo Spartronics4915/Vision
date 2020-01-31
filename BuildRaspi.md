@@ -2,32 +2,34 @@
 
 <!-- TOC depthFrom:2 orderedList:false -->
 
-- [Introduction](#introduction)
-- [Theory of operation](#theory-of-operation)
-- [Prepare for Competition](#prepare-for-competition)
+- [Building a Raspberry PI for FRC - using FRCVision-rPi](#building-a-raspberry-pi-for-frc---using-frcvision-rpi)
+  - [Introduction](#introduction)
+  - [Theory of operation](#theory-of-operation)
+  - [Prepare for Competition](#prepare-for-competition)
     - [official pre-built pi image](#official-pre-built-pi-image)
     - [read-only-raspberry-pi](#read-only-raspberry-pi)
     - [disable wireless (wifi and bluetooth)](#disable-wireless-wifi-and-bluetooth)
     - [duplicate working microSD card](#duplicate-working-microsd-card)
-- [Config Details](#config-details)
-    - [make sure you have a raspi 3 with picam](#make-sure-you-have-a-raspi-3-with-picam)
+  - [Config Details](#config-details)
+    - [make sure you have a raspi 3 or 4 with picam](#make-sure-you-have-a-raspi-3-or-4-with-picam)
     - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
     - [on first boot](#on-first-boot)
     - [rename/renumber your raspi](#renamerenumber-your-raspi)
     - [install python extensions](#install-python-extensions)
-    - [install node 10.x and extensions](#install-node-10x-and-extensions)
+    - [install node and extensions](#install-node-and-extensions)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
-    - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
-        - [install h264player](#install-h264player)
-        - [install rpi-webrtc-streamer (deprecated)](#install-rpi-webrtc-streamer-deprecated)
-        - [install uv4l (deprecated)](#install-uv4l-deprecated)
     - [pull git repository](#pull-git-repository)
+    - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
+      - [install h264player](#install-h264player)
+      - [install rpi-webrtc-streamer (deprecated)](#install-rpi-webrtc-streamer-deprecated)
+      - [install uv4l (deprecated)](#install-uv4l-deprecated)
+    - [optional - install window system](#optional---install-window-system)
     - [misc](#misc)
-        - [mount usb thumbdrive](#mount-usb-thumbdrive)
-        - [FRCVision-rPi services](#frcvision-rpi-services)
-        - [OpenCV+python3 build details](#opencvpython3-build-details)
-- [Troubleshooting](#troubleshooting)
+      - [mount usb thumbdrive](#mount-usb-thumbdrive)
+      - [FRCVision-rPi services](#frcvision-rpi-services)
+      - [OpenCV+python3 build details](#opencvpython3-build-details)
+  - [Troubleshooting](#troubleshooting)
     - [no camera functionality](#no-camera-functionality)
     - [uv4l service is starting on reboot and we don't want it to](#uv4l-service-is-starting-on-reboot-and-we-dont-want-it-to)
     - [frcvision webpage doesn't appear at http://frcvision.local](#frcvision-webpage-doesnt-appear-at-httpfrcvisionlocal)
@@ -186,11 +188,11 @@ via: `chmod +x yourfile`.  And verify that it is executable via
 
 ### official pre-built pi image
 
-Once we've built-out _our variation_ of a standard raspberry pi (see below),
-we can create a disk image that should be used to build out new microsd cards.
-In order to minimize the time to duplicate the image, its best to work with
-an 8BG sdcard.  Our customizations could be made available in the release
-section of our Vision github following
+Once we've built-out _our variation_ of a standard raspberry pi (see 
+[below](#on-first-boot)), we can create a disk image that should be used to 
+build out new microsd cards. In order to minimize the time to duplicate the 
+image, its best to work with an 8BG sdcard.  Our customizations could be made 
+available in the release section of our Vision github following
 [these instructions](https://stackoverflow.com/questions/47584988/how-to-upload-tar-gz-and-jar-files-as-github-assets-using-python-requests),
 however there appears to be a limit on the size of such tarballs and
 we have yet to complete this task.  To get around this limitation
@@ -388,14 +390,18 @@ a few examples:
             `sudo date --set 1998-11-02; sudo date --set 21:08:00`
         * `Interfacing Options`
             * Enable connection to Raspberry Pi Camera (pi3/2019)
+            * Enable I2C (for camera switcher)
         * `Advanced`
             * Consider raising GPU memory to 256MB
+* change user password 
+    ```sh
+    % passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
+    ```
 * update and cleanup (recover diskspace)
-
     ```sh
     sudo apt-get update
     sudo apt-get upgrade
-    sudo apt-get install python3-pip git vim tree lsof
+    sudo apt-get install python3-pip git vim tree lsof i2c-tools
     sudo apt-get clean
     sudo apt-get autoremove
     ```
@@ -431,12 +437,6 @@ ff02::2        ip6-allrouters
 # after editing this file, reboot the machine and potentially the router
 ```
 
-### change password from raspberry to spartronics
-
-```sh
-% passwd
-```
-
 ### install python extensions
 
 ``` bash
@@ -449,6 +449,11 @@ sudo python3 -m pip install pynetworktables
 ```bash
 sudo apt-get install nodejs # version should be > 10.0
 sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
+# to resolve npm install issue: UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm config set registry http://registry.npmjs.org/ 
+# if you have trouble with express (ie: in Vision/h264player)
+npm uninstall express
+npm install express --save
 ```
 
 ### validate camera
@@ -474,6 +479,12 @@ sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
 >>> import networktables
 ```
 
+### pull git repository
+
+* `mkdir -p spartronics`
+* `cd spartronics`
+* `git clone https://github.com/Spartronics4915/Vision`
+
 ### optional - install support for h264 feed
 
 The sub-$25 pi camera can operate at up to 90 fps and includes a
@@ -495,7 +506,7 @@ suggest that `h264player is the preferred solution`.
     are decoded, we rely on an opengl YUV canvas for their display.
     The more modern html5 video element and media streams aren't employed
     by this approach and so its major downside is that it consumes extra 
-    load on the driver station.
+    load on the driver station. See [here](./h264player/README.md) for more.
 * `webRTC` is the newest and shiniest of streaming techs.
     It resolved the biggest issue for broad-deployment of
     streaming through a complex routing negotiation system
@@ -584,11 +595,15 @@ Please refer to file history for more details.
 We experimented with this tech and it failed us during competetions.
 Please refer to file history for more details.
 
-### pull git repository
+### optional - install window system
 
-* `mkdir -p spartronics`
-* `cd spartronics`
-* `git clone https://github.com/Spartronics4915/Vision`
+Details [here](https://www.raspberrypi.org/forums/viewtopic.php?p=890408#p890408)
+
+```bash
+sudo apt-get install --no-install-recommends xserver-xorg
+sudo apt-get install --no-install-recommends xinit
+sudo apt-get install xfce4 xfce4-terminal
+```
 
 ### misc
 
