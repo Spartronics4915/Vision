@@ -27,7 +27,7 @@ if __name__ == '__main__':
     corners = np.vstack(corners).reshape(-1,3)
     img_centers = list()
     obj_pts = list()
-    for f in fnames[::3]:
+    for f in fnames:
         obj_pts.append(corners)
         img = cv2.imread(f)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
