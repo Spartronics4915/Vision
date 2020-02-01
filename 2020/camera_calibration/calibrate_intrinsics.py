@@ -5,16 +5,16 @@ import cv2
 
 if __name__ == '__main__':
 
-    img_dir = Path('calib_imgs')
+    img_dir = Path('calib_imgs_p640')
     fnames = [str(f) for f in img_dir.glob('*.png')]
     fnames.sort()
 
     pattern_width = 8
     pattern_height = 27
-    diagonal_dist = (30e-3)*(39.37)
+    diagonal_dist = (30e-3)#*(39.37)
     pattern_size = (pattern_width, pattern_height)
-
     horizontal_grid_dist = 2*diagonal_dist/np.sqrt(2)
+    #print('Diagonal_dist:{} {}'.format(diagonal_dist, horizontal_grid_dist))
 
     corners = list()
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     corners = np.vstack(corners).reshape(-1,3)
     img_centers = list()
     obj_pts = list()
-    for f in fnames[::3]:
+    for f in fnames:
         obj_pts.append(corners)
         img = cv2.imread(f)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
