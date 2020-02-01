@@ -1,4 +1,14 @@
-# video notes
+# installation
+
+Currently this has been tested on FRCVision 2020 with
+the addition of the standard node (10.15.2) and npm (5.8.0)
+distros. (nb: npm whines about incompatibility, but this can
+be safely ignored).  Most significant npm dependency is express
+but package.json says it all.   If the checked-in node_modules
+are incompatible with your node installation, simply remove the
+directory and issue: `npm install`.
+
+# on selecting h264player
 
 H264 is a very efficient video solution on raspberry pi due to
 its GPU-based implementation.  The hard part is delivering
@@ -12,6 +22,7 @@ take place, but to make the pixels visible in the browser
 we employ a javascript h264 decoder.  Once the pixels
 are decoded we rely on an opengl canvas.  No use of
 the more modern html5 video element here.
+
 * webRTC is the newest and shiniest of streaming techs.
 It resolved the biggest issue for broad-deployment of
 streaming through a complex routing negotiation system
@@ -21,6 +32,7 @@ a native h264 decoder.  But it failed for us in the
 context of the FRC Field Management System. Since we have
 very little time operating in that environment it is
 very difficult to diagnose and resolve the problem.
+
 * rtsp is an older tech for streaming that doesn't
 appear to "gel" with browsers.  It does appear to have
 the same advantages (over webrtc) that h264player does.
@@ -37,4 +49,4 @@ it includes:
 webRTCSignaling was derived from and is for use with uv4l.
 
 an opensource webRTC + pi solution is https://github.com/kclyu/rpi-webrt
-and is preferred over the closed-source uv4l.  
+and may be preferred over the closed-source uv4l.  
