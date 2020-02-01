@@ -69,8 +69,8 @@ moduleDebuggingConfig["picam"].update({
     "contrast": 100,
     "flip": False,
     "rotation": 0,
-    "exposure_mode": "auto", #"fixedfps",
-    "exposure_compensation": 0, # [-25, 25]
+    "exposure_mode": "off", #"fixedfps",
+    "exposure_compensation": -25, # [-25, 25]
 })
 # Algo-Specific settings
 # TODO: Change the outer/innter-most setting of algo 
@@ -79,11 +79,19 @@ moduleDebuggingConfig["algo"].update({
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
-    "camIntrensics": {
-        "focalLength" : (639.83052859,639.70771165),
-        "principalPoint" : (322.56252014,250.77160068),
-        "distortionCoeffs" : np.array([ 1.11238973e-01, -1.04070952e+00,  2.61772165e-03,
-         6.55387532e-04,  2.07132619e+00])
+    "camIntrensics1080p": {
+        "focalLength" : (1.79116329e+03,1.79568335e+03),
+        "principalPoint" : (9.64697499e+02,5.94350454e+02),
+        "distortionCoeffs" : np.array([  1.03245422e-01, -8.14646031e-01,  8.78989595e-04,
+         5.05879957e-04,  1.43069887e+00])
+    },
+    "camIntrinsics640p": {
+        "focalLength" : (634.89045322, 634.85728747),
+        "principalPoint" : (322.55085532, 250.9350097),
+        "distortionCoeffs" : np.array([ 1.14347782e-01, -1.04102188e+00,  2.73924512e-03,
+        7.23847549e-04,  2.04951815e+00])
+    }
+
         # Alternate camera intrensics (from other team)(For a 720p frame): 
         #       disortion Coefficients:  (2.9666848459501894e-02, 7.7071617830897565e-01, 0, 
         #                                                       0, -2.7882844813877661e+00)
