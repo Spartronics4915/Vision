@@ -1,0 +1,25 @@
+640p
+Real: 182" Recorded: 196"
+Real: 100" Recorded: 106"
+Real: 68" Recorded: 73"
+Real: 150" Recorded: 163"
+Real: 270" Recorded: 295"
+Real: 200" Recorded: 215"
+Maximum detectable: 15'
+
+720p
+Real: 263" Recorded: 276"
+Real: 200" Recorded: 210"
+Real: 182" Recorded: 192"
+Real: 100" Recorded: 105"
+Real: 68" Recorded: 73"
+
+1080p
+Real: 200" Recorded: 197-198"
+Real: 270" Recorded: 273"
+Real: 68"  Recorded: 68"
+Real: 100" Recorded: 98"
+Real: 347" Recorded: 349"
+Real: 420" Recorded: 417-423"
+Real: 450" Recorded: 455-451-458"
+Real: 500" Recorded: Unusable
