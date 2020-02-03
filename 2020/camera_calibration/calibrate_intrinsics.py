@@ -5,7 +5,7 @@ import cv2
 
 if __name__ == '__main__':
 
-    img_dir = Path('calib_imgs_p640')
+    img_dir = Path('calib_imgs')
     fnames = [str(f) for f in img_dir.glob('*.png')]
     fnames.sort()
 
