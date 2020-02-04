@@ -79,6 +79,9 @@ moduleDebuggingConfig["algo"].update({
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
+
+    "theta" : 0, # Represents the angle of elevation
+
     "camIntrensics1080p": {
         "focalLength" : (1.79116329e+03,1.79568335e+03),
         "principalPoint" : (9.64697499e+02,5.94350454e+02),
@@ -90,7 +93,15 @@ moduleDebuggingConfig["algo"].update({
         "principalPoint" : (322.55085532, 250.9350097),
         "distortionCoeffs" : np.array([ 1.14347782e-01, -1.04102188e+00,  2.73924512e-03,
         7.23847549e-04,  2.04951815e+00])
+    },
+
+    "camIntrensics720p": { #720p
+    "focalLength" : (1.24108285e+03, 1.24478598e+03),
+    "principalPoint" : (6.43779311e+02, 3.93884033e+02),
+    "distortionCoeffs" : np.array([1.14833683e-01, -9.74930348e-01,  1.03528449e-03,
+         7.31745519e-05,  1.87194365e+00])
     }
+
 
         # Alternate camera intrensics (from other team)(For a 720p frame): 
         #       disortion Coefficients:  (2.9666848459501894e-02, 7.7071617830897565e-01, 0, 
@@ -100,8 +111,6 @@ moduleDebuggingConfig["algo"].update({
         #       Cx = 538                  ~~ 538
         #       Fy = 9.7251025460519838*10^2 ~~ 972.51
         #       Cy = 3.5650000000000000*10^2 ~~ 356.5
-
-    } 
 })
 
 calibConfig = copy.deepcopy(_base)
@@ -123,6 +132,43 @@ calibConfig["picam"].update({
 calibConfig["algo"].update({
     "algo": "calibCap", # Chose proper algo streaming
     "display": False,# 1 if streaming
+
+})
+
+GPConfigV1 = copy.deepcopy(_base)
+GPConfigV1.update({
+    "name": "gpConfig",
+})
+# Camera-Specific Settings
+GPConfigV1["picam"].update({
+    "resolution": (1920, 1080), # cv2.resize() later
+    "framerate": 30, # TODO: Come back to
+    "iso": 400,
+    "brightness": 40,
+    "contrast": 100,
+    "flip": False,
+    "rotation": 0,
+    "exposure_mode": "off", #"fixedfps",
+    "exposure_compensation": -25, # [-25, 25]
+})
+# Algo-Specific settings
+# TODO: Change the outer/innter-most setting of algo 
+GPConfigV1["algo"].update({
+    "algo": "empty",    # Chose proper algo streaming
+                        # Closed loop pnp here
+                        # TODO: Chamge this back later
+    "display": False,   # 1 if streaming
+    "hsvRangeLow": np.array([40,50,90]),
+    "hsvRangeHigh": np.array([255,255,255]),
+
+    "theta" : 0, # Represents the angle of elevation
+
+    "camIntrensics1080p": {
+        "focalLength" : (1.79116329e+03,1.79568335e+03),
+        "principalPoint" : (9.64697499e+02,5.94350454e+02),
+        "distortionCoeffs" : np.array([  1.03245422e-01, -8.14646031e-01,  8.78989595e-04,
+         5.05879957e-04,  1.43069887e+00])
+    },
 
 })
 
