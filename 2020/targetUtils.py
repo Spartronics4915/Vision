@@ -297,6 +297,20 @@ def getPitchYawError(frame, cfg):
     # TBD for closed-loop PID aiming
     pass
 
+def pnpTransformRobotCoordinates(translation, cfg):
+    # translation is a translation vector, cfg is the camera's angle in radians
+    y = translation[2]
+    z = translation[3]
+    # Get the translation vector's y and z
+    distance = math.sqrt(math.pow(y,2) + math.pow(z,2))
+    # Find the distance between the target and the camera. X coordinates will not be affected by the rotation 
+    thetaPrime = cfg["theta"] + math.atan2(y,z)
+    # Find the angle between the ground and the target
+    zPrime = distance * math.cos(thetaPrime)
+    yPrime = distance * math.sin(thetaPrime)
+    # Calculate the robot-relative y and z distance to the target using basic trigonometry
+    return np.array([translation[1],yPrime,zPrime],dtype="float32")
+
 if __name__ == "__main__":
     import doctest
 
