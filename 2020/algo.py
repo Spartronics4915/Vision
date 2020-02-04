@@ -135,9 +135,12 @@ def realPNP(frame, config):
 
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
-    # Deubg
+    # Debug
     logging.debug("Translation Vector: ".format(xlateVector))
     logging.debug("Rotation Vector: ".format(rotVec))
 
+    # Testing pnpTransformRobotCoordinates
+    robotVector = targetUtils.pnpTransformRobotCoordinates(xlateVector, config)
+    logging.debug("Transformed Vector: ".format(robotVector))
     # XXX: For now
     return (None, visImg)
