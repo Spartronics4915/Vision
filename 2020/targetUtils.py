@@ -124,7 +124,6 @@ def threshholdFrame(frame, cfg):
     :rtype: cv2 frame (np.ndarray())
 
     Very hard to doctest, none for now
-    >>> pass
     """
     # Blurs on the frame go in this method
     # Image which is operated upon
