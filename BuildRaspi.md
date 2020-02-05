@@ -450,7 +450,9 @@ ff02::2        ip6-allrouters
 
 ``` bash
 sudo python3 -m pip install picamera
-sudo python3 -m pip install pynetworktables
+# following may be present in frcvision, but shouldn't hurt
+sudo python3 -m pip install numpy
+sudo python3 -m pip install pynetworktables 
 ```
 
 ### install node and extensions
