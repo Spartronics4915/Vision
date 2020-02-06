@@ -28,6 +28,21 @@ def PutNumberArray(key, value):
     if theComm != None:
         theComm.sd.putNumberArray("Vision/"+key, value)
 
+def getCurrentPose():
+    if theComm != None:
+        # Get the current pose
+        return (0,0,0) # x,y,time
+
+def getCameraPosition():
+    if theComm !=- None:
+        # Get the robot relative mounting of the camera
+        return (0,0,0) # x,y,z
+
+def getTurretAngle():
+    if theComm !=- None:
+        # Get the turret angle from smartDashboard
+        return  # x,y,z
+
 class Comm:
     """
         Comm abstracts our network-tables conventions.
