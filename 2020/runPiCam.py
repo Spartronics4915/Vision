@@ -142,18 +142,23 @@ class PiVideoStream:
             if self.processFrame(image):
                 break
 
+    # The end/start of the line for the stack trace 
     def processFrame(self, image):
         # called on each frame in the video
         logging.debug("  (multi threaded)")
 
+        # Cut 'target'
+        # NOTE: Interesting, frame get dropped on the floor here
         target, frame = algo.processFrame(image, cfg=self.config["algo"])
 
+        # XXX: Cut
         if self.commChan:
             if target != None:
                 self.commChan.UpdateVisionState("Acquired")
                 target.send()
             else:
                 self.commChan.UpdateVisionState("Searching")
+        # XXX: End cut
 
     def Shutdown(self):
         self.picam.stop()
