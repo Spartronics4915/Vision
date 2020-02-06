@@ -144,3 +144,35 @@ def realPNP(frame, config):
     logging.debug("Transformed Vector: ".format(robotVector))
     # XXX: For now
     return (None, visImg)
+
+def realPNP(frame, config):
+    # TODO: Try and convert the chamelion 'boundingbox' method to python
+    # frame --> visImg (used for drawing) and mask (used for target detection)
+
+    # -== Frame Threshholding ==-
+    mask = targetUtils.threshholdFrame(frame,config)
+
+    # Slight renaming, for convention
+    visImg = frame
+    # TODO: Add bitwise and 
+    # -== Target Detection ==- 
+    hexagonTarget, visImg = targetUtils.findTarget(visImg, mask, config)
+
+    # If we don't detect a target, drop out here
+    if hexagonTarget == None:
+        return (None, visImg)
+    # -== Target Manipulation ==-
+    # TODO: Pretty sure config in unnessissary here
+    imgPts = targetUtils.target2pnpPoints(hexagonTarget,config)
+
+    xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
+
+    # Debug
+    logging.debug("Translation Vector: ".format(xlateVector))
+    logging.debug("Rotation Vector: ".format(rotVec))
+
+    # Testing pnpTransformRobotCoordinates
+    robotVector = targetUtils.pnpTransformRobotCoordinates(xlateVector, config)
+    logging.debug("Transformed Vector: ".format(robotVector))
+    # XXX: For now
+    return (None, visImg)
