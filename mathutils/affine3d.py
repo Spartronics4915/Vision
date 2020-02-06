@@ -27,9 +27,9 @@ class Affine3d(object):
     >>> npts = f.transformPoints(pts)
     >>> len(npts) == len(pts)
     True
-
     
     """
+    sBases = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
     @staticmethod
     def fromIdentity():
@@ -45,6 +45,15 @@ class Affine3d(object):
         "return Affine3d representing rotation of angle (in degrees) around dir"
         return Affine3d(xform.rotation_matrix(math.radians(angle), dir))
 
+    @staticmethod
+    def fromEulerAngles(a, b, c, order):
+        """
+        return Affine3d representing rotation by angles a, b, c applied
+        according to order:  "rxyz", "syxy" (rotating or static frame)
+        """
+        return Affine3d(xform.euler_matrix(math.radians(a), math.radians(b), 
+                                           math.radians(c), order))
+                                           
     @staticmethod
     def fromQuaternion(*q):
         """return Affine3d representing rotation via quaternion.
@@ -90,7 +99,19 @@ class Affine3d(object):
         mt = xform.translation_matrix([x, y, z])
         self.matrix = xform.concatenate_matrices(self.matrix, mt)
         return self # chainable
+
+    def invert(self):
+        self.matrix = xform.inverse_matrix(self.matrix)
+        return self # chainable
+
+    def asInverse(self):
+        return Affine3d(xform.inverse_matrix(self.matrix))
     
+    def asAffine2d(self):
+        """return a 2d representation of 
+        """
+
+    # --------------------------------------------------------------    
     def transformPoints(self, pts):
         """return an array of points transformed by my transformation matrix.
         pts is assumed to be an array of triples.
@@ -103,20 +124,36 @@ class Affine3d(object):
                 p4 = p3 + [1]
             else:
                 # assume its an np array
-                p4 = p3.tolist() + [1]
+                p4 = p3.tolist() + [1] # -> a point
             npt = self.matrix.dot(p4)[:3] 
             # back to p3
             result[i] = npt # npt type s np.array, should we issue tolist()?
             i+=1
         return result
 
-    def asInverse(self):
-        return Affine3d(xform.inverse_matrix(self.matrix))
-    
-    def asAffine2d(self):
-        """return a 2d representation of 
+    def transformBases(self):
+        return self.transformVectors(self.sBases)
+
+    def transformVectors(self, dirs):
+        """return an array of points transformed by my transformation matrix.
+        dirs is assumed to be an array of triples. Might be a good idea of
+        they are unit-length (ie: normalized)
         """
-    
+        result = np.array(dirs, dtype=np.float32)
+        i = 0
+        for d3 in dirs:
+            # d3 to d4 (so dot works)
+            if isinstance(d3, list):
+                d4 = d3 + [0]  # 0 -> a vector
+            else:
+                # assume its an np array
+                d4 = d3.tolist() + [0]
+            ndir = self.matrix.dot(d4)[:3] 
+            # back to d3
+            result[i] = ndir # npt type s np.array, should we issue tolist()?
+            i+=1
+        return result
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
