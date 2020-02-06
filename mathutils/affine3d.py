@@ -28,40 +28,6 @@ class Affine3d(object):
     >>> len(npts) == len(pts)
     True
 
-    # vision's goal is to identify landmarks in the camera then to convey
-    # to location of the landmark to the robot code expressed in field coords.
-    #
-    # ie: want camera to robot to field transformation
-    #
-    # field coords (z is up)
-    #
-    #           y
-    #       ._____|____. 
-    #       |     |    | 
-    #       |     o-----x
-    #       |__________| 
-    #
-    # robot coords (z is up)
-    #
-    #           y
-    #       .___|___. 
-    #       |   |  c|
-    #       |   o-----x
-    #       |_______| 
-    # 
-    # camera coords from the top (y is down)
-    #
-    #         /
-    #        /       ______ z  
-    #        \       |
-    #         \      x
-    #
-    # camera is mounted with an angle of 20 around y and offset from robot origin
-    >>> cameraToRobot = Affine3d.fromRotation(-20, [0, 1, 0]).translate(10, 10, 0) 
-    >>> p = cameraToRobot.transformPoints([[0, 0, 0]])[0]
-
-    # field is approx x: [0, 52*12], y: [-26*12, 26*12] (z is up)
-    # robotToField = Affine3d.fromRotation()
     
     """
 
@@ -133,7 +99,7 @@ class Affine3d(object):
         i = 0
         for p3 in pts:
             # p3 to p4 (so dot works)
-            if isinstance(p3, list)
+            if isinstance(p3, list):
                 p4 = p3 + [1]
             else:
                 # assume its an np array
