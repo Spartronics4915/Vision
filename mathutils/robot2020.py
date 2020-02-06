@@ -1,4 +1,5 @@
 from robot import *
+from vec import *
 
 class Robot2020(Robot):
     """
@@ -10,7 +11,8 @@ class Robot2020(Robot):
     # hence: we want camera-to-turret-to-robot-to-field transformation!
     #
     # summary:  
-    #   cameraToTurret (take origin of camera into turret space)
+    #   cameraToMount (take origin of camera into mount space )
+    #       we may mount on turret or on robot
     #   turretToRobot  (take origin of turret into robot space)
     #   robotToField   (take origin of robot into field space)
     #   cameraToField (take origin of camera into field space)
@@ -18,7 +20,7 @@ class Robot2020(Robot):
     #  camera coordinates (ie: looking out the camera, cf poseEstimation.py)
     #    x is right, y is down, z it into the screen
     #       
-    #  cameraToTurret:  assume that the camera is mounted on turret, C below.
+    #  cameraToMount:  assume that the camera is mounted on turret, C below.
     #  If we decide that we want a fixed camera, we can skip to the next step.
     #  
     # 
@@ -39,19 +41,34 @@ class Robot2020(Robot):
     #     * place coords on paper matching target config
     #     * find the two rotations needed to cause coords to match camera
     #       (90, -90, 0, "rxyz")
-    # XXX add camera tilt
-    >>> turretRot = Affine3d.fromEulerAngles(90, -90, 0, "rxyz") 
-    >>> turretOffset = Affine3d.fromTranslation(0, -12, 8)
-    >>> d = turretRot.transformBases() # x, y, z axes in camera
-    >>> np.allclose([[0,-1,0], [0,0,1], [-1,0,0]], d)
+    >>> TiltAngle = 45 # extreme example
+    >>> cameraTilt = Affine3.fromRotation(TiltAngle, [0, 1, 0]) # tilt round camera y
+    >>> cameraRot = Affine3.fromEulerAngles(90, -90, 0, "rxyz") 
+    >>> cameraRotTilt = Affine3.concatenate(cameraRot, cameraTilt)
+    >>> cameraOffset = Affine3.fromTranslation(0, -12, 8)
+    >>> d = cameraRot.transformBases() # x, y, z axes in camera
+    >>> np.allclose([[0,-1,0], [0,0,1], [-1,0,0]], d) # axes in camera mountspace
     True
-    >>> cameraToTurret = Affine3d.concatenate(turretOffset, turretRot)
-    >>> o = cameraToTurret.transformPoints([[0,0,0]])
+    >>> cameraToMount = Affine3.concatenate(cameraOffset, cameraRot)
+    >>> o = cameraToMount.transformPoints([[0,0,0]])
     >>> np.allclose(o[0], [0, -12, 8])
     True
-    >>> turretToCamera = cameraToTurret.asInverse()
-    >>> o = turretToCamera.transformPoints([[0,-12,8]]) # verify this is our origin
-    >>> np.allclose(o[0], [0,0,0])
+    >>> cameraToMountTilt = Affine3.concatenate(cameraOffset, cameraRotTilt)
+    >>> o = cameraToMountTilt.transformPoints([[0,0,0]])
+    >>> np.allclose(o[0], [0, -12, 8])
+    True
+    >>> mountToCamera = cameraToMount.asInverse()
+    >>> o = mountToCamera.transformPoints([[0,-12,8]]) 
+    >>> np.allclose(o[0], [0,0,0]) # verifies this is camspace origin
+    True
+    >>> mountToCameraTilt = cameraToMountTilt.asInverse()
+    >>> o = mountToCameraTilt.transformPoints([[0,-12,8]]) 
+    >>> np.allclose(o[0], [0,0,0]) # verifies this is camspace origin
+    True
+    >>>
+    >>> camTgt = [0, 0, -120] # target is center of camera 12 ft away
+    >>> tgt = cameraToMountTilt.transformVectors([camTgt])
+    >>> np.allclose(120, Vec3.length(tgt[0]))
     True
 
     # 
@@ -65,9 +82,9 @@ class Robot2020(Robot):
     #        y             
     #
 
-    >>> t2rRot = Affine3d.fromRotation(180, [0,0,1])
-    >>> t2rOffset = Affine3d.fromTranslation(-15, -5, 0) # turret origin offset from robot origin
-    >>> turretToRobot = Affine3d.concatenate(t2rOffset, t2rRot)
+    >>> t2rRot = Affine3.fromRotation(180, [0,0,1])
+    >>> t2rOffset = Affine3.fromTranslation(-15, -5, 0) # turret origin offset from robot origin
+    >>> turretToRobot = Affine3.concatenate(t2rOffset, t2rRot)
     >>> dirs = turretToRobot.transformBases()
     >>> np.allclose(dirs, [[-1, 0, 0], [0, -1, 0], [0, 0, 1]])
     True
@@ -88,7 +105,7 @@ class Robot2020(Robot):
     # Test
     # 1. place robot on the field at a heading of 20 degrees, at 150, 150, 
     #     robot center is 8 inches off the ground
-    >>> robotToField = Affine3d.fromTranslation(150, 150, 8).rotate(-20, [0, 0, 1])
+    >>> robotToField = Affine3.fromTranslation(150, 150, 8).rotate(-20, [0, 0, 1])
     >>> pts = robotToField.transformPoints([[0, 0, 0], [1, 0, 0], [0, 1, 0]])
     >>> np.allclose(pts[0], [150, 150, 8])
     True
@@ -114,11 +131,11 @@ class Robot2020(Robot):
 
         # camera to turret is a constant assuming the camera is 
         # rigidly mounted there.
-        self.mCameraToTurret = Affine3d()
-        self.mTurretToRobot = Affine3d()
+        self.mCameraToTurret = Affine3()
+        self.mTurretToRobot = Affine3()
     
     def updateRobotPose(self, pose, timestamp):
-        self.mCameraToField = Affine3d.concatenate(self.mCameraToTurret,
+        self.mCameraToField = Affine3.concatenate(self.mCameraToTurret,
                                                    self.mTurretToRobot,
                                                    self.mCameraToRobot,
                                                    self.mRobotToField)

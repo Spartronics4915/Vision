@@ -55,7 +55,7 @@ class Quaternion:
         return self.q.__str__()
     
     def asMatrix(self):
-        """ return a numpy array, to convert to Affine3d, use Affine3d.fromQuaternion
+        """ return a numpy array, to convert to Affine3, use Affine3.fromQuaternion
         """
         return xform.quaternion_matrix(self.q)
 

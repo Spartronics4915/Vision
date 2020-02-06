@@ -2,9 +2,8 @@ import numpy as np
 import math
 import transformations as xform
 from quaternion import *
-from affine2d import *
 
-class Affine3d(object):
+class Affine3(object):
     """We represent a 3D affine transformation as a 4x4 matrix."
 
     Lots of places to learn about affine transformations like this:    
@@ -12,17 +11,17 @@ class Affine3d(object):
     http://graphics.cs.cmu.edu/nsp/course/15-462/Spring04/slides/04-transform.pdf
 
     Examples
-    >>> a = Affine3d()
-    >>> b = Affine3d.fromRotation(30, [1, 0, 0])
-    >>> c = Affine3d.fromTranslation(.5, 1.5, 2.5)
-    >>> d = Affine3d.fromQuaternion(1,2,3,4)
-    >>> e = Affine3d.fromQuaternion([1,2,3,4])
+    >>> a = Affine3()
+    >>> b = Affine3.fromRotation(30, [1, 0, 0])
+    >>> c = Affine3.fromTranslation(.5, 1.5, 2.5)
+    >>> d = Affine3.fromQuaternion(1,2,3,4)
+    >>> e = Affine3.fromQuaternion([1,2,3,4])
     >>> e.equals(d)
     True
-    >>> f = Affine3d.fromQuaternion(Quaternion())
+    >>> f = Affine3.fromQuaternion(Quaternion())
     >>> a.equals(f)
     True
-    >>> f = Affine3d.concatenate(b, c, d)
+    >>> f = Affine3.concatenate(b, c, d)
     >>> pts = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float32)
     >>> npts = f.transformPoints(pts)
     >>> len(npts) == len(pts)
@@ -33,43 +32,43 @@ class Affine3d(object):
 
     @staticmethod
     def fromIdentity():
-        return Affine3d(xform.identity_matrix())
+        return Affine3(xform.identity_matrix())
     
     @staticmethod
     def fromTranslation(x, y, z):
-        "return Affine3d representing translation of x, y and z"
-        return Affine3d(xform.translation_matrix([x, y, z]))
+        "return Affine3 representing translation of x, y and z"
+        return Affine3(xform.translation_matrix([x, y, z]))
 
     @staticmethod
     def fromRotation(angle, dir):
-        "return Affine3d representing rotation of angle (in degrees) around dir"
-        return Affine3d(xform.rotation_matrix(math.radians(angle), dir))
+        "return Affine3 representing rotation of angle (in degrees) around dir"
+        return Affine3(xform.rotation_matrix(math.radians(angle), dir))
 
     @staticmethod
     def fromEulerAngles(a, b, c, order):
         """
-        return Affine3d representing rotation by angles a, b, c applied
+        return Affine3 representing rotation by angles a, b, c applied
         according to order:  "rxyz", "syxy" (rotating or static frame)
         """
-        return Affine3d(xform.euler_matrix(math.radians(a), math.radians(b), 
+        return Affine3(xform.euler_matrix(math.radians(a), math.radians(b), 
                                            math.radians(c), order))
                                            
     @staticmethod
     def fromQuaternion(*q):
-        """return Affine3d representing rotation via quaternion.
+        """return Affine3 representing rotation via quaternion.
         See Quaternion for a variety of methods to describe rotations.
         """
         if(len(q) == 1):
             q = q[0]
         if isinstance(q, Quaternion):
             q = q.q # member of Quaternion
-        return Affine3d(xform.quaternion_matrix(q))
+        return Affine3(xform.quaternion_matrix(q))
 
     @staticmethod
     def concatenate(*objs):
-        "return Affine3d representing concatenation of Affine3ds"
+        "return Affine3 representing concatenation of Affine3s"
         mats = [x.matrix for x in objs]
-        return Affine3d(xform.concatenate_matrices(*mats))
+        return Affine3(xform.concatenate_matrices(*mats))
     
     # XXX: add more factories (scale, reflection, shear)
 
@@ -105,7 +104,7 @@ class Affine3d(object):
         return self # chainable
 
     def asInverse(self):
-        return Affine3d(xform.inverse_matrix(self.matrix))
+        return Affine3(xform.inverse_matrix(self.matrix))
     
     def asAffine2d(self):
         """return a 2d representation of 
