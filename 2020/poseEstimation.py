@@ -92,7 +92,7 @@ s_firstTime = True
 
 def estimatePose(im, imgPts, cfg):
     """
-    Given an imput image and image points, guess where we are
+    Given an input image and image points, guess where we are
 
     :param im: frame from which the image points were captured
     :type im: opencv frame (np.ndarray())
