@@ -9,7 +9,7 @@
 #  (see bottom for details on parameters)
 import numpy as np
 import copy
-
+import targets
 # ------ Base -------
 
 _base = {
@@ -135,6 +135,8 @@ calibConfig["algo"].update({
 
 })
 
+# ------ Deployment configs -------
+
 GPConfigV1 = copy.deepcopy(_base)
 GPConfigV1.update({
     "name": "gpConfig",
@@ -152,7 +154,7 @@ GPConfigV1["picam"].update({
     "exposure_compensation": -25, # [-25, 25]
 })
 # Algo-Specific settings
-# TODO: Change the outer/innter-most setting of algo 
+# Generally, these are going to be numbers/flags/constants used in cv2 function calls
 GPConfigV1["algo"].update({
     "algo": "empty",    # Chose proper algo streaming
                         # Closed loop pnp here
@@ -161,8 +163,6 @@ GPConfigV1["algo"].update({
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
 
-    "theta" : 0, # Represents the angle of elevation
-
     "camIntrensics1080p": {
         "focalLength" : (1.79116329e+03,1.79568335e+03),
         "principalPoint" : (9.64697499e+02,5.94350454e+02),
@@ -170,6 +170,18 @@ GPConfigV1["algo"].update({
          5.05879957e-04,  1.43069887e+00])
     },
 
+})
+
+# create a sub-dict under 'algo' representing the current state of the run.
+# NOTE: the 'state' dict is not under 'picam', simply because picam shouldnt care what the current state is. It should be read once when communicating the 
+GPConfigV1["algo"].update({
+    "state": {
+        "operatingRes" : "high", # Determines weather or not we run cv2.resize the image before processing
+        "TargetPNP" : targets.TargetPNP(), # Target objects 
+        "TargetPID" : targets.TargetPID(),
+        "opeartingPipe" : "pnp", # Will corresspond to pipelines in algo.processframe()
+
+    }
 })
 
 default = moduleDebuggingConfig
