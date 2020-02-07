@@ -25,10 +25,13 @@ class Target:
     def __init__(self, updateDelta=True):
         # Member Varables
         self.subkey = "baseTarget"
+        self.clkSubkey = "computationTime"
         self.autoSend = False
-        self.clock = time.monotonic()
-        self.value = None
+        self.startTime = time.monotonic()
+        self.value = None 
 
+        self.newDataFlag = None
+        '''
         # Deltaclock computation
         if updateDelta:
             # Used when setValue *is* construction, NB: if there
@@ -39,12 +42,9 @@ class Target:
         else:
             self.deltaclock = 0
             self.lastUpdate = self.clock
-
+        '''
     def setValue(self, value, forceupdate=True):
-        if forceupdate or value != self.value:
-            self.clock = time.monotonic()
-            self.deltaclock = self.clock - self.lastUpdate
-            self.lastUpdate = self.clock
+        if forceupdate or value != self.value:             
             self.value = value  # expect a tuple or list
             if self.autoSend:
                 self.send()
@@ -56,6 +56,47 @@ class Target:
     def send(self):
         comm.PutString(self.subkey,
                 "{0};{1}".format(str(self.value), str(self.deltaclock)))
+
+
+class TargetPID(Target):
+
+    def __init__(self):
+        super().__init__(self)
+        self.valuehOffSet = None
+        self.valuevOffset = None
+        self.subkey = "RobotPose"
+
+        # Will be set to true wwhen there is unsgent data
+
+    def update(self, hOffSet, vOffset):
+        # Assumed this is instantanous
+        # Update the vlaues of the target object
+        # Changes the value
+        pass
+
+    def send(self):
+        # Push the value to netweork tables
+        # Should be called afteer all the computational intensive data is done
+        comm.PutNumberArray(self.subkey)
+        pass
+
+
+class TargetPNP(Target):
+
+    def __init__(self):
+        super().__init__(self)
+        # Should be /SmartDashboard/Vision/PNPValue
+        self.subkey = "PNPValue"
+        self.poseValue = None
+        self.timeValue = None
+
+    def update(self, psoe, time):
+        # Update the vlaues of the target object
+        pass
+
+    def send(self):
+        # Push to network tables
+        pass
 
 # Currently no doctests, however if needed un-comment
 '''
