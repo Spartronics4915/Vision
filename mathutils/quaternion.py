@@ -3,9 +3,16 @@ import numpy as np
 import math
 
 class Quaternion:
-    """Robust representation of 3D rotation
+    """Robust+compact representation of 3D rotation
 
     Quaternions w+ix+jy+kz are represented as [w, x, y, z].
+    see: 
+        ttps://eater.net/quaternions/intro
+        https://www.youtube.com/watch?v=jlskQDR8-bY  (Mathoma)
+        https://www.youtube.com/watch?v=d5EgbgTm0Bg (3Blue1Brown)
+        https://www.youtube.com/watch?v=zjMuIxRvygQ (3Blue1Brown)
+    
+    XXX: add interpolation
 
     Examples:
     >>> a = Quaternion()
@@ -19,11 +26,23 @@ class Quaternion:
     >>> q2 = Quaternion.fromAngles(45, 0, 0)
     >>> q3 = Quaternion.fromAngles(0, 45, 0)
     >>> q4 = Quaternion.fromAngles(0, 0, 45)
+    >>> s = q4.asString()
+    >>> q5 = Quaternion.fromString(s)
+    >>> q4.equals(q4)
+    True
     """
 
     @staticmethod
     def fromMatrix(matrix, isprecise=False):
         return Quaternion(xform.quaternion_from_matrix(matrix, isprecise))
+    
+    @staticmethod
+    def fromString(s):
+        """ assume s created by asString (below): 'q 0 1 2 3'
+        """
+        vals = s.split(" ")
+        assert(len(vals) == 5 and vals[0] == "q")
+        return Quaternion([float(vals[1]), float(vals[2]), float(vals[3])])
 
     @staticmethod
     def fromAxisAngle(angle, axis):
@@ -52,7 +71,10 @@ class Quaternion:
 
     def __str__(self):
         "for print"
-        return "[ %f %f %f %f ]" % (self.q[0], self.q[1], self.q[2], self.q[3])
+        return self.asString()
+    
+    def asString(self):
+        return "q %g %g %g %g" % (self.q[0], self.q[1], self.q[2], self.q[3])
     
     def equals(self, other):
         if isinstance(other, Quaternion):

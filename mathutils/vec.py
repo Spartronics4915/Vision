@@ -13,8 +13,8 @@ class Vec3(object):
     >>> len = Vec3.length(vec)
     >>> np.allclose(len, 3.7416573)
     True
-    >>> nlen = Vec3.normalize(Vec3.asVec3(vec))
-    >>> np.allclose(nlen, len)
+    >>> vec2 = Vec3.normalize(vec)
+    >>> np.allclose(Vec2.length(vec2), 1)
     True
     """
 
@@ -31,8 +31,7 @@ class Vec3(object):
     def normalize(vec3):
         """ nb: this wont overwrite vec3 unless it's an np.array """
         len = np.linalg.norm(vec3, 2, -1)
-        vec3 /= len
-        return len
+        return vec3/len
 
 class Vec2(object):
     """
