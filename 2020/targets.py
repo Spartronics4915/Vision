@@ -49,13 +49,13 @@ class Target:
             if self.autoSend:
                 self.send()
             return True
-        else:
-            return False
+
+        return False
 
     # override me to present alternate respresentation
     def send(self):
         comm.PutString(self.subkey,
-                "{0};{1}".format(str(self.value), str(self.deltaclock)))
+                "{0};{1}".format(str(self.value), '0'))
 
 
 class TargetPID(Target):
@@ -64,7 +64,7 @@ class TargetPID(Target):
         super().__init__(self)
         self.valuehOffSet = None
         self.valuevOffset = None
-        self.subkey = "RobotPose"
+        self.subkey = "PIDOffset"
 
         # Will be set to true wwhen there is unsgent data
 
@@ -77,8 +77,7 @@ class TargetPID(Target):
     def send(self):
         # Push the value to netweork tables
         # Should be called afteer all the computational intensive data is done
-        comm.PutNumberArray(self.subkey)
-        pass
+        comm.PutNumberArray(self.subkey,(self.valuehOffSet,self.valuevOffset))
 
 
 class TargetPNP(Target):
@@ -86,17 +85,17 @@ class TargetPNP(Target):
     def __init__(self):
         super().__init__(self)
         # Should be /SmartDashboard/Vision/PNPValue
-        self.subkey = "PNPValue"
-        self.poseValue = None
+        self.subkey = "RobotPose"
+        self.poseValue = None # Should be a tuple?
         self.timeValue = None
 
-    def update(self, psoe, time):
+    def update(self, pose, time):
         # Update the vlaues of the target object
         pass
 
     def send(self):
         # Push to network tables
-        pass
+        comm.PutNumberArray(self.subkey, (self.poseValue,self.timeValue))
 
 # Currently no doctests, however if needed un-comment
 '''

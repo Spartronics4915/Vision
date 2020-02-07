@@ -34,14 +34,14 @@ def getCurrentPose():
         return (0,0,0) # x,y,time
 
 def getCameraPosition():
-    if theComm !=- None:
+    if theComm != None:
         # Get the robot relative mounting of the camera
         return (0,0,0) # x,y,z
 
 def getTurretAngle():
-    if theComm !=- None:
+    if theComm != None:
         # Get the turret angle from smartDashboard
-        return  # x,y,z
+        return  0# x,y,z
 
 class Comm:
     """
