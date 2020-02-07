@@ -61,7 +61,7 @@ class Affine3(object):
         if(len(q) == 1):
             q = q[0]
         if isinstance(q, Quaternion):
-            q = q.q # member of Quaternion
+            q = q.q # access member of Quaternion
         return Affine3(xform.quaternion_matrix(q))
 
     @staticmethod
@@ -102,14 +102,27 @@ class Affine3(object):
     def invert(self):
         self.matrix = xform.inverse_matrix(self.matrix)
         return self # chainable
+    
+    def decompose(self):
+        """ returns tuple of:
+            scale : vector of 3 scaling factors
+            shear : list of shear factors for x-y, x-z, y-z
+            angles : list of euler angles about sxyz
+            translate : vector of 3
+            perspective ; perspective partition
+        """
+        return xform.decompose_matrix(self.matrix)
 
     def asInverse(self):
         return Affine3(xform.inverse_matrix(self.matrix))
     
+    def asQuaternion(self):
+        """Returns the rotational component of transform in quaternion form"""
+        return Quaternion(xform.quaternion_from_matrix(self.matrix))
+    
     def asAffine2d(self):
         """return a 2d representation of 
         """
-
     # --------------------------------------------------------------    
     def transformPoints(self, pts):
         """return an array of points transformed by my transformation matrix.

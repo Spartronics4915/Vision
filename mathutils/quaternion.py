@@ -52,25 +52,28 @@ class Quaternion:
 
     def __str__(self):
         "for print"
-        return self.q.__str__()
+        return "[ %f %f %f %f ]" % (self.q[0], self.q[1], self.q[2], self.q[3])
+    
+    def equals(self, other):
+        if isinstance(other, Quaternion):
+            return xform.is_same_quaternion(self.q, other.q)
+        else:
+            return xform.is_same_quaternion(self.q, other)
     
     def asMatrix(self):
         """ return a numpy array, to convert to Affine3, use Affine3.fromQuaternion
         """
         return xform.quaternion_matrix(self.q)
 
-    def equals(self, other):
-        return xform.is_same_quaternion(self.q, other.q)
-    
     def multiply(self, other):
         """
-        >>> q1 = Quaternion(4, 1, -2, 3)
-        >>> q2 = Quaternion(8, -5, 6, 7)
+        >>> q1 = Quaternion([4, 1, -2, 3])
+        >>> q2 = Quaternion([8, -5, 6, 7])
         >>> q3 = q1.multiply(q2)
-        >>> q3.equals(Quaternion(28, -44, -14, 48))
+        >>> q3.equals(Quaternion([28, -44, -14, 48]))
         True
         """
-        return xform.quaternion_multiply(self.q, other.q)
+        return Quaternion(xform.quaternion_multiply(self.q, other.q))
 
 if __name__ == "__main__":
     import doctest
