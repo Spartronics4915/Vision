@@ -77,8 +77,8 @@ h = a
 h[0] + divideLength
 '''
 # Model Points
-s_modelPts = np.array([a, b, c, d], dtype="double")
-# s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
+#s_modelPts = np.array([a, b, c, d], dtype="double")
+s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
 
 s_firstTime = True
 

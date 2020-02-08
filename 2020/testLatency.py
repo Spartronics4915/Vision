@@ -3,6 +3,7 @@ Tests a wide variety of frames to find the average time it takes to solvePNP
 '''
 from pathlib import Path
 
+import logging
 import numpy as np
 import algo
 import config
