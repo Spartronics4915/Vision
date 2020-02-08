@@ -168,7 +168,7 @@ def realPNP(frame, config):
         return (None, visImg)
     # -== Target Manipulation ==-
     # TODO: Pretty sure config in unnessissary here
-    imgPts = targetUtils.target2pnpPoints(hexagonTarget,config)
+    imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
 
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
