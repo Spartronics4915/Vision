@@ -91,7 +91,7 @@ def calibrationCapture(frame, config):
     output_dir = Path('calib_imgs')
 
     output_dir.mkdir(exist_ok=True)
-
+    '''
     # Pattern intrensics    
     pattern_width = 8
     pattern_height = 27
@@ -111,6 +111,11 @@ def calibrationCapture(frame, config):
         
     
     time.sleep(.01)
+    '''
+    cv2.imwrite(str(output_dir/'frame-{}.png'.format(time.monotonic())), frame)
+    time.sleep(.3)
+    logging.debug("Frame captured")
+
     return (None, frame)
 
 def realPNP(frame, config):

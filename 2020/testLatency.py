@@ -3,7 +3,10 @@ Tests a wide variety of frames to find the average time it takes to solvePNP
 '''
 from pathlib import Path
 
+<<<<<<< HEAD
 import logging
+=======
+>>>>>>> f9bb508719ecaace7a69fe3adb1178d6485df818
 import numpy as np
 import algo
 import config
@@ -21,7 +24,6 @@ dateFmt = "%H:%M"
 logging.basicConfig(level=logging.DEBUG,format=logFmt, datefmt=dateFmt)
 
 logging.info("Began logger")
-
 
 
 for test_dir in img_dir:

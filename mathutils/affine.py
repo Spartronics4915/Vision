@@ -10,9 +10,38 @@ class Affine3(object):
 
     http://graphics.cs.cmu.edu/nsp/course/15-462/Spring04/slides/04-transform.pdf
 
-    Examples
+    Basic idea: an affine matrix can be used to describe coordinate-system
+    conversions as we have when characterizing how to convert from the
+    camera coordinate-frame to the robot-coordinate frame.  Here the camera
+    has a natural coordinate system and so does the robot.  The question
+    we'd like to answer: what does a point (or direction) in the camera's 
+    coordinate system mean to the robot?  Once we've "designed" a transformation 
+    matrix, we can "multiply" (via "dot product") the point in one coordinate 
+    system by the transformation matrix to obtain the point in another 
+    coordinate system. But wait, there's more! We can "chain" coordinate 
+    systems together to convert points from camera, then to robot, then to 
+    field.  A combined matrix can be produced (by concatenate) to represent
+    multiple transformations in one matrix.  We can also "invert" these 
+    transformations and now we can compute where a field location should 
+    appear in the camera coordinate system.
+
+    To construct/design a matrix we must carefully consider the way that
+    we must rotate one coordinate system to obtain another.  There are
+    a number of ways to characterize this rotation, some more intuitive
+    than others.  If you are dealing with 90 degree, rigid transformations,
+    the "fromAxes" approach may be best.  Euler angles may be the most
+    traditional in robotics, but multiple, sequential rotations can be difficult 
+    to grasp.  Quaternions are very useful for interpolating arbitrary 3D
+    rotations (and avoid "gimbal lock") but harder to design from scratch.  
+    Quaternions are also a robust and compact representation for rotations.  
+    So we offer/support a range of rotation specification methodologies.  
+    See also the sibling Quaternion class.
+
     >>> a = Affine3()
-    >>> b = Affine3.fromRotation(30, [1, 0, 0])
+    >>> b1 = Affine3.fromAxes([0, -1, 0], [0, 0, 1], [-1, 0, 0])
+    >>> np.allclose(b1.transformBases(), [[0, -1, 0], [0, 0, 1], [-1, 0, 0]])
+    True
+    >>> b2 = Affine3.fromRotation(30, [1, 0, 0])
     >>> c = Affine3.fromTranslation(.5, 1.5, 2.5)
     >>> d = Affine3.fromQuaternion(1,2,3,4)
     >>> e = Affine3.fromQuaternion([1,2,3,4])
@@ -21,10 +50,14 @@ class Affine3(object):
     >>> f = Affine3.fromQuaternion(Quaternion())
     >>> a.equals(f)
     True
-    >>> f = Affine3.concatenate(b, c, d)
-    >>> pts = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], dtype=np.float32)
+    >>> f = Affine3.concatenate(b2, c, d)
+    >>> pts = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
     >>> npts = f.transformPoints(pts)
     >>> len(npts) == len(pts)
+    True
+    >>> str = f.asString()
+    >>> ff = Affine3.fromString(str)
+    >>> ff.equals(f)
     True
     
     """
@@ -33,7 +66,24 @@ class Affine3(object):
     @staticmethod
     def fromIdentity():
         return Affine3(xform.identity_matrix())
-    
+
+    @staticmethod
+    def fromString(s):
+        """assume s looks like:  'o 0.3 0.5 -2 q 1 2 3 4'  
+         nb: we can't represent skew and scale but for our purposes
+             this is fine.
+        """
+        vals = s.split(" ")
+        assert(len(vals) == 9)
+        assert(vals[0] == "o") 
+        assert(vals[4] == "q")
+        x = [float(vals[1]), float(vals[2]), float(vals[3])]
+        q = [float(vals[5]), float(vals[6]), float(vals[7]), float(vals[8])]
+        om = xform.translation_matrix(x)
+        qm = xform.quaternion_matrix(q)
+        result = xform.concatenate_matrices(om, qm)
+        return Affine3(result)
+
     @staticmethod
     def fromTranslation(x, y, z):
         "return Affine3 representing translation of x, y and z"
@@ -41,8 +91,25 @@ class Affine3(object):
 
     @staticmethod
     def fromRotation(angle, dir):
-        "return Affine3 representing rotation of angle (in degrees) around dir"
+        """return Affine3 representing rotation of angle (in degrees) around dir
+        """
         return Affine3(xform.rotation_matrix(math.radians(angle), dir))
+
+    def fromAxes(xtgt, ytgt, ztgt):
+        """return Affine3 representing rotation of axes to targets
+        NB: all targets should be normalized (unit length).
+        """
+        m = xform.identity_matrix()
+        m[0][0] = xtgt[0]
+        m[1][0] = xtgt[1]
+        m[2][0] = xtgt[2]
+        m[0][1] = ytgt[0]
+        m[1][1] = ytgt[1]
+        m[2][1] = ytgt[2]
+        m[0][2] = ztgt[0]
+        m[1][2] = ztgt[1]
+        m[2][2] = ztgt[2]
+        return Affine3(m)
 
     @staticmethod
     def fromEulerAngles(a, b, c, order):
@@ -103,7 +170,11 @@ class Affine3(object):
         self.matrix = xform.inverse_matrix(self.matrix)
         return self # chainable
     
-    def decompose(self):
+    def getTranslation(self):
+        xlate = xform.decompose_matrix(self.matrix)[3]
+        return (xlate[0], xlate[1], xlate[2])
+    
+    def _decompose(self):
         """ returns tuple of:
             scale : vector of 3 scaling factors
             shear : list of shear factors for x-y, x-z, y-z
@@ -112,6 +183,13 @@ class Affine3(object):
             perspective ; perspective partition
         """
         return xform.decompose_matrix(self.matrix)
+
+    def asString(self):
+        # nb: currently we assume no scales, skews, etc
+        q = xform.quaternion_from_matrix(self.matrix)
+        o = xform.decompose_matrix(self.matrix)[3]
+        return "o %g %g %g %s" %  \
+                (o[0], o[1], o[2], Quaternion(q).asString())
 
     def asInverse(self):
         return Affine3(xform.inverse_matrix(self.matrix))
