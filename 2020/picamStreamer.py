@@ -111,7 +111,9 @@ class CamHandler(BaseHTTPRequestHandler):
         cam.start()
         while True:
             camframe = cam.next()
+            self.startTime = time.monotonic()
             target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
+            self.endTime = time.monotonic()
             if target != None:
                 logging.debug(str(target))
             else:
@@ -135,7 +137,6 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_header('Content-length', jpg.size)
             self.end_headers()
             self.wfile.write(jpg.tostring())
-            time.sleep(0.05)
 
 def main():
   global s_args
