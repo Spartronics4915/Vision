@@ -134,6 +134,7 @@ class PiVideoStream:
         """
         logging.info("  (single threaded)")
         self.picam.start()
+        self.picam.startThread()
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Began processing images")
         while True:

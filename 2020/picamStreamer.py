@@ -109,8 +109,9 @@ class CamHandler(BaseHTTPRequestHandler):
         s_config["algo"]["algo"] = algoselector
         s_config["algo"]["disply"] = True
         cam.start()
+        cam.startThread()
         while True:
-            camframe = self.picam.imageQueue.get()
+            camframe = cam.imageQueue.get()
             target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
             if target != None:
                 logging.debug(str(target))

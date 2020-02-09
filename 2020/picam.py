@@ -24,8 +24,6 @@ class PiCam:
         self.imageQueue = queue.Queue(1)
         
         time.sleep(.1) # allow the camera to warm up
-        
-        self.startThread()
 
         self.cam = PiCamera(resolution=self.config["resolution"],
                             framerate=self.config["framerate"],
@@ -97,11 +95,18 @@ class PiCam:
         logging.info("  shutter_speed:%d us" % self.cam.shutter_speed)
         logging.info("  framerate:%s" % self.cam.framerate)
 
+        
+
     def start(self):
         self.rawCapture = PiRGBArray(self.cam, size=self.resolution)
         self.stream = self.cam.capture_continuous(self.rawCapture, format="bgr",
                                                     use_video_port=True)
         self.numFrames = 0
+
+    def startThread(self):
+        self.runThread = threading.Thread(target=self.capImagesThread)
+        self.quitThreadEvent = threading.Event()
+        self.runThread.start()
 
     def capImagesThread(self):
         while not self.quitThreadEvent.is_set():
@@ -114,12 +119,6 @@ class PiCam:
             except queue.Full:
                 self.imageQueue.get()
                 self.imageQueue.put_nowait(image)
-
-
-    def startThread(self):
-        self.runThread = threading.Thread(target=self.CapImagesThread)
-        self.quitThreadEvent = threading.Event()
-        self.runThread.start()
 
     def next(self):
         frame = next(self.stream)

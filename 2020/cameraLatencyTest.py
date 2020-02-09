@@ -3,6 +3,7 @@ from picamera.array import PiRGBArray
 import time
 import picam
 
+'''
 cfg = {"resolution": (1920, 1080), # cv2.resize() later
     "framerate": 30, # TODO: Come back to
     "iso": 400,
@@ -14,6 +15,7 @@ cfg = {"resolution": (1920, 1080), # cv2.resize() later
     "exposure_compensation": -25,
     "sensormode": 7
 }
+'''
 
 framesCap = 0
 camera = picam.PiCam(config = cfg)
