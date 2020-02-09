@@ -135,7 +135,6 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_header('Content-length', jpg.size)
             self.end_headers()
             self.wfile.write(jpg.tostring())
-            time.sleep(0.05)
 
 def main():
   global s_args
