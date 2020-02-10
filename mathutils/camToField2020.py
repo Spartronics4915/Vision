@@ -1,7 +1,7 @@
 from robot import *
 from vec import *
 
-class Robot2020(Robot):
+class CamToField2020(CamToField):
     """
     # Vision's goal is to identify landmarks as seen by the camera (ie in 
     # camera space) then to convey the location of the landmark to the robot 
@@ -18,7 +18,7 @@ class Robot2020(Robot):
     #   robotToField   (take origin/orientation of robot into field space)
     #   camToField (take origin/orientation of camera into field space)
     #
-    >>> r = Robot2020()
+    >>> r = CamToField2020()
     >>> r.updateRobotPose("150 150 20", 0)
     >>> fpt = r.transformPoints([[0, 0, -120]])[0]
     >>> np.allclose(fpt, [194.45436, 153, -24.7487])

@@ -2,7 +2,7 @@ from affine import Affine3
 from vec import Vec3
 import numpy as np
 
-class Robot:
+class CamToField:
     """
     Abstract Robot configuration for vision coordinate-system conversion. 
     Year-specific coordinate system setups are implemented in subclasses.
@@ -14,7 +14,7 @@ class Robot:
     time in the past represented by the associated timestamp.
 
     Example
-    >>> r = Robot()
+    >>> r = CamToField()
     >>> camToMountStr = "o 10 10 8 q 0.92388 0.382683 -0 -0"
     >>> mountToRobotStr = "o 0 0 0 q 0.5 0.5 -0.5 -0.5"
     >>> r.setCameraPose(camToMountStr)

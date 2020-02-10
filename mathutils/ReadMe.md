@@ -4,9 +4,9 @@ Mathlib is a collection of season-agnostic math and misc utilities which may be 
 in Vision solutions.  We recommend that you start exploring from the top-down.
 Comments and doctests "say it all"!
 
-* `Robot2020` is an example transformation chain representing the coordinate system
+* `CamToField2020` is an example transformation chain representing the coordinate system
  transformations for a camera attached to a rotating turret attached to the robot.
-* `Robot` is the base class for any robot that receives periodic updates of the robot's pose.
+* `CamToField` is the base class for any robot that receives periodic updates of the robot's pose.
 * `Affine3` is our core representation of geometric transformations and coordinate systems.
 * `Quaternion` is a compact/robust representation for rotations
 * `transformations.py` is a third-party package for manipulating & creating matrices.
