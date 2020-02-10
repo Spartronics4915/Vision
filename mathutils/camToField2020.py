@@ -1,4 +1,4 @@
-from robot import *
+from camToField import *
 from vec import *
 
 class CamToField2020(CamToField):
