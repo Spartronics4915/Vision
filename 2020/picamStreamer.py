@@ -109,8 +109,9 @@ class CamHandler(BaseHTTPRequestHandler):
         s_config["algo"]["algo"] = algoselector
         s_config["algo"]["disply"] = True
         cam.start()
+        cam.startThread()
         while True:
-            camframe = cam.next()
+            camframe = cam.imageQueue.get()
             target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
             if target != None:
                 logging.debug(str(target))
@@ -135,7 +136,6 @@ class CamHandler(BaseHTTPRequestHandler):
             self.send_header('Content-length', jpg.size)
             self.end_headers()
             self.wfile.write(jpg.tostring())
-            time.sleep(0.05)
 
 def main():
   global s_args

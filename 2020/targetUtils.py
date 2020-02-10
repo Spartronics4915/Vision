@@ -12,6 +12,7 @@
 import numpy as np
 import cv2
 import logging
+import math
 
 def findTarget(frame, mask, cfg):
     """
@@ -64,8 +65,10 @@ def findTarget(frame, mask, cfg):
             if cfg['display'] == 1:
 
                 cv2.drawContours(frame, [c],-1,(0,255,255),1)
-            
-            hexagonTarget = approx
+            area = cv2.moments(approx)
+
+            if area['m00'] > 200:
+                hexagonTarget = approx
 
     # TODO: Double check the useability of the frame
     # NOTE: The list retured here has three layers:

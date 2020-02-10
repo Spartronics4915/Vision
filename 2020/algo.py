@@ -91,7 +91,7 @@ def calibrationCapture(frame, config):
     output_dir = Path('calib_imgs')
 
     output_dir.mkdir(exist_ok=True)
-
+    '''
     # Pattern intrensics    
     pattern_width = 8
     pattern_height = 27
@@ -111,6 +111,11 @@ def calibrationCapture(frame, config):
         
     
     time.sleep(.01)
+    '''
+    cv2.imwrite(str(output_dir/'frame-{}.png'.format(time.monotonic())), frame)
+    time.sleep(.3)
+    logging.debug("Frame captured")
+
     return (None, frame)
 
 def realPNP(frame, config):
@@ -131,39 +136,7 @@ def realPNP(frame, config):
         return (None, visImg)
     # -== Target Manipulation ==-
     # TODO: Pretty sure config in unnessissary here
-    imgPts = targetUtils.target2pnpPoints(hexagonTarget,config)
-
-    xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
-
-    # Debug
-    logging.debug("Translation Vector: ".format(xlateVector))
-    logging.debug("Rotation Vector: ".format(rotVec))
-
-    # Testing pnpTransformRobotCoordinates
-    robotVector = targetUtils.pnpTransformRobotCoordinates(xlateVector, config)
-    logging.debug("Transformed Vector: ".format(robotVector))
-    # XXX: For now
-    return (None, visImg)
-
-def realPNP(frame, config):
-    # TODO: Try and convert the chamelion 'boundingbox' method to python
-    # frame --> visImg (used for drawing) and mask (used for target detection)
-
-    # -== Frame Threshholding ==-
-    mask = targetUtils.threshholdFrame(frame,config)
-
-    # Slight renaming, for convention
-    visImg = frame
-    # TODO: Add bitwise and 
-    # -== Target Detection ==- 
-    hexagonTarget, visImg = targetUtils.findTarget(visImg, mask, config)
-
-    # If we don't detect a target, drop out here
-    if hexagonTarget == None:
-        return (None, visImg)
-    # -== Target Manipulation ==-
-    # TODO: Pretty sure config in unnessissary here
-    imgPts = targetUtils.target2pnpPoints(hexagonTarget,config)
+    imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
 
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 

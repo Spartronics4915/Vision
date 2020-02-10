@@ -77,8 +77,8 @@ h = a
 h[0] + divideLength
 '''
 # Model Points
-s_modelPts = np.array([a, b, c, d], dtype="double")
-# s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
+#s_modelPts = np.array([a, b, c, d], dtype="double")
+s_modelPts = np.array([a, b, c, d, e, f, g, h], dtype="double")
 
 s_firstTime = True
 
@@ -120,15 +120,15 @@ def estimatePose(im, imgPts, cfg):
     # If there are camera intresncics set in the config, default to those
     try:
 
-        fx,fy = cfg['camIntrensics']['focalLength']
-        cx,cy = cfg['camIntrensics']['principalPoint']
-        distCoeffs = cfg['camIntrensics']['distortionCoeffs']
+        fx,fy = cfg['camIntrensics1080p']['focalLength']
+        cx,cy = cfg['camIntrensics1080p']['principalPoint']
+        distCoeffs = cfg['camIntrensics1080p']['distortionCoeffs']
         
     except Exception as e:
         logging.warning("Running PnP with no camera intrensics in config!")
         distCoeffs = np.zeros((4,1)) 
         y,x,_ = im.shape
-        # Default to theory camera intresnsics, which seem to be closest to 
+        # Default to theory camera intrensics, which seem to be closest to 
         fx = x*3.6/3.76
         fy = y*3.6/2.74
         cx,cy = (fx/2,fy/2)
