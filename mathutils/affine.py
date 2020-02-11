@@ -1,7 +1,11 @@
 import numpy as np
 import math
-import transformations as xform
-from quaternion import *
+if __package__ is None or __package__ == "":
+    import transformations as xform
+    from quaternion import *
+else:
+    from . import transformations as xform
+    from .quaternion import *
 
 class Affine3(object):
     """We represent a 3D affine transformation as a 4x4 matrix."

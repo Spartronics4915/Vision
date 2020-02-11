@@ -1,6 +1,10 @@
-from affine import Affine3
-from vec import Vec3
 import numpy as np
+if __package__ == "" or __package__ is None:
+    from affine import *
+    from vec import *
+else:
+    from .affine import *
+    from .vec import *
 
 class CamToField:
     """
@@ -14,16 +18,16 @@ class CamToField:
     time in the past represented by the associated timestamp.
 
     Example
-    >>> r = CamToField()
+    >>> ctof = CamToField()
     >>> camToMountStr = "o 10 10 8 q 0.92388 0.382683 -0 -0"
     >>> mountToRobotStr = "o 0 0 0 q 0.5 0.5 -0.5 -0.5"
-    >>> r.setCameraPose(camToMountStr)
-    >>> r.setMountPose(mountToRobotStr) 
-    >>> r.updateRobotPose("40 40 5.2", 333)
-    >>> r.updateMountPose("5", 334) # optional, year-dependent pose
+    >>> ctof.setCameraPose(camToMountStr)
+    >>> ctof.setMountPose(mountToRobotStr) 
+    >>> ctof.updateRobotPose("40 40 5.2", 333)
+    >>> ctof.updateMountPose("5", 334) # optional, year-dependent pose
     >>> targetInCamera = [0, 0, -120]  # 10 feet from camera in center of its screen
-    >>> targetField = r.transformPoints([targetInCamera])[0]
-    >>> targetFieldDir = r.transformVectors([targetInCamera])[0]
+    >>> targetField = ctof.transformPoints([targetInCamera])[0]
+    >>> targetFieldDir = ctof.transformVectors([targetInCamera])[0]
     >>> np.allclose(Vec3.length(targetFieldDir), 120)
     True
     """

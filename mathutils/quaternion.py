@@ -1,6 +1,9 @@
-import transformations as xform
 import numpy as np
 import math
+if __package__ is None or __package__ == "":
+    import transformations as xform
+else:
+    from . import transformations as xform
 
 class Quaternion:
     """Robust+compact representation of 3D rotation

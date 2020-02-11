@@ -1,5 +1,9 @@
-from camToField import *
-from vec import *
+if __package__ == "" or __package__ is None:
+    from camToField import *
+    from vec import *
+else:
+    from .camToField import *
+    from .vec import *
 
 class CamToField2020(CamToField):
     """
