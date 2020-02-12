@@ -62,7 +62,7 @@ moduleDebuggingConfig.update({
 })
 # Camera-Specific Settings
 moduleDebuggingConfig["picam"].update({
-    "resolution": (640, 480),
+    "resolution": (1920, 1080),
     "framerate": 90,
     "iso": 400,
     "brightness": 40,
@@ -78,7 +78,7 @@ moduleDebuggingConfig["algo"].update({
     "algo": "verticies", # Chose proper algo streaming
     "display": False,# 1 if streaming
     "hsvRangeLow": np.array([40,50,90]),
-    "hsvRangeHigh": np.array([255,255,255]),
+    "hsvRangeHigh": np.array([90,255,255]),
 
     "theta" : 0, # Represents the angle of elevation
 

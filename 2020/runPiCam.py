@@ -134,11 +134,12 @@ class PiVideoStream:
         """
         logging.info("  (single threaded)")
         self.picam.start()
+        self.picam.startThread()
         logging.debug(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
         logging.debug("Began processing images")
         while True:
             # The image here is directly passed to cv2.
-            image = self.picam.next()
+            image = self.picam.imageQueue.get()
             if self.processFrame(image):
                 break
 

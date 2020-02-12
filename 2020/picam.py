@@ -4,6 +4,7 @@ import time
 import threading
 import sys
 import logging
+import queue
 
 # -------------------------------------------------------------------------
 class PiCam:
@@ -20,11 +21,14 @@ class PiCam:
         self.framerate = self.config["framerate"]
         self.stream = None
         self.rawCapture = None
+        self.imageQueue = queue.Queue(1)
+        
+        time.sleep(.1) # allow the camera to warm up
 
         self.cam = PiCamera(resolution=self.config["resolution"],
                             framerate=self.config["framerate"],
                             sensor_mode=self.config["sensormode"])
-        time.sleep(.1) # allow the camera to warm up
+        
 
 
         if "iso" in self.config:
@@ -91,11 +95,30 @@ class PiCam:
         logging.info("  shutter_speed:%d us" % self.cam.shutter_speed)
         logging.info("  framerate:%s" % self.cam.framerate)
 
+        
+
     def start(self):
         self.rawCapture = PiRGBArray(self.cam, size=self.resolution)
         self.stream = self.cam.capture_continuous(self.rawCapture, format="bgr",
                                                     use_video_port=True)
         self.numFrames = 0
+
+    def startThread(self):
+        self.runThread = threading.Thread(target=self.capImagesThread)
+        self.quitThreadEvent = threading.Event()
+        self.runThread.start()
+
+    def capImagesThread(self):
+        while not self.quitThreadEvent.is_set():
+            frame = next(self.stream)
+            image = frame.array
+            self.rawCapture.truncate(0)
+            self.numFrames += 1
+            try:
+                self.imageQueue.put_nowait(image)
+            except queue.Full:
+                self.imageQueue.get()
+                self.imageQueue.put_nowait(image)
 
     def next(self):
         frame = next(self.stream)

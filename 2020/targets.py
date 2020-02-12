@@ -54,8 +54,7 @@ class Target:
 
     # override me to present alternate respresentation
     def send(self):
-        comm.PutString(self.subkey,
-                "{0};{1}".format(str(self.value), '0'))
+        comm.PutNumberArray(self.subkey,self.value)
 
 
 class TargetPID(Target):
