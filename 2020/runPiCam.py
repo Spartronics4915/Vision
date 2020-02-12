@@ -74,6 +74,9 @@ class PiVideoStream:
         if (self.args.algo is not None):
             self.algoConfig["algo"] = self.args.algo
 
+        # Setting mmounting intrenssics
+        self.algoConfig["state"]["mountingIntrensics"] = comm.getCameraPosition()
+
     def parseArgs(self):
         """
         Parse input arguments
@@ -139,24 +142,25 @@ class PiVideoStream:
         logging.debug("Began processing images")
         while True:
             # The image here is directly passed to cv2.
+            startPose = comm.getCurrentPose()
+            self.algoConfig["state"]["startPipeTime"] = startPose[2] # Should be the 3rd item in the list
+            self.algoConfig["state"]["turretAngle"] = comm.getTurretAngle()
+
             image = self.picam.imageQueue.get()
             if self.processFrame(image):
                 break
 
     # The end/start of the line for the stack trace 
     def processFrame(self, image):
-        # called on each frame in the video
-        logging.debug("  (multi threaded)")
-
         # Cut 'target'
         # NOTE: Interesting, frame get dropped on the floor here
-        target, frame = algo.processFrame(image, cfg=self.config["algo"])
+        robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
 
         # XXX: Cut
         if self.commChan:
-            if target != None:
+            if robotPose != None:
                 self.commChan.UpdateVisionState("Acquired")
-                target.send()
+                self.algoConfig["state"]["TargetPNP"].poseValue = robotPose
             else:
                 self.commChan.UpdateVisionState("Searching")
         # XXX: End cut
