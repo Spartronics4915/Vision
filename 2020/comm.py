@@ -31,17 +31,21 @@ def PutNumberArray(key, value):
 def getCurrentPose():
     if theComm != None:
         # Get the current pose
-        return (0,0,0) # x,y,time
+        robotState = theComm.controlTable.getNumberArray("robotPose",(-1,-1,-1))
+        return robotState # x,y,time
 
 def getCameraPosition():
     if theComm != None:
         # Get the robot relative mounting of the camera
-        return (0,0,0) # x,y,z
+        mountPosition = theComm.controlTable.getNumberArray("mountIntrensics",-1)
+        return mountPosition # x,y,z
 
 def getTurretAngle():
     if theComm != None:
         # Get the turret angle from smartDashboard
-        return  0# x,y,z
+        # TODO Check
+        turretTheta = theComm.controlTable.getNumber("turretAngle",-1)
+        return turretTheta
 
 class Comm:
     """

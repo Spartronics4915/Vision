@@ -121,6 +121,7 @@ def calibrationCapture(frame, config):
 def realPNP(frame, config):
     # TODO: Try and convert the chamelion 'boundingbox' method to python
     # frame --> visImg (used for drawing) and mask (used for target detection)
+    robotPose = None
 
     # -== Frame Threshholding ==-
     mask = targetUtils.threshholdFrame(frame,config)
@@ -141,11 +142,15 @@ def realPNP(frame, config):
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
     # Debug
-    logging.debug("Translation Vector: ".format(xlateVector))
-    logging.debug("Rotation Vector: ".format(rotVec))
+    #  - logging.debug("Translation Vector: ".format(xlateVector))
+    #  - logging.debug("Rotation Vector: ".format(rotVec))
 
-    # Testing pnpTransformRobotCoordinates
-    robotVector = targetUtils.pnpTransformRobotCoordinates(xlateVector, config)
-    logging.debug("Transformed Vector: ".format(robotVector))
+    
+    # MATHUTIL MATRIX TRANSFORMATIONS GO HERE
+    # All cuirrent status is avaible here through cfg->>state->
+    
     # XXX: For now
-    return (None, visImg)
+    if robotPose is None:
+        return ((0,0,0),visImg)
+    else:
+        return (robotPose, visImg)

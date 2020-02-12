@@ -125,7 +125,7 @@ def estimatePose(im, imgPts, cfg):
         distCoeffs = cfg['camIntrensics1080p']['distortionCoeffs']
         
     except Exception as e:
-        logging.warning("Running PnP with no camera intrensics in config!")
+        logging.debug("Running PnP with no camera intrensics in config!")
         distCoeffs = np.zeros((4,1)) 
         y,x,_ = im.shape
         # Default to theory camera intrensics, which seem to be closest to 

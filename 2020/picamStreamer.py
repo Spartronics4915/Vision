@@ -113,6 +113,7 @@ class CamHandler(BaseHTTPRequestHandler):
         while True:
             camframe = cam.imageQueue.get()
             target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
+            self.endTime = time.monotonic()
             if target != None:
                 logging.debug(str(target))
             else:
