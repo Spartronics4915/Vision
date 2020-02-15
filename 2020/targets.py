@@ -84,7 +84,7 @@ class TargetPNP(Target):
     def __init__(self):
         super().__init__(self)
         # Should be /SmartDashboard/Vision/PNPValue
-        self.subkey = "RobotPose"
+        self.subkey = "Target"
         self.poseValue = None # Should be a tuple?
         self.timeValue = None
 
@@ -94,7 +94,8 @@ class TargetPNP(Target):
 
     def send(self):
         # Push to network tables
-        comm.PutNumberArray(self.subkey, (self.poseValue,self.timeValue))
+        # Should result in a key of '/Vision/Target/Result'
+        comm.PutNumberArray(self.subkey + "/Result", (self.poseValue,self.timeValue))
 
 # Currently no doctests, however if needed un-comment
 '''

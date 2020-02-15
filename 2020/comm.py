@@ -28,11 +28,11 @@ def PutNumberArray(key, value):
     if theComm != None:
         theComm.sd.putNumberArray("Vision/"+key, value)
 
-def getCurrentPose():
+def getCurrentTime():
     if theComm != None:
-        # Get the current pose
-        robotState = theComm.controlTable.getNumberArray("robotPose",(-1,-1,-1))
-        return robotState # x,y,time
+        # Get the current time
+        timestamp = theComm.robotTable.getNumber("timestamp",(-1))
+        return timestamp # x,y,time
 
 def getCameraPosition():
     if theComm != None:
@@ -80,7 +80,8 @@ class Comm:
             self.UpdateVisionState("Standby")
 
             # We communicate target to robot via Vision table.
-            self.controlTable = NetworkTables.getTable("/VisionControl`")
+            self.controlTable = NetworkTables.getTable("/VisionControl")
+            self.robotTable =  NetworkTables.getTable("SmartDashboard/RobotState") #XXX: Might not work
             self.control = Control()
 
             # Robot communicates to us via fields within the Vision/Control
