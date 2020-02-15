@@ -108,6 +108,7 @@ class PiVideoStream:
         self.go()
 
     def go(self):
+        # TODO: Needs to be cut due to jeffery's multithreading
         if self.args.threads <= 1:
             self.processVideo()
         else:
@@ -142,9 +143,8 @@ class PiVideoStream:
         logging.debug("Began processing images")
         while True:
             # The image here is directly passed to cv2.
-            startPose = comm.getCurrentPose()
-            self.algoConfig["state"]["startPipeTime"] = startPose[2] # Should be the 3rd item in the list
-            self.algoConfig["state"]["turretAngle"] = comm.getTurretAngle()
+            startTime = comm.getCurrentTime()
+            self.algoConfig["state"]["startPipeTime"] = startTime # Should be the 3rd item in the list
 
             image = self.picam.imageQueue.get()
             if self.processFrame(image):

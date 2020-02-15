@@ -181,8 +181,8 @@ GPConfigV1["algo"].update({
         "TargetPID" : targets.TargetPID(),
         "opeartingPipe" : "pnp", # Will corresspond to pipelines in algo.processframe()
         "startPipeTime" : -1,
-        "mountingIntrensics" : -1,
-        "turretAngle" : -1,
+        #"mountingIntrensics" : -1,
+        #"turretAngle" : -1,
 
     }
 })
