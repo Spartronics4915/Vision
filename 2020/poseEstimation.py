@@ -174,8 +174,8 @@ def estimatePose(im, imgPts, cfg):
         # [[ -113.84452688]
         #  [ -297.88517426]
         #  [-1340.13762528]]
-        #logging.debug("Rotation Vector:\n {0}".format(rotVec))
-        #logging.debug("Translation Vector:\n {0}".format(xlateVec))
+        logging.debug("Rotation Vector:\n {0}".format(rotVec))
+        logging.debug("Translation Vector:\n {0}".format(xlateVec))
 
         # First transform target *world* points to camera coordinates.
         # In opencv x is to the right, y is down and z is fwd.

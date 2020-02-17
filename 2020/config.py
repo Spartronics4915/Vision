@@ -82,25 +82,12 @@ moduleDebuggingConfig["algo"].update({
 
     "theta" : 0, # Represents the angle of elevation
 
-    "camIntrensics1080p": {
-        "focalLength" : (1.79116329e+03,1.79568335e+03),
-        "principalPoint" : (9.64697499e+02,5.94350454e+02),
-        "distortionCoeffs" : np.array([  1.03245422e-01, -8.14646031e-01,  8.78989595e-04,
-         5.05879957e-04,  1.43069887e+00])
+    "camBIntrensics1080p": { #Calibrated on 2020.02.16, reprojection error of 0.5
+        "focalLength" : (1.81606009e+03,1.82082976e+03,),
+        "principalPoint" : (9.52672626e+02,5.47692316e+02),
+        "distortionCoeffs" : np.array([ 1.07854440e-01, -8.34892908e-01, -1.86048786e-03,
+        -1.26161591e-03,  1.44654595e+00])
     },
-    "camIntrinsics640p": {
-        "focalLength" : (634.89045322, 634.85728747),
-        "principalPoint" : (322.55085532, 250.9350097),
-        "distortionCoeffs" : np.array([ 1.14347782e-01, -1.04102188e+00,  2.73924512e-03,
-        7.23847549e-04,  2.04951815e+00])
-    },
-
-    "camIntrensics720p": { #720p
-    "focalLength" : (1.24108285e+03, 1.24478598e+03),
-    "principalPoint" : (6.43779311e+02, 3.93884033e+02),
-    "distortionCoeffs" : np.array([1.14833683e-01, -9.74930348e-01,  1.03528449e-03,
-         7.31745519e-05,  1.87194365e+00])
-    }
 
 
         # Alternate camera intrensics (from other team)(For a 720p frame): 
@@ -119,7 +106,7 @@ calibConfig.update({
 })
 # Camera-Specific Settings
 calibConfig["picam"].update({
-    "resolution": (640, 480),
+    "resolution": (1920, 1080),
     "framerate": 90,
     "iso": 0,
     "flip": False,
@@ -164,10 +151,9 @@ GPConfigV1["algo"].update({
     "hsvRangeHigh": np.array([255,255,255]),
 
     "camIntrensics1080p": {
-        "focalLength" : (1.79116329e+03,1.79568335e+03),
-        "principalPoint" : (9.64697499e+02,5.94350454e+02),
-        "distortionCoeffs" : np.array([  1.03245422e-01, -8.14646031e-01,  8.78989595e-04,
-         5.05879957e-04,  1.43069887e+00])
+        "focalLength" : (0,0),
+        "principalPoint" : (0,0),
+        "distortionCoeffs" : np.array([0, 0, 0, 0, 0])
     },
 
 })
