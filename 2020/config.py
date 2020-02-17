@@ -83,12 +83,15 @@ moduleDebuggingConfig["algo"].update({
     "theta" : 0, # Represents the angle of elevation
 
     "camBIntrensics1080p": { #Calibrated on 2020.02.16, reprojection error of 0.5
-        "focalLength" : (1.81606009e+03,1.82082976e+03,),
+        "focalLength" : (1.81606009e+03,1.82082976e+03),
         "principalPoint" : (9.52672626e+02,5.47692316e+02),
-        "distortionCoeffs" : np.array([ 1.07854440e-01, -8.34892908e-01, -1.86048786e-03,
-        -1.26161591e-03,  1.44654595e+00])
+        "distortionCoeffs" : np.array([ 1.07854440e-01, -8.34892908e-01, -1.86048786e-03, -1.26161591e-03,  1.44654595e+00])
     },
-
+    "camCIntrensics1080p": { #Calibrated on 2020.02.16, reprojection error of 0.7
+        "focalLength" : (1.87012116e+03,1.87277363e+03),
+        "principalPoint" : (9.95565596e+02,5.26934854e+02),
+        "distortionCoeffs" : np.array([ 1.34505906e-01, -1.11122889e+00, -2.26698187e-03, -8.81176466e-05,  2.14086939e+00])
+    },
 
         # Alternate camera intrensics (from other team)(For a 720p frame): 
         #       disortion Coefficients:  (2.9666848459501894e-02, 7.7071617830897565e-01, 0, 
