@@ -91,31 +91,22 @@ def calibrationCapture(frame, config):
     output_dir = Path('calib_imgs')
 
     output_dir.mkdir(exist_ok=True)
-    '''
-    # Pattern intrensics    
+ 
     pattern_width = 8
     pattern_height = 27
     pattern_size = (pattern_width, pattern_height)
-    img_ind = 0
             
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # cv2.imshow('frame',gray)
     ret, centers = cv2.findCirclesGrid(gray, pattern_size, None, cv2.CALIB_CB_ASYMMETRIC_GRID)
     
     if ret:
-        cv2.imwrite(str(output_dir/'frame-{:04d}.png'.format(img_ind)), gray)
-        img_ind += 1
+        cv2.imwrite(str(output_dir/'frame-{}.png'.format(time.monotonic())), frame)
         cv2.drawChessboardCorners(frame, pattern_size, centers, ret)
-        # cv2.imshows are here
         
-    
-    time.sleep(.01)
-    '''
-    cv2.imwrite(str(output_dir/'frame-{}.png'.format(time.monotonic())), frame)
-    time.sleep(.3)
-    logging.debug("Frame captured")
+        logging.info("Frame captured")
 
+        
     return (None, frame)
 
 def realPNP(frame, config):
@@ -133,7 +124,7 @@ def realPNP(frame, config):
     hexagonTarget, visImg = targetUtils.findTarget(visImg, mask, config)
 
     # If we don't detect a target, drop out here
-    if hexagonTarget == None:
+    if hexagonTarget is None:
         return (None, visImg)
     # -== Target Manipulation ==-
     # TODO: Pretty sure config in unnessissary here
