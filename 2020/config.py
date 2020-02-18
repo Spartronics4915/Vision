@@ -92,6 +92,12 @@ moduleDebuggingConfig["algo"].update({
         "principalPoint" : (9.95565596e+02,5.26934854e+02),
         "distortionCoeffs" : np.array([ 1.34505906e-01, -1.11122889e+00, -2.26698187e-03, -8.81176466e-05,  2.14086939e+00])
     },
+    "camAIntrensics1080p": {
+        "focalLength" : (1.79116329e+03,1.79568335e+03),
+        "principalPoint" : (9.64697499e+02,5.94350454e+02),
+        "distortionCoeffs" : np.array([  1.03245422e-01, -8.14646031e-01,  8.78989595e-04,
+         5.05879957e-04,  1.43069887e+00])
+    },
 
         # Alternate camera intrensics (from other team)(For a 720p frame): 
         #       disortion Coefficients:  (2.9666848459501894e-02, 7.7071617830897565e-01, 0, 
@@ -153,6 +159,7 @@ GPConfigV1["algo"].update({
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
 
+    # Mounted camera is camera B
     "camIntrensics1080p": {
         "focalLength" : (1.81606009e+03,1.82082976e+03),
         "principalPoint" : (9.52672626e+02,5.47692316e+02),
