@@ -154,9 +154,9 @@ GPConfigV1["algo"].update({
     "hsvRangeHigh": np.array([255,255,255]),
 
     "camIntrensics1080p": {
-        "focalLength" : (0,0),
-        "principalPoint" : (0,0),
-        "distortionCoeffs" : np.array([0, 0, 0, 0, 0])
+        "focalLength" : (1.81606009e+03,1.82082976e+03),
+        "principalPoint" : (9.52672626e+02,5.47692316e+02),
+        "distortionCoeffs" : np.array([ 1.07854440e-01, -8.34892908e-01, -1.86048786e-03, -1.26161591e-03,  1.44654595e+00])
     },
 
 })

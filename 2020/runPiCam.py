@@ -109,8 +109,8 @@ class PiVideoStream:
 
     def go(self):
         # TODO: Needs to be cut due to jeffery's multithreading
-        if self.args.threads <= 1:
-            self.processVideo()
+        self.processVideo()
+        '''
         else:
             try:
                 self.captureThread = picam.CaptureThread(self.picam,
@@ -132,6 +132,7 @@ class PiVideoStream:
 
         if self.args.display:
             cv2.destroyAllWindows()
+        '''
 
     def processVideo(self):
         """ create a camera, continually read frames and process them.

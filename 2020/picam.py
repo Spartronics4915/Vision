@@ -133,7 +133,7 @@ class PiCam:
         if self.rawCapture:
             self.rawCapture.close()
         self.cam.close()
-
+'''
 # ------------------------------------------------------------------------
 class CaptureThread(threading.Thread):
     def __init__(self, picam, procCallback, numProcessingThreads=0):
@@ -211,4 +211,4 @@ class ProcessingThread(threading.Thread):
                     with self.mainthread.lock:
                         self.mainthread.procPool.insert(0, self)
         logging.info("Processor thread %s terminated" % self.name)
-
+'''
