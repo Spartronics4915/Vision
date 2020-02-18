@@ -12,6 +12,7 @@ with picamera.PiCamera(resolution = (1920,1080), framerate = 30) as camera:
         startTime = time.monotonic() 
         frame = next(cap)
         #startTime = time.monotonic()
+        # BRG_frame = cv2.cvtColor(frame, cv2.CV_YCrCb2BGR)
         stream.seek(0)
         
         stream.truncate()
