@@ -141,7 +141,4 @@ def realPNP(frame, config):
     # All cuirrent status is avaible here through cfg->>state->
     
     # XXX: For now
-    if robotPose is None:
-        return ((0,0,0),visImg)
-    else:
-        return (robotPose, visImg)
+    return (robotPose, visImg)
