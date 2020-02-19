@@ -80,8 +80,9 @@ class Comm:
             self.UpdateVisionState("Standby")
 
             # We communicate target to robot via Vision table.
+            # TODO: Should be cut later
             self.controlTable = NetworkTables.getTable("/VisionControl")
-            self.robotTable =  NetworkTables.getTable("SmartDashboard/RobotState") #XXX: Might not work
+            self.robotTable =  NetworkTables.getTable("/SmartDashboard/RobotState") 
             self.control = Control()
 
             # Robot communicates to us via fields within the Vision/Control
