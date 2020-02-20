@@ -95,7 +95,7 @@ class TargetPNP(Target):
     def send(self):
         # Push to network tables
         # Should result in a key of '/Vision/Target/Result'
-        comm.PutNumberArray(self.subkey + "/Result", (self.poseValue,self.timeValue))
+        comm.PutNumberArray(self.subkey + "/Result", self.poseValue + self.timeValue) # Tuples add to form one tuples
 
 # Currently no doctests, however if needed un-comment
 '''

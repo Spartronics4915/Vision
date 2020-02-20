@@ -75,7 +75,6 @@ class PiVideoStream:
             self.algoConfig["algo"] = self.args.algo
 
         # Setting mmounting intrenssics
-        self.algoConfig["state"]["mountingIntrensics"] = comm.getCameraPosition()
 
     def parseArgs(self):
         """
@@ -162,6 +161,7 @@ class PiVideoStream:
             if robotPose != None:
                 self.commChan.UpdateVisionState("Acquired")
                 self.algoConfig["state"]["TargetPNP"].poseValue = robotPose
+                self.algoConfig["state"]["TargetPNP"].send()
             else:
                 self.commChan.UpdateVisionState("Searching")
         # XXX: End cut
