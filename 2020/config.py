@@ -159,7 +159,7 @@ GPConfigV1["algo"].update({
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([255,255,255]),
 
-    # Mounted camera is camera B
+    # -= Mounted camera is camera B =-
     "camIntrensics1080p": {
         "focalLength" : (1.81606009e+03,1.82082976e+03),
         "principalPoint" : (9.52672626e+02,5.47692316e+02),
@@ -175,10 +175,7 @@ GPConfigV1["algo"].update({
         "operatingRes" : "high", # Determines weather or not we run cv2.resize the image before processing
         "TargetPNP" : targets.TargetPNP(), # Target objects 
         "TargetPID" : targets.TargetPID(),
-        "opeartingPipe" : "pnp", # Will corresspond to pipelines in algo.processframe()
         "startPipeTime" : -1,
-        #"mountingIntrensics" : -1,
-        #"turretAngle" : -1,
 
     }
 })
