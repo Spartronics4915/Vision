@@ -125,7 +125,7 @@ def realPNP(frame, config):
 
     # If we don't detect a target, drop out here
     if hexagonTarget is None:
-        return (None, visImg)
+        return (None,None, visImg)
     # -== Target Manipulation ==-
     # TODO: Pretty sure config in unnessissary here
     imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
