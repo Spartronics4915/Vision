@@ -144,7 +144,9 @@ class PiVideoStream:
         while True:
             # The image here is directly passed to cv2.
             startTime = comm.getCurrentTime()
-            self.algoConfig["state"]["startPipeTime"] = startTime # Should be the 3rd item in the list
+            self.algoConfig["state"]["TargePNP"].timeValue = startTime # Should be the 3rd item in the list
+            self.algoConfig["state"]["TargetPID"].timeValue = startTime # Should be the 3rd item in the list
+
 
             image = self.picam.imageQueue.get()
             if self.processFrame(image):
@@ -154,14 +156,20 @@ class PiVideoStream:
     def processFrame(self, image):
         # Cut 'target'
         # NOTE: Interesting, frame get dropped on the floor here
-        robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
+        robotPose, yawOffset, frame = algo.processFrame(image, cfg=self.algoConfig)
 
         # XXX: Cut
         if self.commChan:
             if robotPose != None:
                 self.commChan.UpdateVisionState("Acquired")
+                # PNP
                 self.algoConfig["state"]["TargetPNP"].poseValue = robotPose
                 self.algoConfig["state"]["TargetPNP"].send()
+                # PID
+                self.algoConfig["state"]["TargetPID"].valuehOffSet = yawOffset
+                self.algoConfig["state"]["TargetPID"].send()
+
+
             else:
                 self.commChan.UpdateVisionState("Searching")
         # XXX: End cut

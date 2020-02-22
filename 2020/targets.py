@@ -63,6 +63,8 @@ class TargetPID(Target):
         super().__init__(self)
         self.valuehOffSet = None
         self.valuevOffset = None
+        self.timeValue = None
+
         self.subkey = "PIDOffset"
 
         # Will be set to true wwhen there is unsgent data
@@ -76,7 +78,7 @@ class TargetPID(Target):
     def send(self):
         # Push the value to netweork tables
         # Should be called afteer all the computational intensive data is done
-        comm.PutNumberArray(self.subkey,(self.valuehOffSet,self.valuevOffset))
+        comm.PutNumberArray(self.subkey,(self.valuehOffSet,self.timeValue))
 
 
 class TargetPNP(Target):
@@ -95,7 +97,9 @@ class TargetPNP(Target):
     def send(self):
         # Push to network tables
         # Should result in a key of '/Vision/Target/Result'
-        comm.PutNumberArray(self.subkey + "/Result", self.poseValue + self.timeValue) # Tuples add to form one tuples
+        comm.PutNumberArray(self.subkey + "/Result", self.poseValue.extend(self.timeValue)) 
+        # Tuples add to form one tuples
+        # (x,y,z,time)
 
 # Currently no doctests, however if needed un-comment
 '''
