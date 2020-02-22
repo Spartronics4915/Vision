@@ -31,7 +31,7 @@ def PutNumberArray(key, value):
 def getCurrentTime():
     if theComm != None:
         # Get the current time
-        timestamp = theComm.robotTable.getNumber("timestamp",(-1))
+        timestamp = theComm.robotTable.getNumber("timeStamp",(-1))
         return timestamp # x,y,time
 
 def getCameraPosition():
