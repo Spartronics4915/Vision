@@ -130,6 +130,11 @@ def realPNP(frame, config):
     # TODO: Pretty sure config in unnessissary here
     imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
 
+    # -== PnP Offset Value Calculation ==- #
+    targetCenter = targetUtils.getTargetCenter(imgPts)
+
+    yawOffset = targetUtils.getYawError(frame,targetCenter)
+
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
     # Debug
@@ -140,5 +145,4 @@ def realPNP(frame, config):
     # MATHUTIL MATRIX TRANSFORMATIONS GO HERE
     # All cuirrent status is avaible here through cfg->>state->
     
-    # XXX: For now
-    return (robotPose, visImg)
+    return (robotPose, yawOffset, visImg)

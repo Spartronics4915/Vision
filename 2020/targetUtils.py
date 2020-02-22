@@ -292,12 +292,18 @@ def estimatePosePNP(frame, cfg):
     """
     pass
 
-def getTargetCenter(frame, cfg):
-    pass
+def getTargetCenter(target):
+    # Takes the points of a target, and returns an approximation of where the (0,0) is
+    #   in PnP coordinate space
 
-def getPitchYawError(frame, cfg):
+    # Hacky, for now
+    center = (target[0] + target[3])/2
+    return center
+
+def getYawError(frame, center):
     # TBD for closed-loop PID aiming
-    pass
+    yawOffset = (frame.size()[1]/2) / center
+    return yawOffset
 
 def pnpTransformRobotCoordinates(translation, cfg):
     # translation is a translation vector, cfg is the camera's angle in radians
