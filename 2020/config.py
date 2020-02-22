@@ -144,7 +144,7 @@ GPConfigV1["picam"].update({
     "iso": 400,
     "brightness": 40,
     "contrast": 100,
-    "flip": False,
+    "flip": True,
     "rotation": 0,
     "exposure_mode": "off", #"fixedfps",
     "exposure_compensation": -25, # [-25, 25]
@@ -157,7 +157,7 @@ GPConfigV1["algo"].update({
                         # TODO: Chamge this back later
     "display": False,   # 1 if streaming
     "hsvRangeLow": np.array([40,50,90]),
-    "hsvRangeHigh": np.array([255,255,255]),
+    "hsvRangeHigh": np.array([80,255,255]),
 
     # -= Mounted camera is camera B =-
     "camIntrensics1080p": {
