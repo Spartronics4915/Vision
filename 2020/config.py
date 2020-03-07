@@ -139,8 +139,8 @@ GPConfigV1.update({
 })
 # Camera-Specific Settings
 GPConfigV1["picam"].update({
-    "resolution": (1920, 1080), # cv2.resize() later
-    "framerate": 30, # TODO: Come back to
+    "resolution": (1920, 1080), # (320,240)
+    "framerate": 30, # 90
     "iso": 400,
     "brightness": 40,
     "contrast": 100,
@@ -152,10 +152,9 @@ GPConfigV1["picam"].update({
 # Algo-Specific settings
 # Generally, these are going to be numbers/flags/constants used in cv2 function calls
 GPConfigV1["algo"].update({
-    "algo": "empty",    # Chose proper algo streaming
-                        # Closed loop pnp here
-                        # TODO: Chamge this back later
-    "display": False,   # 1 if streaming
+    "algo": "empty",    # 'pid' or 'pnp'
+
+    "display": False,   # 1 if streaming 
     "hsvRangeLow": np.array([40,50,90]),
     "hsvRangeHigh": np.array([80,255,255]),
 
