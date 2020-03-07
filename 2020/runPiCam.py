@@ -144,7 +144,7 @@ class PiVideoStream:
         while True:
             # The image here is directly passed to cv2.
             startTime = comm.getCurrentTime()
-            self.algoConfig["state"]["TargePNP"].timeValue = startTime # Should be the 3rd item in the list
+            self.algoConfig["state"]["TargetPNP"].timeValue = startTime # Should be the 3rd item in the list
             self.algoConfig["state"]["TargetPID"].timeValue = startTime # Should be the 3rd item in the list
 
 
