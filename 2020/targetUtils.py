@@ -302,7 +302,7 @@ def getTargetCenter(target):
 
 def getYawError(frame, center):
     # TBD for closed-loop PID aiming
-    yawOffset = (frame.size()[1]/2) / center
+    yawOffset = (frame.shape[1]/2) / center[0]
     return yawOffset
 
 def pnpTransformRobotCoordinates(translation, cfg):

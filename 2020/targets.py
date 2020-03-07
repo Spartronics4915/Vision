@@ -78,7 +78,7 @@ class TargetPID(Target):
     def send(self):
         # Push the value to netweork tables
         # Should be called afteer all the computational intensive data is done
-        comm.PutNumberArray(self.subkey,(self.valuehOffSet,self.timeValue))
+        comm.putNumber(self.subkey,self.valuehOffSet)
 
 
 class TargetPNP(Target):

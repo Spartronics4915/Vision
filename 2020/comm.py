@@ -47,6 +47,10 @@ def getTurretAngle():
         turretTheta = theComm.controlTable.getNumber("turretAngle",-1)
         return turretTheta
 
+def putNumber(key, value):
+    if theComm != None:
+        theComm.sd.putNumber("Vision/"+key, value)
+
 class Comm:
     """
         Comm abstracts our network-tables conventions.
