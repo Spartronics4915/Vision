@@ -54,6 +54,9 @@ def processFrame(frame, cfg=None):
         return calibrationCapture(frame, cfg)
     elif algo == "pnp":
         return realPNP(frame, cfg)
+    elif algo == "pid":
+        # Should return two things
+        return hexagonPIDPipieline(frame, cfg)
     else:
         logging.info("algo: unexpected name " + algo + " running default")
         return defaultAlgo(frame, cfg)
@@ -73,16 +76,28 @@ def emptyAlgo(frame, cfg):
 def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
-def generatorHexagonVerticies(frame, cfg):
+def hexagonPIDPipieline(frame, cfg):
 
-    # Apply our thresholds to the frame
-    frame = targetUtils.threshholdFrame(frame,cfg)
+    mask = targetUtils.threshholdFrame(frame,config)
 
-    # Taget acquisition
-    target, frame = targetUtils.findTarget(frame,cfg)
+    # Slight renaming, for convention
+    visImg = frame
+    # TODO: Add bitwise and 
+    # -== Target Detection ==- 
+    hexagonTarget, visImg = targetUtils.findTarget(visImg, mask, config)
 
+    # If we don't detect a target, drop out here
+    if hexagonTarget is None:
+        return (None,None, visImg)
+    
+    imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
 
-    return (None, frame)
+    # -== PID Offset Value Calculation ==- #
+    targetCenter = targetUtils.getTargetCenter(imgPts)
+
+    yawOffset = targetUtils.getYawError(frame,targetCenter)
+
+    return (yawOffset, frame)
 
 def calibrationCapture(frame, config):
     # A pipeline to capture frames (asymetic circles) to be used for clibration
