@@ -158,7 +158,7 @@ class PiVideoStream:
         # NOTE: Interesting, frame get dropped on the floor here
 
         if self.algoConfig["algo"] == "pnp":
-            robotPose, yawOffset, frame = algo.processFrame(image, cfg=self.algoConfig)
+            robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
     
         
         if self.algoConfig["algo"] == "pid":
