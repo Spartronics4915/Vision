@@ -155,40 +155,36 @@ class PiVideoStream:
     # The end/start of the line for the stack trace 
     def processFrame(self, image):
         # Cut 'target'
-        # NOTE: Interesting, frame get dropped on the floor here
 
-        robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
-    
-        #if self.algoConfig["algo"] == "pid":
-        #    yawOffset, frame = algo.processFrame(image, cfg=self.algoConfig)
+        # Not to be misleading here - target is the general-purpose data
+        #   we will get back from processFrame. It is NOT a target object
+        target, frame = algo.processFrame(image, cfg=self.algoConfig)
+
 
         # XXX: Cut
         if self.commChan:
             
-            # -== PNP version ==-
-            if self.algoConfig["algo"] == "pnp":
-                if robotPose is not None:
+            if target is not None
 
-                    self.commChan.UpdateVisionState("Acquired")
+                self.commChan.UpdateVisionState("Acquired")
+                
+                # -== PNP version ==-
+                if self.algoConfig["algo"] == "pnp":
+                    
                     # PNP
-                    self.algoConfig["state"]["TargetPNP"].poseValue = robotPose
+                    self.algoConfig["state"]["TargetPNP"].poseValue = target
                     self.algoConfig["state"]["TargetPNP"].send()
-
-                else:
-                    self.commChan.UpdateVisionState("Searching")
-            # -== PID version ==-
-            if self.algoConfig["algo"] == "pid":
-
-                if yawOffset is not None:
-        
-                    self.commChan.UpdateVisionState("Acquired")
+                
+                # -== PID version ==-
+                if self.algoConfig["algo"] == "pid":
+            
                     # PID
-                    self.algoConfig["state"]["TargetPID"].valuehOffSet = yawOffset
+                    self.algoConfig["state"]["TargetPID"].valuehOffSet = target
                     self.algoConfig["state"]["TargetPID"].send()
 
-                else:
+            else:
 
-                    self.commChan.UpdateVisionState("Searching")
+                self.commChan.UpdateVisionState("Searching")
 
         # XXX: End cut
 

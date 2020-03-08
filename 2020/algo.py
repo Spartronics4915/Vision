@@ -76,6 +76,7 @@ def emptyAlgo(frame, cfg):
 def hsvAlgo(frame,cfg):
     return (None,cv2.cvtColor(frame, cv2.COLOR_BGR2HSV))  # HSV color space
 
+# PID (closed-loop)
 def hexagonPIDPipieline(frame, cfg):
 
     mask = targetUtils.threshholdFrame(frame,config)
@@ -124,6 +125,7 @@ def calibrationCapture(frame, config):
         
     return (None, frame)
 
+# PNP
 def realPNP(frame, config):
     # TODO: Try and convert the chamelion 'boundingbox' method to python
     # frame --> visImg (used for drawing) and mask (used for target detection)

@@ -89,6 +89,7 @@ class TargetPNP(Target):
         self.subkey = "Target"
         self.poseValue = None # Should be a tuple?
         self.timeValue = None
+        self.dataString = ""
 
     def update(self, pose, time):
         # Update the vlaues of the target object
@@ -97,11 +98,12 @@ class TargetPNP(Target):
     def send(self):
         # Push to network tables
         # Should result in a key of '/Vision/Target/Result'
-        self.camX = self.poseValue[0]
-        self.camY = self.poseValue[1]
-        self.camZ = self.poseValue[2]
         
-        comm.PutString(self.subkey + "/Result", "{0} {1} {2} {3}".format(self.camX, self.camY, self.camZ, self.timeValue)) 
+        # More friendly multiple types of input data
+        for data in self.poseValue:
+            self.dataString += str(data) + " "
+        
+        comm.PutString(self.subkey + "/Result", "{0}{1}".format(self.dataString, self.timeValue))
         # Tuples add to form one tuples
         # (x,y,z,time)
 
