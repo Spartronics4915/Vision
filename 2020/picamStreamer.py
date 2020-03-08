@@ -114,13 +114,13 @@ class CamHandler(BaseHTTPRequestHandler):
             camframe = cam.imageQueue.get()
             target,frame = algo.processFrame(camframe, cfg=s_config["algo"])
             self.endTime = time.monotonic()
-            if target != None:
+            if target is not None:
                 logging.debug(str(target))
             else:
                 logging.info("no target");
 
             if s_comm != None:
-                if target != None:
+                if target is not None:
                     s_comm.UpdateVisionState("Acquired")
                     target.send()
                 else:

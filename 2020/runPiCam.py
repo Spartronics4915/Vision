@@ -157,33 +157,29 @@ class PiVideoStream:
         # Cut 'target'
         # NOTE: Interesting, frame get dropped on the floor here
 
-        if self.algoConfig["algo"] == "pnp":
-            robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
+        robotPose, frame = algo.processFrame(image, cfg=self.algoConfig)
     
-        
-        if self.algoConfig["algo"] == "pid":
-            yawOffset, frame = algo.processFrame(image, cfg=self.algoConfig)
+        #if self.algoConfig["algo"] == "pid":
+        #    yawOffset, frame = algo.processFrame(image, cfg=self.algoConfig)
 
         # XXX: Cut
         if self.commChan:
             
             # -== PNP version ==-
             if self.algoConfig["algo"] == "pnp":
-                if robotPose != None:
+                if robotPose is not None:
 
                     self.commChan.UpdateVisionState("Acquired")
                     # PNP
                     self.algoConfig["state"]["TargetPNP"].poseValue = robotPose
                     self.algoConfig["state"]["TargetPNP"].send()
-                    # PID
-                    self.algoConfig["state"]["TargetPID"].valuehOffSet = yawOffset
-                    self.algoConfig["state"]["TargetPID"].send()
+
                 else:
                     self.commChan.UpdateVisionState("Searching")
             # -== PID version ==-
             if self.algoConfig["algo"] == "pid":
 
-                if yawOffset != None:
+                if yawOffset is not None:
         
                     self.commChan.UpdateVisionState("Acquired")
                     # PID

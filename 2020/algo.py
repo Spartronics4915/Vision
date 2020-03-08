@@ -140,7 +140,7 @@ def realPNP(frame, config):
 
     # If we don't detect a target, drop out here
     if hexagonTarget is None:
-        return (None,None, visImg)
+        return (None, visImg)
     # -== Target Manipulation ==-
     # TODO: Pretty sure config in unnessissary here
     imgPts = targetUtils.target2pnp8Points(hexagonTarget,config)
@@ -150,6 +150,7 @@ def realPNP(frame, config):
 
     xlateVector, rotVec, visImg = poseEstimation.estimatePose(visImg, imgPts, config)
 
+    robotPose = xlateVector
     # Debug
     #  - logging.debug("Translation Vector: ".format(xlateVector))
     #  - logging.debug("Rotation Vector: ".format(rotVec))
