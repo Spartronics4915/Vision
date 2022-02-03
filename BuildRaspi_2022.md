@@ -1,8 +1,8 @@
-= WebCams =
+# WebCams 
 
 Notes on setting up new driver cam from WPILibPi (formerly FRCVision).
 
-== Install ==
+## Install 
 
  * Start from the most current WPILibPi image, found on the WPILibPi repo: [https://github.com/wpilibsuite/WPILibPi/releases WPILibPi repo].
  * Download the current image (as of this writing, 2021.3.1): [https://github.com/wpilibsuite/WPILibPi/releases/download/v2021.3.1/WPILibPi_image-v2021.3.1.zip Image]
