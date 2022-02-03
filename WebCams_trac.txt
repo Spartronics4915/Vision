@@ -1,0 +1,69 @@
+[[PageOutline}
+
+= WebCams =
+
+Notes on setting up new driver cam from WPILibPi (formerly FRCVision).
+
+== Install ==
+
+ * Start from the most current WPILibPi image, found on the WPILibPi repo: [https://github.com/wpilibsuite/WPILibPi/releases WPILibPi repo].
+ * Download the current image (as of this writing, 2021.3.1): [https://github.com/wpilibsuite/WPILibPi/releases/download/v2021.3.1/WPILibPi_image-v2021.3.1.zip Image]
+ * Burn to an SD card (best choice Raspberry Pi Imager)
+ * Login to 'pi', either directly or over ssh to 'wpilibpi.local' on a local LAN
+ * Make sure that you are in write mode (the prompt will either have '(ro)' [for read-only] or '(rw)' [for writeable] appended) by typing the command 'rw'
+ * Run raspi-config:
+{{{
+sudo raspi-config
+}}}
+ * Select 'Change Password' under System Settings and set a new password for the 'pi' account ('''Write it down! ''')
+ * Also under System Settings, select the Hostname option and set a new host name for the Pi
+ * Select 'Finish' and reboot the Pi
+ * Login to the 'pi' account
+ * Check the date with the 'date' command.  Fix if wrong.
+ * Do an apt update (the releaseinfo-change option is because buster is old):
+{{{
+apt update --allow-releaseinfo-change
+}}}
+ * Do an apt upgrade (this could take a while, if there are a lot of upgrades):
+{{{
+mount -o remount,rw /
+mount -o remount,rw /boot
+apt upgrade
+}}}
+ * Reboot the Pi again
+ * Login, set filesystem to writable ('rw' command)
+ * Install some needed packages:
+{{{
+sudo apt-get install python3-pip git vim tree lsof i2c-tools lshw aptitude
+}}}
+ * Install apps for rpi-clone:
+{{{
+sudo apt-get install rsync parted util-linux mount bsdmainutils dosfstools
+}}}
+ * Clean things up
+{{{
+sudo apt-get clean
+sudo apt-get autoremove
+}}}
+ * Install Python extensions (probably already installed, but just to be safe):
+{{{
+sudo python3 -m pip install picamera
+sudo python3 -m pip install numpy
+sudo python3 -m pip install pynetworktables
+}}}
+ * Install node and extensions.  Grab the latest LTS version from unofficial-builds.nodejs.org [wget https://unofficial-builds.nodejs.org/download/release/v16.9.1/node-v16.9.1-linux-armv6l.tar.gz NodeJS].
+{{{
+sudo mkdir -p /usr/local/lib/nodejs
+sudo tar ztf node-v16.9.1-linux-armv6l.tar.gz
+mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
+ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
+ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
+}}}
+ * Test for successful install, by checking versions:
+{{{
+node -v
+npm -v
+}}}
+ In this case, the commands return 'v16.9.1' and '7.21.1', respectively.
+
+
