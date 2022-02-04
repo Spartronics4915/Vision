@@ -382,14 +382,16 @@ a few examples:
   you need to make any changes, the disk must be writable.
 * ssh into wpilibpi.local (user is 'pi', password is 'raspberry')
 * `sudo raspi-config`  (use Tab, Esc and Arrow keys to navigate)
+	* `System Options`
+		* Hostname (set host name here - reflect how camera is used)
 	* `Localisation Options/Locale`
 		* set locale (en_US.UTF8 - make sure that's the only one marked)
-	* 'Localisation Options/TimeZone'
+	* `Localisation Options/TimeZone`
 		* time-zone (America/Los Angeles)
 	* `Interfacing Options`
 		* Enable connection to Raspberry Pi Camera (pi3/2019)
 		* Enable I2C (for camera switcher)
-	* `Advanced`
+	* `Performance Options`
 		* Consider raising GPU memory to 256MB
 * set time manually if needed
 	* `sudo date --set 1998-11-02; sudo date --set 21:08:00`
