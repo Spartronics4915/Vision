@@ -1,0 +1,651 @@
+Created a new repo from:
+
+https://github.com/billw2/rpi-clone
+
+rather than forking - record the changes since.
+
+
+commit 630e2e765b1c82bce382239aa99ea89870b5d8cb
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 13:06:24 2022 -0800
+
+    More minor tweaks
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit e57062c07d92f6ee6ea6f262275e61940d067cb6
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 13:02:58 2022 -0800
+
+    Tweak format - getting used to Markdown
+
+ README.md | 2 --
+ 1 file changed, 2 deletions(-)
+
+commit e46e86ee84b1847ef2c1de235c3a8a70132d406b
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 13:01:19 2022 -0800
+
+    Tweak attribution
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 3919b276a3f2915d96836a0fab04c0a853c97cc7
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 12:59:12 2022 -0800
+
+    Add attribution
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit ddc3769cd961f57ba7bddd8725acd7f89f5e63fc
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 12:53:31 2022 -0800
+
+    Fix markdown for code blocks
+
+ README.md | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+commit 80305a691b9314c971d1584deb15fe0d4dff0547
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 12:47:39 2022 -0800
+
+    Add Spartronics notes to README
+
+ README.md | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+
+commit 7ef91929702f3979984108cc60ce9e59a3ff1f94
+Author: Randy Groves <randomgrace@gmail.com>
+Date:   Mon Jan 31 12:18:08 2022 -0800
+
+    Add a tar of the code and a rsync .deb file
+    
+    The tar is for loading directly on a Pi via a USB stick. The files are
+    in Unix format, so they will work in the Pi environment.
+    
+    The rsync .deb file needs to be installed before running rpi-clone if
+    the Pi is not connected to the internet.  Install with:
+    
+    dpkg -i rsync_3.1.3-6_armhf.deb
+
+ rpi-clone.tar.gz        | Bin 0 -> 22804 bytes
+ rsync_3.1.3-6_armhf.deb | Bin 0 -> 377996 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 07f536e9d93cb5b50635415ee0fa46f498614ee4
+Merge: 3c5d373 da45b9f
+Author: billw2 <billw@gkrellm.net>
+Date:   Sun May 24 14:10:44 2020 -0500
+
+    Merge pull request #95 from bdwilson/master
+    
+    add trusted paths that often fail if run via cron
+
+commit da45b9f5de5f5b437261bd10401c33f9cae0696b
+Author: Brian Wilson <wilson@bubba.org>
+Date:   Thu May 21 14:42:14 2020 -0400
+
+    add trusted paths that often fail if run via cron
+
+ rpi-clone | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 3c5d373022b6dbed6c07c2085a59294abef02745
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Aug 26 17:30:06 2019 -0500
+
+    Check for /dev/ in findmnt results for source /boot and root
+    
+    There can be multiple findmnt lines (eg systemd and /dev/...) for /boot
+    on some systems and the device /dev entry is the one needed.
+    So grep for /dev/ on those findmnt results.
+
+ README.md | 7 ++++---
+ rpi-clone | 6 +++---
+ 2 files changed, 7 insertions(+), 6 deletions(-)
+
+commit 7ac40602cda45532b77eb886934d608e89a4efe7
+Merge: 8b22bea ed0732f
+Author: billw2 <billw@gkrellm.net>
+Date:   Sun Aug 25 19:49:54 2019 -0500
+
+    Merge pull request #76 from hkuno9000/exclude-option
+    
+    Feat: add exclude option
+
+commit ed0732f5c88399be1da5813fd5702204ba8dc26a
+Author: Hiroshi Kuno <hkuno9000@gmail.com>
+Date:   Mon Jul 29 18:58:55 2019 +0900
+
+    Feat: add exclude option
+
+ rpi-clone | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+commit 8b22bea69d021dfdd326f31613a65e2588747283
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sun Aug 25 18:15:00 2019 -0500
+
+    Add -p size option so first partition can be resized.
+    
+    V 2.0.21
+    The recent Rasbian Buster release increases the /boot partition to 256M
+    so added the -p option so a Stretch system updated to Buster can increase
+    the destination /boot when cloning.
+
+ README.md | 111 ++++++++++----------
+ rpi-clone | 344 ++++++++++++++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 313 insertions(+), 142 deletions(-)
+
+commit 033cb6119218d6b5cf15b81fc040b08dd4364cc3
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Feb 7 10:58:13 2019 -0600
+
+    Added Copyright notice to rpi-clone
+
+ rpi-clone | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+commit c5660ff4760f315d4869138f082d46702441bc3e
+Author: billw2 <billw@gkrellm.net>
+Date:   Thu Feb 7 10:53:34 2019 -0600
+
+    Create LICENSE
+    
+    Added LICENSE file.
+
+ LICENSE | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+commit 82b833c7a44c1ec64716120096cd740c699f211f
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Nov 30 14:04:50 2017 -0600
+
+    If no destination partitions, set n_dst_partitions to zero.
+
+ rpi-clone | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+commit fe7a646261d2add97928918bafd16a1cac70eb7c
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Oct 16 10:05:04 2017 -0500
+
+    Add HXA rsync options.  -L changes ext labels for sync clones.
+    
+    Add to rsync options preserve hard links, extended attributes and access
+    control lists.
+
+ rpi-clone | 37 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 33 insertions(+), 4 deletions(-)
+
+commit 31e571f7e15546f54ffcb952784be1138e5863d8
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Sep 27 14:00:44 2017 -0500
+
+    2.0.18 - Add -L option for ext partition labeling.
+    
+    If label ends with '#', label all ext partitions and replace '#' with
+    partition number.
+
+ README.md | 35 +++++++++++++++-------------
+ rpi-clone | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++------------
+ 2 files changed, 82 insertions(+), 31 deletions(-)
+
+commit 0f0e299e469abfbce08f110e186a5549516d49ab
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Tue Sep 26 17:47:09 2017 -0500
+
+    Remove -b from findmnt command. Wheezy's findmnt does not have it.
+
+ rpi-clone | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 24f1d5f3a3bd387a9c021a9aeb2a7fd6340ff496
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sun Sep 24 11:23:15 2017 -0500
+
+    Add desktop example to README. Mention grub-install in summary.
+
+ README.md | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ rpi-clone | 27 +++++++++++++----
+ 2 files changed, 111 insertions(+), 15 deletions(-)
+
+commit 896fd9fee4f063b8c48b6d81b19575d750841dbc
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 23 19:34:13 2017 -0500
+
+    More formatting.  Reverse order of destination disk mounted checks.
+
+ rpi-clone | 50 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
+
+commit 08da1feceb1b826af95934db6036eb2e33987120
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 23 16:58:31 2017 -0500
+
+    More progress printing formatting changes.
+
+ rpi-clone | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
+
+commit 2a5d17fd16eca99816755d4962fcec84981b569a
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 23 16:22:03 2017 -0500
+
+    Adjusted progress printing.  Stop mkfs verbose output.
+
+ rpi-clone | 53 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
+
+commit 41b70a47b3f8dfa6d75a43247a56b2eef20dc723
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 23 14:18:53 2017 -0500
+
+    When initializing, put disk id change back after sfdisk, delay after partprobe.
+    
+    fdisk can complain when changing disk id is before sfdisk.
+    
+    Delay after partprobe, device name changes in /dev can take a moment.
+
+ rpi-clone | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+commit dd5e4d63cf899ab645a0a248b37cfc29f7cf2e96
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 23 11:27:32 2017 -0500
+
+    Add quick guide to examples in README.md
+
+ README.md | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 62 insertions(+), 7 deletions(-)
+
+commit 5882f69aef5cdfe2e498922a3deffc3eea8f63ba
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 19:18:01 2017 -0500
+
+    Move setting of new Disk ID to after dd.
+
+ rpi-clone | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+commit 46c7e0fdd169b83d54b58f8ae199e7a3c2174b7a
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 17:30:12 2017 -0500
+
+    Change disk ID if resize fails.
+
+ rpi-clone | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+commit b2e494e8ac2d147734fa570855d3ca6893eb84ef
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 17:20:53 2017 -0500
+
+    Give dest disk new disk id right after partition image to avoid remounts.
+
+ rpi-clone | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+commit 2359c3959d8d0a02a57766e84169b51445e21af4
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 16:37:00 2017 -0500
+
+    Change version number.
+
+ README.md | 2 +-
+ rpi-clone | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit bffda282e087e2b8db4a60e2b888ba1a077a8690
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 16:33:24 2017 -0500
+
+    Change some error messages and README examples.
+
+ README.md | 90 +++++++--------------------------------------------------------
+ rpi-clone | 19 +++++++-------
+ 2 files changed, 19 insertions(+), 90 deletions(-)
+
+commit 7087dae68db9e31ce4bf7bc8f893e26c12f31e83
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 22 11:42:40 2017 -0500
+
+    Adjusted some error messages and fixed README typos
+
+ README.md | 12 ++++++++----
+ rpi-clone | 59 ++++++++++++++++++++++++-----------------------------------
+ 2 files changed, 32 insertions(+), 39 deletions(-)
+
+commit 2b4bacd9589fd1e22cd8864be7fc21476afbffb8
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Sep 21 17:47:02 2017 -0500
+
+    Fix --convert-fstab-to-partuuid. Add grub-install run if grub found.
+
+ rpi-clone | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+commit 927ec680d2c07d7b3c13e8f70427a5a7738417a8
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Sep 21 16:00:23 2017 -0500
+
+    V 2.0.5: -f2 multi partition clone to 2 partitions.  Redo some README examples.
+
+ README.md | 351 +++++++++++++++++++++++++++++++++++++-------------------------
+ rpi-clone | 180 ++++++++++++++++++++++----------
+ 2 files changed, 332 insertions(+), 199 deletions(-)
+
+commit 1597f6b7ce5811493464a374cbe973901b2069fb
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Sep 20 06:45:56 2017 -0500
+
+    Convert fstab device names to PARTUUID option.  README changes.
+    
+    Added --convert-fstab-to-partuuid option that converts a device name
+    using fstab and cmdline.txt to use PARTUUID as is standard in recent
+    Raspbian distributions.  Just a helper option for users that want to
+    convert.
+    
+    Added back in clone to smaller 4GB card example.
+
+ README.md | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ rpi-clone | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 123 insertions(+), 9 deletions(-)
+
+commit 17849312cf5a09eefc4c6a1e0ca5ca409dc6aa32
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Sep 18 17:57:58 2017 -0500
+
+    Demote the README example 4 caution a bit.  The issue seems to be with my Pi.
+
+ README.md | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
+
+commit 7697e2cc240b23da9ed3adf5906d7258231ac01b
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Sep 18 13:07:59 2017 -0500
+
+    Add option to preserve SD to USB cmdline.txt boots
+    
+    Implemented Peter Collinson's idea for preserving the SD card cmdline.txt
+    that is set up to boot to USB when cloning from USB back to the SD card.
+    
+    Update README.md examples.
+
+ README.md | 168 ++++++++++++++++++++++++++++++++++++++++++--------------------
+ rpi-clone |  60 ++++++++++++++++++----
+ 2 files changed, 162 insertions(+), 66 deletions(-)
+
+commit d00c0d179e073f4ff4d5217ec2828f95af825b65
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sun Sep 17 16:17:48 2017 -0500
+
+    Add quiet mode, edit README.md examples
+
+ README.md | 249 ++++++++++++++++++++++++++++++++------------------------------
+ rpi-clone | 163 ++++++++++++++++++++++------------------
+ 2 files changed, 221 insertions(+), 191 deletions(-)
+
+commit 013d65b61e570103b0078c0f0006b2d8ad6aee04
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Sep 16 14:46:07 2017 -0500
+
+    Add USB boots to SD card slot (mmcblk0) clones and update README.md
+
+ README.md |  88 ++++++++++++++++++++++++++++++++++++-------------
+ rpi-clone | 110 +++++++++++++++++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 149 insertions(+), 49 deletions(-)
+
+commit 2e7ea43d1e1610587c8a5b107b417b6bf9b8bafd
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 15 18:06:48 2017 -0500
+
+    New Version 2.0 - a complete rewrite.
+    
+    The examples in README.md show the new capabilities.
+
+ README.md       |  482 ++++++++++++++---
+ rpi-clone       | 1548 ++++++++++++++++++++++++++++++++++++++++---------------
+ rpi-clone-setup |  144 ++++++
+ 3 files changed, 1668 insertions(+), 506 deletions(-)
+
+commit 2d8412dd12fec63260b678f307b43891872fc953
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Aug 19 17:08:30 2017 -0500
+
+    Bugfix: did not set SRC_ROOT when using -s option
+
+ rpi-clone | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+commit 8b1a6590c55c8edef6e6a94660b1929f0fdb31a2
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Sat Aug 19 13:56:21 2017 -0500
+
+    Use mtab to get source booted disk so can clone from USB disks.
+    
+    Previously SD card mmcblk0 was hardwired as the source disk so clones from
+    USB disk did not work.  Using mtab to get the booted disk allows cloning
+    from USB disks.  Should that fail, a -s option can force the source disk.
+    The source disk must be the booted disk.
+
+ README.md | 48 +++++++++++++++++------------------
+ rpi-clone | 87 +++++++++++++++++++++++++++++++++++++++++++--------------------
+ 2 files changed, 84 insertions(+), 51 deletions(-)
+
+commit 154867712c982cee3fef92d588f081ff28929d4d
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri May 26 19:50:31 2017 -0500
+
+    Remove /mnt and /media excludes.  No longer need to make optional mount dirs.
+    
+    Since SpoddyCoder's no cross file system patch, /mnt and /media mounts will
+    be excluded so don't need to explicitly exclude them.
+
+ README.md |  3 ++-
+ rpi-clone | 17 ++++-------------
+ 2 files changed, 6 insertions(+), 14 deletions(-)
+
+commit f4c3285d30ee6b4f7595be817c9b8f44cb61f6a1
+Merge: f961aee a37954c
+Author: billw2 <billw@gkrellm.net>
+Date:   Fri May 26 19:47:08 2017 -0500
+
+    Merge pull request #34 from SpoddyCoder/cross_filesystem_feature
+    
+    Cross Filesystem Feature
+    
+    Split rsync into 2 separate processes, 1 for /boot, 1 for rest of filesystem
+    and add -x rsync flag to make not crossing filesytem boundaries the default.
+    
+    Added --cross-filesystems switch to reproduce old behaviour.
+
+commit a37954c93020b74247ee9546b856b6c53d6e48ba
+Author: SpoddyCoder <paul@spoddycoder.com>
+Date:   Wed May 24 22:13:32 2017 +0100
+
+    Split rsync into two processes, one for /boot one for rest of filesystem. Added --cross-filesystems switch and made no cross filesystems default behaviour
+
+ README.md |  4 ++++
+ rpi-clone | 30 ++++++++++++++++++++++++++----
+ 2 files changed, 30 insertions(+), 4 deletions(-)
+
+commit f961aee3f9816d345c2df335aa96b3907ee68b09
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Fri Sep 9 10:41:14 2016 -0500
+
+    Remove any leading /dev/ and warn dest disk ending in digit may be a partition.
+
+ rpi-clone | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+commit 2dd5220aa36561293b902aa7e16fce995728b677
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Mar 23 21:14:07 2016 -0500
+
+    Use -F with mkfs.ext4 and avoid questions.
+
+ README.md | 4 +++-
+ rpi-clone | 6 ++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+commit f4df34029c075eb0bf94c4e6e1512833a2e593f4
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Mar 16 20:15:43 2016 -0500
+
+    Do not > /dev/null for the mkfs.ext4 since mkfs can ask a question.
+
+ README.md | 3 +++
+ rpi-clone | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+commit 18361ca1591a88c097fb26a5a869a9daee089bf1
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jul 16 08:50:42 2015 -0500
+
+    Added a link to Mehdi HAMIDA's French translation.
+
+ README.md | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 835c8a5fc3902195257541614384af7760b4542c
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Tue Feb 17 09:19:55 2015 -0600
+
+    Add -x option and tweak some echo messages
+
+ rpi-clone | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+commit d0109f03e8b6fe559846f09397a6f7bdecdae1c7
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Feb 16 22:35:36 2015 -0600
+
+    Edit the README.md
+
+ README.md | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
+
+commit 9ea4af03e5c75f081513ed8dfb27dcdd835f9997
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Mon Feb 16 22:13:11 2015 -0600
+
+    Exclude dphys swapfile from the clone  and fix some issues
+    
+    If using dphys swapfile, exclude it from the rsync clone.
+    
+    Jessie versions of parted and fdisk have some changes to account for:
+            * Add a missing -s flag to one of the parted commands.
+            * Dump parted stderr to /dev/null since it now complains about destination
+              disk partitions ending outside of disk before I get chance to resize
+              the partitions.
+            * Strip trailing s from PART_START - (fdisk now doesn't seem to accept...)
+
+ README.md |  4 ++-
+ rpi-clone | 84 ++++++++++++++++++++++++++++++++++++++++++---------------------
+ 2 files changed, 59 insertions(+), 29 deletions(-)
+
+commit eb7721e0ea7a20fc28566c093baf4da58c1ad281
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Tue Mar 18 12:39:22 2014 -0500
+
+    fsck the destination boot partition after dd
+
+ rpi-clone | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+commit d10b873d2ff2d01cb53e52f14650c125b0931be0
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Feb 28 13:56:18 2013 -0600
+
+    Handle unmounting busy destination partitions
+
+ rpi-clone | 65 ++++++++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 44 insertions(+), 21 deletions(-)
+
+commit c65e13f90c57064cb2b2164697508b8df59a7730
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Feb 20 21:59:34 2013 -0600
+
+    Edited README.md
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 21314baacdb9f3398c1df678f80db818f90019d4
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Feb 20 21:57:35 2013 -0600
+
+    Edited README.md
+
+ README.md | 47 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 40 insertions(+), 7 deletions(-)
+
+commit 1facf6e0ffb24cf1b412889115977faa3b363b24
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Wed Feb 20 21:20:40 2013 -0600
+
+    Abort with message if cannot run rsync
+
+ rpi-clone | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+commit 301438f204485f66a3e8e4b571e4356a86ce859b
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jan 17 20:29:18 2013 -0600
+
+    Added -h|--help option
+
+ rpi-clone | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 35ac1a5162d1c0a5520744b0095c208b19ff81d4
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jan 17 20:15:51 2013 -0600
+
+    Edited README.md
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit e80a8184b70c9497de53c949f70ffa39a0eb09f9
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jan 17 12:56:59 2013 -0600
+
+    Edited README.md
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 501388b8f5ef4b64bf975b4fa779ea12c706ff35
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jan 17 12:19:59 2013 -0600
+
+    Edited README.md
+
+ README.md | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+commit ac868c94ce37d0f06a3101b8a2723e4563da68cd
+Author: Bill Wilson <billw@gkrellm.net>
+Date:   Thu Jan 17 12:09:02 2013 -0600
+
+    Initial git add of rpi-clone which was on pastebin.
+
+ README.md |  47 +++++++-
+ rpi-clone | 396 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 440 insertions(+), 3 deletions(-)
+
+commit 185103c253f8ec1ff69418756c9b16af506ebca4
+Author: billw2 <billw@gkrellm.net>
+Date:   Thu Jan 17 10:02:11 2013 -0800
+
+    Initial commit
+
+ README.md | 4 ++++
+ 1 file changed, 4 insertions(+)
