@@ -381,7 +381,9 @@ a few examples:
 
 ### build microSD card (minimum 8GB)
 
-* follow instructions [here](https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/using-the-raspberry-pi-for-frc.html)
+* The basic instructions are [here](https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/using-the-raspberry-pi-for-frc.html), with the following modifications.
+  * The easiest imager to use now is the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).  The current version as of this writing (02.04.22) is 1.7.  This imager will understand how to unpack images inside .zip files.
+  * The actual installation instructions begin at [Installing the image to your MicroSD card](https://docs.wpilib.org/en/stable/docs/software/vision-processing/wpilibpi/installing-the-image-to-your-microsd-card.html) and the image is in the [WPILibPi repo](https://github.com/wpilibsuite/WPILibPi/releases).  As of this writing, the current version is 2021.3.1.
 
 ### on first boot
 
@@ -406,17 +408,27 @@ a few examples:
 		* Enable I2C (for camera switcher)
 	* `Performance Options`
 		* Consider raising GPU memory to 256MB
-* set time manually if needed
-	* `sudo date --set 1998-11-02; sudo date --set 21:08:00`
+* make sure date/time is set correctly - set time manually if needed
+	* `sudo date 0204150622
+		format is MMDDHHMMYY
 * change user password 
     ```sh
     % passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
     ```
 * update and cleanup (recover diskspace)
     ```sh
+	sudo mount -o remount,rw /
+	sudo mount -o remount,rw /boot
     sudo apt-get update
     sudo apt-get upgrade
+	```
+* install some needed packages
+	```sh
     sudo apt-get install python3-pip git vim tree lsof i2c-tools
+	sudo apt-get install rsync parted util-linux mount bsdmainutils dosfstools
+	```
+* clean things up
+	```sh
     sudo apt-get clean
     sudo apt-get autoremove
     ```
@@ -463,13 +475,26 @@ sudo python3 -m pip install pynetworktables
 
 ### install node and extensions
 
-```bash
-sudo apt-get install nodejs # version should be > 10.0
-sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
-# to resolve npm install issue: UNABLE_TO_GET_ISSUER_CERT_LOCALLY
-npm config set registry http://registry.npmjs.org/ 
-sudo npm install
-```
+* Installing NodeJS seems to be somewhat problematic - the versions available in apt-get are old and
+don't seem to be configured correctly. Perusing various sets of instructions on the net led to installing
+from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS version.  Get it with the folliwing
+	```bash
+	wget https://unofficial-builds.nodejs.org/download/release/v16.9.1/node-v16.9.1-linux-armv6l.tar.gz 
+	```
+	and install with the following:
+	```bash
+	sudo mkdir -p /usr/local/lib/nodejs
+	sudo tar ztf node-v16.9.1-linux-armv6l.tar.gz
+	mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
+	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
+	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
+	```
+* Test for successful install by checking versions:
+	```bash
+	node -v
+	npm -v
+	```
+	In this case, the commands return 'v16.9.1' and '7.21.1', respectively.
 
 ### validate camera
 
