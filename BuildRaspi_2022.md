@@ -2,7 +2,9 @@
 
 <!-- TOC depthFrom:2 orderedList:false -->
 
+
 - [Building a Raspberry PI for FRC - using WPILibPi](#building-a-raspberry-pi-for-frc---using-wpilibpi)
+  - [TL;DR Skip to Config](#config-details)
   - [Introduction](#introduction)
   - [Theory of operation](#theory-of-operation)
   - [Prepare for Competition](#prepare-for-competition)
@@ -317,7 +319,8 @@ More information on configuration wifi can be found [here](https://www.raspberry
   The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md for instructions.
 
 ---
-  ** This section is outdated - left for archival purposes **
+  **This section is outdated - left for archival purposes**
+
   Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.  On Linux and MacOS you can use this:
@@ -353,7 +356,8 @@ __Unfortunately__, this particular script wasn't able to successfully duplicate
 an FRC vision system, perhaps because the number of mount points and file systems
 is unusual.
 
-** End of archival section **
+**End of archival section**
+
 ---
 
 ## Config Details
