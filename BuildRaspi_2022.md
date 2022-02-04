@@ -312,7 +312,13 @@ More information on configuration wifi can be found [here](https://www.raspberry
 ### duplicate working microSD card
 
 * a properly duplicated (up-to-date!) microsd is essential issurance
-  for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
+  for a competition.  
+
+  The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md for instructions.
+
+---
+  ** This section is outdated - left for archival purposes **
+  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
   to a variety of methods to accomplish this task.  The larger your microsd,
   the longer this process will take.  On Linux and MacOS you can use this:
 
@@ -346,6 +352,9 @@ your master pi.
 __Unfortunately__, this particular script wasn't able to successfully duplicate
 an FRC vision system, perhaps because the number of mount points and file systems
 is unusual.
+
+** End of archival section **
+---
 
 ## Config Details
 
