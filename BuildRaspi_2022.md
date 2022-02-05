@@ -409,7 +409,9 @@ a few examples:
 	* `Performance Options`
 		* Consider raising GPU memory to 256MB
 * make sure date/time is set correctly - set time manually if needed
-	* `sudo date 0204150622
+	* ```sh
+		sudo date 0204150622
+	```
 		format is MMDDHHMMYY
 * change user password 
     ```sh
@@ -484,8 +486,8 @@ from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS versi
 	and install with the following:
 	```bash
 	sudo mkdir -p /usr/local/lib/nodejs
-	sudo tar ztf node-v16.9.1-linux-armv6l.tar.gz
-	mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
+	tar xvzf node-v16.9.1-linux-armv6l.tar.gz
+	sudo mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
 	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
 	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
 	```
