@@ -316,48 +316,48 @@ More information on configuration wifi can be found [here](https://www.raspberry
 * a properly duplicated (up-to-date!) microsd is essential issurance
   for a competition.  
 
-  The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md for instructions.
+  The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md (in the Spartronics repo which will be cloned into this image in a later step ([pull git repository](#pull-git-repository)) for instructions.
 
 ---
-  **This section is outdated - left for archival purposes**
-
-  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
-  to a variety of methods to accomplish this task.  The larger your microsd,
-  the longer this process will take.  On Linux and MacOS you can use this:
-
-  ```sh
-  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
-  # where N is your microSD, you can findit either via:
-  #  `mount` or `diskutil list`
-
-  # to monitor its progress, you can periodically send it a signal
-  # (either background the dd process or perform this in another shell)
-  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
-  ```
-
-Note well: if your "working disk" is much larger than your target disk, you can
-reduce the time it takes to perform the duplication through the use of 
-a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
-your master pi.
-
-  ```bash
-  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
-  ```
-
-  And to create a duplicate, reverse the process:
-
-  ```sh
-  # make sure the /dev/diskN is unmounted either via:
-  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
-  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
-  ```
-
-__Unfortunately__, this particular script wasn't able to successfully duplicate
-an FRC vision system, perhaps because the number of mount points and file systems
-is unusual.
-
-**End of archival section**
-
+>  **This section is outdated - left for archival purposes**
+>
+>  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
+>  to a variety of methods to accomplish this task.  The larger your microsd,
+>  the longer this process will take.  On Linux and MacOS you can use this:
+>
+>  ```sh
+>  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
+>  # where N is your microSD, you can findit either via:
+>  #  `mount` or `diskutil list`
+>
+>  # to monitor its progress, you can periodically send it a signal
+>  # (either background the dd process or perform this in another shell)
+>  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
+>  ```
+>
+>Note well: if your "working disk" is much larger than your target disk, you can
+>reduce the time it takes to perform the duplication through the use of 
+>a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
+>your master pi.
+>
+>  ```bash
+>  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
+>  ```
+>
+>  And to create a duplicate, reverse the process:
+>
+>  ```sh
+>  # make sure the /dev/diskN is unmounted either via:
+>  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
+>  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
+>  ```
+>
+>__Unfortunately__, this particular script wasn't able to successfully duplicate
+>an FRC vision system, perhaps because the number of mount points and file systems
+>is unusual.
+>
+>**End of archival section**
+>
 ---
 
 ## Config Details
@@ -409,62 +409,66 @@ a few examples:
 	* `Performance Options`
 		* Consider raising GPU memory to 256MB
 * make sure date/time is set correctly - set time manually if needed
-	* ```sh
-		sudo date 0204150622
+	```sh
+	sudo date 0204150622 # (format is MMDDHHMMYY)
 	```
-		format is MMDDHHMMYY
 * change user password 
-    ```sh
-    % passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
-    ```
+	```sh
+	% passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
+	```
 * update and cleanup (recover diskspace)
     ```sh
 	sudo mount -o remount,rw /
 	sudo mount -o remount,rw /boot
-    sudo apt-get update
-    sudo apt-get upgrade
+	sudo apt-get update
+	sudo apt-get upgrade
 	```
 * install some needed packages
 	```sh
-    sudo apt-get install python3-pip git vim tree lsof i2c-tools
+	sudo apt-get install python3-pip git vim tree lsof i2c-tools
 	sudo apt-get install rsync parted util-linux mount bsdmainutils dosfstools
 	```
 * clean things up
 	```sh
-    sudo apt-get clean
-    sudo apt-get autoremove
-    ```
+	sudo apt-get clean
+	sudo apt-get autoremove
+	```
 
 See also: https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/the-raspberry-pi-frc-console.html
 
 ### rename/renumber your raspi
 
-You can establish DHCP addressing with a static IP fallback via the
-[wpilibpi dashboard](http://wpilibpi.local).
+You can establish DHCP addressing with a static IP fallback via the WPILibPi dashboard.  If you haven't renamed your Pi
+yet, it can be accessed via [wpilibpi dashboard](http://wpilibpi.local). If you have named your Pi, replace 'wpilibpi' with the Pi's name.
 
-To change your raspi name, you must log-in manually.  Note that using
-the raspi-config tool is __insufficient__ for this task due to frc
-conventions. Also note that this step may not be needed since we
-generally prefer to rely on ip addresses (since we have multiple
-raspis to manage).
+---
+> **Following probably not needed. It looks like the new base image already does this**
+>
+>To change your raspi name, you must log-in manually.  Note that using
+>the raspi-config tool is __insufficient__ for this task due to frc
+>conventions. Also note that this step may not be needed since we
+>generally prefer to rely on ip addresses (since we have multiple
+>raspis to manage).
+>
+>```sh
+># renaming your raspi may not be necessary
+># first the usual step
+>sudo hostnamectl set-hostname drivecamfront
+>
+># next, the frc fixup:
+># sudo edit /etc/hosts with nano or vi to look like this:
+>
+>127.0.0.1       localhost
+>::1            localhost ip6-localhost ip6-loopback
+>ff02::1        ip6-allnodes
+>ff02::2        ip6-allrouters
+>
+>127.0.1.1      drivecamfront
+>
+># after editing this file, reboot the machine and potentially the router
+>```
 
-```sh
-# renaming your raspi may not be necessary
-# first the usual step
-sudo hostnamectl set-hostname drivecamfront
-
-# next, the frc fixup:
-# sudo edit /etc/hosts with nano or vi to look like this:
-
-27.0.0.1       localhost
-::1            localhost ip6-localhost ip6-loopback
-ff02::1        ip6-allnodes
-ff02::2        ip6-allrouters
-
-127.0.1.1      drivecamfront
-
-# after editing this file, reboot the machine and potentially the router
-```
+---
 
 ### install python extensions
 
