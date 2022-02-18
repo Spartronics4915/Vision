@@ -318,47 +318,6 @@ More information on configuration wifi can be found [here](https://www.raspberry
 
   The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md (in the Spartronics repo which will be cloned into this image in a later step ([pull git repository](#pull-git-repository)) for instructions.
 
----
->  **This section is outdated - left for archival purposes**
->
->  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
->  to a variety of methods to accomplish this task.  The larger your microsd,
->  the longer this process will take.  On Linux and MacOS you can use this:
->
->  ```sh
->  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
->  # where N is your microSD, you can findit either via:
->  #  `mount` or `diskutil list`
->
->  # to monitor its progress, you can periodically send it a signal
->  # (either background the dd process or perform this in another shell)
->  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
->  ```
->
->Note well: if your "working disk" is much larger than your target disk, you can
->reduce the time it takes to perform the duplication through the use of 
->a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
->your master pi.
->
->  ```bash
->  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
->  ```
->
->  And to create a duplicate, reverse the process:
->
->  ```sh
->  # make sure the /dev/diskN is unmounted either via:
->  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
->  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
->  ```
->
->__Unfortunately__, this particular script wasn't able to successfully duplicate
->an FRC vision system, perhaps because the number of mount points and file systems
->is unusual.
->
->**End of archival section**
->
----
 
 ## Config Details
 
@@ -387,7 +346,7 @@ a few examples:
 
 ### on first boot
 
-* verify that the built-in webserver is operational by pointing
+* you can verify that the built-in webserver is operational by pointing
   your browser to http://wpilibpi.local. Note that you must be
   on the same network for this to work.  Typically its best to
   plug your laptop and the pi into the same network access point
@@ -395,7 +354,11 @@ a few examples:
   this if you have more than one raspi on the same network.
 * notice the Read-Only | Writable selector at the top of the page.  If
   you need to make any changes, the disk must be writable.
+  (in practice, setting the read/write status is best done just after first
+  login, by entering 'rw' at the prompt)
 * ssh into wpilibpi.local (user is 'pi', password is 'raspberry')
+* make sure disk is writable by entering 'rw' (status is shown in parens in the
+  command prompt)
 * `sudo raspi-config`  (use Tab, Esc and Arrow keys to navigate)
 	* `System Options`
 		* Hostname (set host name here - reflect how camera is used)
@@ -408,7 +371,11 @@ a few examples:
 		* Enable I2C (for camera switcher)
 	* `Performance Options`
 		* Consider raising GPU memory to 256MB
-* make sure date/time is set correctly - set time manually if needed
+* you will be required to reboot after the raspi-config process. After the
+  reboot, the Pi will be available at '<hostname>.local', where '<hostname>' is the
+  hostname that you set above
+* make sure disk is writable by entering 'rw' at the prompt
+* when you login, make sure date/time is set correctly - set time manually if needed
 	```sh
 	sudo date 0204150622 # (format is MMDDHHMMYY)
 	```
@@ -423,9 +390,10 @@ a few examples:
 	sudo apt-get update
 	sudo apt-get upgrade
 	```
+* reboot
 * install some needed packages
 	```sh
-	sudo apt-get install python3-pip git vim tree lsof i2c-tools
+	sudo apt-get install python3-pip git vim tree lsof i2c-tools lshw
 	sudo apt-get install rsync parted util-linux mount bsdmainutils dosfstools
 	```
 * clean things up
@@ -436,71 +404,53 @@ a few examples:
 
 See also: https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/the-raspberry-pi-frc-console.html
 
-### rename/renumber your raspi
-
-You can establish DHCP addressing with a static IP fallback via the WPILibPi dashboard.  If you haven't renamed your Pi
-yet, it can be accessed via [wpilibpi dashboard](http://wpilibpi.local). If you have named your Pi, replace 'wpilibpi' with the Pi's name.
-
----
-> **Following probably not needed. It looks like the new base image already does this**
->
->To change your raspi name, you must log-in manually.  Note that using
->the raspi-config tool is __insufficient__ for this task due to frc
->conventions. Also note that this step may not be needed since we
->generally prefer to rely on ip addresses (since we have multiple
->raspis to manage).
->
->```sh
-># renaming your raspi may not be necessary
-># first the usual step
->sudo hostnamectl set-hostname drivecamfront
->
-># next, the frc fixup:
-># sudo edit /etc/hosts with nano or vi to look like this:
->
->127.0.0.1       localhost
->::1            localhost ip6-localhost ip6-loopback
->ff02::1        ip6-allnodes
->ff02::2        ip6-allrouters
->
->127.0.1.1      drivecamfront
->
-># after editing this file, reboot the machine and potentially the router
->```
-
----
-
 ### install python extensions
 
 ``` bash
-sudo python3 -m pip install picamera
 # following may be present in wpilibpi, but shouldn't hurt
+sudo python3 -m pip install picamera
 sudo python3 -m pip install numpy
 sudo python3 -m pip install pynetworktables 
 ```
 
-### install node and extensions
+### pull git repository
 
-* Installing NodeJS seems to be somewhat problematic - the versions available in apt-get are old and
-don't seem to be configured correctly. Perusing various sets of instructions on the net led to installing
-from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS version.  Get it with the folliwing
-	```bash
-	wget https://unofficial-builds.nodejs.org/download/release/v16.9.1/node-v16.9.1-linux-armv6l.tar.gz 
-	```
-	and install with the following:
-	```bash
-	sudo mkdir -p /usr/local/lib/nodejs
-	tar xvzf node-v16.9.1-linux-armv6l.tar.gz
-	sudo mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
-	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
-	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
-	```
-* Test for successful install by checking versions:
-	```bash
-	node -v
-	npm -v
-	```
-	In this case, the commands return 'v16.9.1' and '7.21.1', respectively.
+* `mkdir -p spartronics`
+* `cd spartronics`
+* `git clone https://github.com/Spartronics4915/Vision`
+
+### install GStreamer and plugins
+```bash
+sudo apt install gstreamer1.0-tools gstreamer1.0-plugins-base
+```
+
+### rename/renumber your raspi (going off the outside network)
+
+If you are done with needing access to the outside network, then it's time to set up each camera with a static 
+address.
+
+You can establish a static IP via the WPILibPi dashboard.  If you haven't renamed your Pi
+yet, it can be accessed via [wpilibpi dashboard](http://wpilibpi.local). If you have named your Pi, replace 'wpilibpi' with the Pi's name.
+
+Using the WPILibPi dashboard, set one of the following static IP addresses, based on the camera's use case:
+```
+Name		IP Address		Port
+---
+frontcam	10.49.15.11		5805
+backcam		10.49.15.12		5806
+upcam		10.49.15.13		5807
+vision		10.49.15.10
+
+gateway		10.49.15.1
+DNS server	10.49.15.1
+
+Subnet mask	255.255.0.0
+```
+On the dashboard, under 'Network Settings', change the 'DHCP' to 'Static', and fill in the IPv4 address field with
+the appropriate value from the table above.
+
+On the dashboard, under 'Vision Settings', make sure that the 'Client' button is on, and fill in the team number (4915).
+
 
 ### validate camera
 
@@ -524,12 +474,6 @@ from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS versi
 >>> import picamera
 >>> import networktables
 ```
-
-### pull git repository
-
-* `mkdir -p spartronics`
-* `cd spartronics`
-* `git clone https://github.com/Spartronics4915/Vision`
 
 ### optional - install support for h264 feed
 
@@ -998,3 +942,104 @@ script manually before installing it as the application.
 * make sure to enter the correct team number into `Vision Settings`
 * make sure robot is on the same network as raspi
 * check the console output in the wpilibpi webapp
+
+# Archived sections
+---
+>With the change to using GStreamer, NodeJS is no longer needed.  Left for archival purposes
+>
+>### install node and extensions
+>
+>* Installing NodeJS seems to be somewhat problematic - the versions available in apt-get are old and
+>don't seem to be configured correctly. Perusing various sets of instructions on the net led to installing
+>from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS version.  Get it with the folliwing
+>	```bash
+>	wget https://unofficial-builds.nodejs.org/download/release/v16.9.1/node-v16.9.1-linux-armv6l.tar.gz 
+>	```
+>	and install with the following:
+>	```bash
+>	sudo mkdir -p /usr/local/lib/nodejs
+>	tar xvzf node-v16.9.1-linux-armv6l.tar.gz
+>	sudo mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
+>	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
+>	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
+>	```
+>* Test for successful install by checking versions:
+>	```bash
+>	node -v
+>	npm -v
+>	```
+>	In this case, the commands return 'v16.9.1' and '7.21.1', respectively.
+>
+---
+
+---
+>### Renaming the pi
+> **Following probably not needed. It looks like the new base image already does this**
+>
+>To change your raspi name, you must log-in manually.  Note that using
+>the raspi-config tool is __insufficient__ for this task due to frc
+>conventions. Also note that this step may not be needed since we
+>generally prefer to rely on ip addresses (since we have multiple
+>raspis to manage).
+>
+>```sh
+># renaming your raspi may not be necessary
+># first the usual step
+>sudo hostnamectl set-hostname drivecamfront
+>
+># next, the frc fixup:
+># sudo edit /etc/hosts with nano or vi to look like this:
+>
+>127.0.0.1       localhost
+>::1            localhost ip6-localhost ip6-loopback
+>ff02::1        ip6-allnodes
+>ff02::2        ip6-allrouters
+>
+>127.0.1.1      drivecamfront
+>
+># after editing this file, reboot the machine and potentially the router
+>```
+
+---
+---
+>### Backing up SD card - old methods
+>  **This section is outdated - left for archival purposes**
+>
+>  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
+>  to a variety of methods to accomplish this task.  The larger your microsd,
+>  the longer this process will take.  On Linux and MacOS you can use this:
+>
+>  ```sh
+>  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
+>  # where N is your microSD, you can findit either via:
+>  #  `mount` or `diskutil list`
+>
+>  # to monitor its progress, you can periodically send it a signal
+>  # (either background the dd process or perform this in another shell)
+>  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
+>  ```
+>
+>Note well: if your "working disk" is much larger than your target disk, you can
+>reduce the time it takes to perform the duplication through the use of 
+>a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
+>your master pi.
+>
+>  ```bash
+>  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
+>  ```
+>
+>  And to create a duplicate, reverse the process:
+>
+>  ```sh
+>  # make sure the /dev/diskN is unmounted either via:
+>  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
+>  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
+>  ```
+>
+>__Unfortunately__, this particular script wasn't able to successfully duplicate
+>an FRC vision system, perhaps because the number of mount points and file systems
+>is unusual.
+>
+>**End of archival section**
+>
+---
