@@ -421,7 +421,7 @@ sudo python3 -m pip install pynetworktables
 
 ### install GStreamer and plugins
 ```bash
-sudo apt install gstreamer1.0-tools gstreamer1.0-plugins-base
+sudo apt install gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-good
 ```
 
 ### rename/renumber your raspi (going off the outside network)
