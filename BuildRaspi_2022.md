@@ -451,6 +451,10 @@ the appropriate value from the table above.
 
 On the dashboard, under 'Vision Settings', make sure that the 'Client' button is on, and fill in the team number (4915).
 
+Also, since we are NOT using a USB camera, make sure to click the 'Remove' button if there is a camera listed in this section.
+
+Always remember to click 'Save' on each page when you are done with your changes.
+
 
 ### validate camera
 
