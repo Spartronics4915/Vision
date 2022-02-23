@@ -415,6 +415,7 @@ sudo python3 -m pip install pynetworktables
 
 ### pull git repository
 
+* `cd`
 * `mkdir -p spartronics`
 * `cd spartronics`
 * `git clone https://github.com/Spartronics4915/Vision`
@@ -422,6 +423,12 @@ sudo python3 -m pip install pynetworktables
 ### install GStreamer and plugins
 ```bash
 sudo apt install gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-good
+```
+
+### Copy scripts to the home directory
+```bash
+cd ~/spartronics/Vision/tools/DriverCamScripts/RPi
+cp -rp .??* * ~
 ```
 
 ### rename/renumber your raspi (going off the outside network)
