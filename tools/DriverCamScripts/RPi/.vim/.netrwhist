@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/home/randy/src/extracts_11/quagga-0.99.11.ospfv3-quagga-multicast.tmp'
+let g:netrw_dirhist_2='/home/randy/src/extracts_11/quagga-0.99.11-boeing/m4'
+let g:netrw_dirhist_3='/home/randy/src/quagga-0.99.11-boeing'
+let g:netrw_dirhist_4='/home/randy/src/quagga-0.99.dev-boeing'
+let g:netrw_dirhist_5='/home/randy/src/quagga-0.99.dev-boeing/xpimd/xorp/pim'
+let g:netrw_dirhist_6='/home/randy/src/bmr_work/bmr_r0.3/install/bmrsoftware/bmrfiles'
+let g:netrw_dirhist_7='/home/randy/src/bmr_work/bmr_r0.3/doc'
