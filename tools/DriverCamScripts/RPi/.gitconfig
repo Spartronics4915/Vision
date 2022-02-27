@@ -1,0 +1,23 @@
+# Core vars
+[core]
+    ; Editor
+    editor = vim
+    excludesfile = $HOME/randy/.gitignore
+;   gitproxy = $HOME/randy/bin/proxy-wrapper
+
+; Commenting out - leave for example
+;[url "ssh://packet.blv.boeing.com/a/git/"]
+;    insteadOf = packet:
+
+[alias]
+    st = status
+    di = diff
+    co = checkout
+    ci = commit
+    br = branch
+
+[user]
+    email = randomgrace@gmail.com
+    name = Randy Groves
+[init]
+    defaultBranch = main
