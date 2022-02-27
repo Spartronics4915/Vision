@@ -78,9 +78,17 @@ def killCamera(camera_ip='10.49.15.12', user='pi'):
     msg = "Ran {0.command!r} on {0.connection.host}, got stdout:\n{0.stdout}"
     print(msg.format(result))
 
+def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam'):
+    """ Check the camera process """
+    command = "./check_gstream.sh"
+    result = Connection(camera_ip,user=user).run(command, hide=True)
+    msg = "{0.stdout}"
+    print("%s: " % name)
+    print(msg.format(result))
+
 
 usage="""
-%prog [-h] [options] front|back|up start|stop|check"""
+%prog [-h] [options] front|back|up|all start|stop|check"""
 
 
 def main(argv):
@@ -102,10 +110,16 @@ def main(argv):
 
 
     # Check that camera is valid
-    camera = args[0]
-    action = args[1]
+    camera = args[0].lower()
+    action = args[1].lower()
 
-    if camera not in available_cameras:
+    cameras = []
+    if camera == 'all':
+        cameras = available_cameras
+    else:
+        cameras.append(camera)
+
+    if camera != 'all' and camera not in available_cameras:
         print("Camera %s is not installed at this time." % camera)
         print("Available cameras are:")
         for item in available_cameras:
@@ -117,28 +131,36 @@ def main(argv):
         for item in available_actions:
             print(item)
 
-    # Set some defaults based on this camera
-    camera_def = display_info[camera]
+    # Now loop through camera list
+    for camera in cameras:
 
-    cam_port = camera_def.get('port')
-    cam_ip = camera_def.get('camip')
-    cam_user = camera_def.get('user')
+        # Set some defaults based on this camera
+        camera_def = display_info[camera]
+    
+        cam_port = camera_def.get('port')
+        cam_ip = camera_def.get('camip')
+        cam_user = camera_def.get('user')
+        cam_name = camera_def.get('name')
+    
+        # Override if user entered options
+        if options.port_override:
+            cam_port = options.port_override
+        if options.addr_override:
+            cam_ip = options.addr_override
+        if options.user_override:
+            cam_user = options.user_override
 
-    # Override if user entered options
-    if options.port_override:
-        cam_port = options.port_override
-    if options.addr_override:
-        cam_ip = options.addr_override
-    if options.user_override:
-        cam_user = options.user_override
+        if action == 'start':
 
-    if action == 'start':
+            startCamera(port=cam_port, camera_ip=cam_ip, user=cam_user)
 
-        startCamera(port=cam_port, camera_ip=cam_ip, user=cam_user)
+        elif action == 'stop':
+    
+            killCamera(camera_ip=cam_ip, user=cam_user)
 
-    elif action == 'stop':
+        elif action == 'check':
 
-        killCamera(camera_ip=cam_ip, user=cam_user)
+            checkCamera(camera_ip=cam_ip, user=cam_user, name=cam_name)
 
 
 if __name__ == "__main__":

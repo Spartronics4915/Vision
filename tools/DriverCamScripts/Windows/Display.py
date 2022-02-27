@@ -111,10 +111,29 @@ def enumHandlerKill(hwnd, lParam):
         if window_name in win32gui.GetWindowText(hwnd):
             win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
             print("Killed window %s" % hwnd)
+
+def checkDisplay(display='front', name=None):
+    """ Check to see if display is running """
+    display_spec = display_info.get(display, None)
+
+    if display_spec:
+        this_spec = {}
+        if name:
+            this_spec['name'] = name
+        else:
+            this_spec['name'] = display_spec.get('name')
+        win32gui.EnumWindows(enumHandlerCheck, this_spec)
+
+def enumHandlerCheck(hwnd, lParam):
+    """ Is window open? """
+    window_name = lParam.get('name')
+    if win32gui.IsWindowVisible(hwnd):
+        if window_name in win32gui.GetWindowText(hwnd):
+            print("%s found: %s" % (window_name, hwnd))
         
 
 usage="""
-%prog [-h] [options] display start|stop|check"""
+%prog [-h] [options] display|all start|stop|check"""
 
 
 def main(argv):
@@ -134,10 +153,16 @@ def main(argv):
         sys.exit(0)
 
     # Check that camera is valid
-    camera = args[0]
-    action = args[1]
+    camera = args[0].lower()
+    action = args[1].lower()
 
-    if camera not in available_cameras:
+    displays = []
+    if camera == 'all':
+        displays = available_cameras
+    else:
+        displays.append(camera)
+
+    if camera != 'all' and camera not in available_cameras:
         print("Camera %s is not installed at this time." % camera)
         print("Available cameras are:")
         for item in available_cameras:
@@ -149,31 +174,39 @@ def main(argv):
         for item in available_actions:
             print(item)
 
-    # Set some defaults based on this camera
-    camera_def = display_info[camera]
+    # Now loop through camera list
+    for camera in displays:
 
-    disp_port = camera_def['port']
-    disp_name = camera_def['name']
-
-    # Override if user entered options
-    if options.disp_port:
-        disp_port = options.disp_port
-    if options.disp_name:
-        disp_name = options.disp_name
-
-    # the main actions
-    if action == 'start':
-
-        startDisplay(display=camera, port=disp_port)
+        # Set some defaults based on this camera
+        camera_def = display_info[camera]
     
-        print("Started display")
+        disp_port = camera_def['port']
+        disp_name = camera_def['name']
 
-        time.sleep(5)
+        # Override if user entered options
+        if options.disp_port:
+            disp_port = options.disp_port
+        if options.disp_name:
+            disp_name = options.disp_name
 
-        moveDisplay(display=camera, name=disp_name)
+        # the main actions
+        if action == 'start':
 
-    elif action == 'stop':
-        killDisplay(display=camera, name=disp_name)
+            startDisplay(display=camera, port=disp_port)
+    
+            print("Started display")
+
+            time.sleep(5)
+
+            moveDisplay(display=camera, name=disp_name)
+
+        elif action == 'stop':
+
+            killDisplay(display=camera, name=disp_name)
+
+        elif action == 'check':
+
+            checkDisplay(display=camera, name=disp_name)
 
 
 if __name__ == "__main__":
