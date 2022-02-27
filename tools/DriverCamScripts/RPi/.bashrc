@@ -102,6 +102,13 @@ alias sut='su - root'
 alias diffe="diff -Nupbwr --exclude='.svn' --exclude='.git' --exclude='build'"
 alias findx="$HOME/bin/findx"
 alias set_title="$HOME/bin/set_xterm_title.sh"
+# Git aliases
+alias gco='git checkout'
+alias gci='git commit -a'
+alias gad='git add '
+alias gbr='git branch '
+alias gst='git status '
+alias gdi='git diff '
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
