@@ -208,7 +208,6 @@ def main(argv):
             print(item)
 
     # Now loop through camera list
-    print("Displays: %s" % displays)
     for camera in displays:
 
         # Set some defaults based on this camera
