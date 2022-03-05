@@ -1,10 +1,12 @@
 #! python3
 from subprocess import Popen, PIPE
-import win32gui, win32con, time, sys
+import win32gui, win32con, time, sys, socket
 from optparse import OptionParser
 
 # Messy
 global WindowPos
+
+static_ip = "10.49.15.20"
 
 display_info = {
         'front': 
@@ -38,6 +40,19 @@ display_info = {
             'active':   'true'
             }
         }
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.49.15.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
 
 def get_available_cameras():
     """ Check display_info list for active cameras """
@@ -170,6 +185,18 @@ usage="""
 def main(argv):
     global WindowPos
     WindowPos = False
+
+    # Check to see if static IP has been set
+    my_ip = get_ip()
+    if my_ip != static_ip:
+        print("********************************************************************")
+        print("      Incorrect ip: %s" % my_ip)
+        print("      Set a static IP of %s for the WiFi connection!!!" % static_ip)
+        print("********************************************************************")
+
+        input("Enter any key")
+        sys.exit()
+
     ''' Main for display start script '''
     parser = OptionParser(usage=usage)
     parser.add_option("-p", type="string", dest="disp_port",
