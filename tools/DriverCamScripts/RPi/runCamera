@@ -1,0 +1,10 @@
+#!/bin/sh
+#echo "runCamera waiting 2 seconds ----"
+#cat /proc/device-tree/model
+#echo "\n"
+#sleep 2
+# source the file
+#. ./startH264player.sh
+# Here's an python alternative, should you wish to debug restart mechanisms
+# export PYTHONUNBUFFERED=1
+# exec ./tickTock.py
