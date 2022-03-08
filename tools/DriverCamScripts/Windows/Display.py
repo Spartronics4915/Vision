@@ -13,6 +13,8 @@ display_info = {
             {
             'name':     "FrontCam",
             'coords':   [1265, 0],
+            'coords2':   [1937, 10],
+            'coords3':   [1928, 10],
             'size':     [640, 480],
             'port':     "5805",
             'camip':    "10.49.15.12",
@@ -23,6 +25,8 @@ display_info = {
             {
             'name':     "BackCam",
             'coords':   [500, 500],
+            'coords2':   [500, 500],
+            'coords3':   [500, 500],
             'size':     [640, 480],
             'port':     "5807",
             'camip':    "10.49.15.13",
@@ -33,6 +37,8 @@ display_info = {
             {
             'name':     "UpCam",
             'coords':   [1265, 472],
+            'coords2':   [2565, 10],
+            'coords3':   [1928, 485],
             'size':     [640, 480],
             'port':     "5806",
             'camip':    "10.49.15.11",
@@ -66,7 +72,7 @@ def get_available_cameras():
 
 available_cameras = get_available_cameras()
 
-available_actions = ['start', 'stop', 'check', 'find']
+available_actions = ['start', 'stop', 'check', 'find', 'portrait', 'landscape']
 
 def startDisplay(display='front', port=None):
     ''' Start a display on a certain port '''
@@ -81,7 +87,7 @@ def startDisplay(display='front', port=None):
     WindowPos = False
     p = Popen([command, disp_port])
 
-def moveDisplay(display='front', name=None):
+def moveDisplay(display='front', name=None, orientation=None):
     """ Move and rename a new display window """
     display_spec = display_info.get(display, None)
     if display_spec:
@@ -90,7 +96,13 @@ def moveDisplay(display='front', name=None):
             this_spec['name'] = name
         else:
             this_spec['name'] = display_spec.get('name')
-        this_spec['coords'] = display_spec.get('coords')
+        if orientation == 'landscape':
+            this_spec['coords'] = display_spec.get('coords2')
+        elif orientation == 'portrait':
+            this_spec['coords'] = display_spec.get('coords3')
+        else:
+            this_spec['coords'] = display_spec.get('coords')
+
         this_spec['size'] = display_spec.get('size')
         this_spec['old_name'] = 'GStreamer D3D'
         print("Moving display %s to %s" % (this_spec['old_name'], this_spec['name']))
@@ -263,6 +275,36 @@ def main(argv):
                     break
 
                 moveDisplay(display=camera, name=disp_name)
+                time.sleep(2)
+
+        elif action == 'landscape':
+
+            startDisplay(display=camera, port=disp_port)
+    
+            print("Started display")
+
+            #time.sleep(5)
+            for x in range(5):
+                findDisplay(display=camera, name=disp_name)
+                if WindowPos:
+                    break
+
+                moveDisplay(display=camera, name=disp_name, orientation='landscape')
+                time.sleep(2)
+
+        elif action == 'portrait':
+
+            startDisplay(display=camera, port=disp_port)
+    
+            print("Started display")
+
+            #time.sleep(5)
+            for x in range(5):
+                findDisplay(display=camera, name=disp_name)
+                if WindowPos:
+                    break
+
+                moveDisplay(display=camera, name=disp_name, orientation='portrait')
                 time.sleep(2)
 
         elif action == 'stop':
