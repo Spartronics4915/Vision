@@ -1,10 +1,8 @@
-# Building a Raspberry PI for FRC - using WPILibPi
+# Building a Raspberry PI for FRC - using FRCVision-rPi
 
 <!-- TOC depthFrom:2 orderedList:false -->
 
-
-- [Building a Raspberry PI for FRC - using WPILibPi](#building-a-raspberry-pi-for-frc---using-wpilibpi)
-  - [TL;DR Skip to Config](#config-details)
+- [Building a Raspberry PI for FRC - using FRCVision-rPi](#building-a-raspberry-pi-for-frc---using-frcvision-rpi)
   - [Introduction](#introduction)
   - [Theory of operation](#theory-of-operation)
   - [Prepare for Competition](#prepare-for-competition)
@@ -29,12 +27,12 @@
     - [optional - install window system](#optional---install-window-system)
     - [misc](#misc)
       - [mount usb thumbdrive](#mount-usb-thumbdrive)
-      - [WPILibPi services](#wpilibpi-services)
+      - [FRCVision-rPi services](#frcvision-rpi-services)
       - [OpenCV+python3 build details](#opencvpython3-build-details)
   - [Troubleshooting](#troubleshooting)
     - [no camera functionality](#no-camera-functionality)
     - [uv4l service is starting on reboot and we don't want it to](#uv4l-service-is-starting-on-reboot-and-we-dont-want-it-to)
-    - [wpilibpi webpage doesn't appear at http://wpilibpi.local](#wpilibpi-webpage-doesnt-appear-at-httpwpilibpi)
+    - [frcvision webpage doesn't appear at http://frcvision.local](#frcvision-webpage-doesnt-appear-at-httpfrcvisionlocal)
     - [webrtc isn't working](#webrtc-isnt-working)
     - [uv4l webpage doesn't appear](#uv4l-webpage-doesnt-appear)
     - [vision services aren't available](#vision-services-arent-available)
@@ -49,10 +47,10 @@ capable of both video capture and processing.  Outfitting a raspi to
 integrate well with FRC network tables and competition requirements is
 a non-trivial system-administration task and so the FRC folks have
 kindly provided the community with a canned 
-[raspi disk image](https://github.com/wpilibsuite/WPILibPi/releases/tag/v2021.3.1)
+[raspi disk image](https://github.com/wpilibsuite/FRCVision-pi-gen/releases) 
 that can be installed onto a raspi and get you running in under 20 minutes.
 
-Among the built-in conveneniences offered by the WPILibPi image:
+Among the built-in conveneniences offered by the FRCVision-rPi image:
 
 * WPI libraries for network tables and FRC interop utilities.
 * The opencv image processing library with bridges to java, c++ and python.
@@ -73,11 +71,11 @@ Among the built-in conveneniences offered by the WPILibPi image:
     * wolfram mathematica
     * x windows and associated desktop tools
 * WIFI disabling: disallowed during FRC competition and disabled in
-  WPILibPi (this is an inconvenience at first).
+  FRCVision-rPi (this is an inconvenience at first).
 
 ## Theory of operation
 
-Basic idea:  use the web WPILibPi [dashboard](http://wpilibpi.local) to
+Basic idea:  use the web FRCVision [dashboard](http://frcvision.local) to
 control and monitor your raspi. If you change your raspi's name, this link
 won't work, but you can either enter the new hostname or its static ip
 address like [this](http://10.49.15.11).
@@ -94,7 +92,7 @@ _in the 10.49.15.*_ address range.
 Establishing a static IP address is one way to ensure that the raspi is
 in the robot's address space. It's also a way for our DriverStation
 dashboard to identify each raspi reliably.  The standard name,
-`wpilibpi.local`, will __not__ work reliably when multiple raspis are
+`frcvision.local`, will __not__ work reliably when multiple raspis are
 on the same network. You can also change the hostname of your raspi.
 Now, a static IP would still be of potential use, but not absolutely
 necessary to disambiguate multiple raspis.
@@ -199,7 +197,7 @@ available in the release section of our Vision github following
 however there appears to be a limit on the size of such tarballs and
 we have yet to complete this task.  To get around this limitation
 FRC has elected to "zip" the image.  Interestingly, disk-duplication
-utilities like Etcher are able to handle .zip-ed images.
+utilities liek Etcher are able to handle .zip-ed images.
 
 Note that any disk image will reflect a specific machine identity
 ([see here](#duplicate-working-microsd-card)) (ie: its static ip).  After
@@ -215,7 +213,7 @@ simpler than the more modern version.
 
 ### read-only-raspberry-pi
 
-* use the WPILibPi dashboard to ensure you're operating in Read-Only mode.
+* use the FRCVision-rPi dashboard to ensure you're operating in Read-Only mode.
  You can use these commands to toggle between ro and rw:
 
 ``` bash
@@ -231,7 +229,7 @@ rw
 
 ### disable wireless (wifi and bluetooth)
 
-WPILibPi disables both wifi and bluetooth via these contents of
+FRCVision-rPi disables both wifi and bluetooth via these contents of
     `/etc/modprobe.d/raspi-blacklist.config`.
 
 ```sh
@@ -314,15 +312,45 @@ More information on configuration wifi can be found [here](https://www.raspberry
 ### duplicate working microSD card
 
 * a properly duplicated (up-to-date!) microsd is essential issurance
-  for a competition.  
+  for a competition.  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
+  to a variety of methods to accomplish this task.  The larger your microsd,
+  the longer this process will take.  On Linux and MacOS you can use this:
 
-  The Vision tree includes a script, 'rpi-clone' in the tools directory. See tools/rpi-clone/README.md (in the Spartronics repo which will be cloned into this image in a later step ([pull git repository](#pull-git-repository)) for instructions.
+  ```sh
+  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
+  # where N is your microSD, you can findit either via:
+  #  `mount` or `diskutil list`
 
+  # to monitor its progress, you can periodically send it a signal
+  # (either background the dd process or perform this in another shell)
+  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
+  ```
+
+Note well: if your "working disk" is much larger than your target disk, you can
+reduce the time it takes to perform the duplication through the use of 
+a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
+your master pi.
+
+  ```bash
+  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
+  ```
+
+  And to create a duplicate, reverse the process:
+
+  ```sh
+  # make sure the /dev/diskN is unmounted either via:
+  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
+  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
+  ```
+
+__Unfortunately__, this particular script wasn't able to successfully duplicate
+an FRC vision system, perhaps because the number of mount points and file systems
+is unusual.
 
 ## Config Details
 
 Following are details on how to buy, provision and operate a raspi based
-on the WPILibPi image.  Additional customizations are offered to maximize
+on the FRCVision-rPi image.  Additional customizations are offered to maximize
 utility in the context of Spatronics4915. These are the steps needed to build
 a raspi that can be used as a base-image. If you already have a base-image available,
 use it skip these steps. In that case, remember to set the static IP and drive
@@ -340,128 +368,102 @@ a few examples:
 
 ### build microSD card (minimum 8GB)
 
-* The basic instructions are [here](https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/using-the-raspberry-pi-for-frc.html), with the following modifications.
-  * The easiest imager to use now is the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).  The current version as of this writing (02.04.22) is 1.7.  This imager will understand how to unpack images inside .zip files.
-  * The actual installation instructions begin at [Installing the image to your MicroSD card](https://docs.wpilib.org/en/stable/docs/software/vision-processing/wpilibpi/installing-the-image-to-your-microsd-card.html) and the image is in the [WPILibPi repo](https://github.com/wpilibsuite/WPILibPi/releases).  As of this writing, the current version is 2021.3.1.
+* follow instructions [here](https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/using-the-raspberry-pi-for-frc.html)
 
 ### on first boot
 
-* you can verify that the built-in webserver is operational by pointing
-  your browser to http://wpilibpi.local. Note that you must be
+* verify that the built-in webserver is operational by pointing
+  your browser to http://frcvision.local. Note that you must be
   on the same network for this to work.  Typically its best to
   plug your laptop and the pi into the same network access point
   (wifi hub/bridge). Note also that you may have problems with
   this if you have more than one raspi on the same network.
 * notice the Read-Only | Writable selector at the top of the page.  If
   you need to make any changes, the disk must be writable.
-  (in practice, setting the read/write status is best done just after first
-  login, by entering 'rw' at the prompt)
-* ssh into wpilibpi.local (user is 'pi', password is 'raspberry')
-* make sure disk is writable by entering 'rw' (status is shown in parens in the
-  command prompt)
-* `sudo raspi-config`  (use Tab, Esc and Arrow keys to navigate)
-	* `System Options`
-		* Hostname (set host name here - reflect how camera is used)
-	* `Localisation Options/Locale`
-		* set locale (en_US.UTF8 - make sure that's the only one marked)
-	* `Localisation Options/TimeZone`
-		* time-zone (America/Los Angeles)
-	* `Interfacing Options`
-		* Enable connection to Raspberry Pi Camera (pi3/2019)
-		* Enable I2C (for camera switcher)
-	* `Performance Options`
-		* Consider raising GPU memory to 256MB
-* you will be required to reboot after the raspi-config process. After the
-  reboot, the Pi will be available at '<hostname>.local', where '<hostname>' is the
-  hostname that you set above
-* make sure disk is writable by entering 'rw' at the prompt
-* when you login, make sure date/time is set correctly - set time manually if needed
-	```sh
-	sudo date 0204150622 # (format is MMDDHHMMYY)
-	```
+* ssh into frcvision.local (user is 'pi', password is 'raspberry')
+    * `sudo raspi-config`  (use Tab, Esc and Arrow keys to navigate)
+        * `Localisation Options`
+            * set keyboard locale (US-UTF8...)
+            * time-zone (America/Los Angeles)
+            * enable camera (interfaces))
+            * set time manually if needed
+            `sudo date --set 1998-11-02; sudo date --set 21:08:00`
+        * `Interfacing Options`
+            * Enable connection to Raspberry Pi Camera (pi3/2019)
+            * Enable I2C (for camera switcher)
+        * `Advanced`
+            * Consider raising GPU memory to 256MB
+    * `sudo raspi-config --expand-rootfs` - enlarge filesystem if your 
+      microsd card is larger than 8GB. Before reboot, you must edit the
+      file in /etc/init.d to ensure that the disk is in rw mode before
+      the resize operation occurs. Here are the lines that need to
+      be added:
+      ```sh
+      mount -o remount,rw / && 
+      mount -o remount,rw /boot &&
+      ```
 * change user password 
-	```sh
-	% passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
-	```
+    ```sh
+    % passwd # respond to prompts, old was raspberry, new: teamname (spartronics)
+    ```
 * update and cleanup (recover diskspace)
     ```sh
-	sudo mount -o remount,rw /
-	sudo mount -o remount,rw /boot
-	sudo apt-get update
-	sudo apt-get upgrade
-	```
-* reboot
-* install some needed packages
-	```sh
-	sudo apt-get install python3-pip git vim tree lsof i2c-tools lshw
-	sudo apt-get install rsync parted util-linux mount bsdmainutils dosfstools
-	```
-* clean things up
-	```sh
-	sudo apt-get clean
-	sudo apt-get autoremove
-	```
+    sudo apt-get update
+    sudo apt-get upgrade
+    sudo apt-get install python3-pip git vim tree lsof i2c-tools
+    sudo apt-get clean
+    sudo apt-get autoremove
+    ```
 
 See also: https://docs.wpilib.org/en/latest/docs/software/vision-processing/raspberry-pi/the-raspberry-pi-frc-console.html
+
+### rename/renumber your raspi
+
+You can establish DHCP addressing with a static IP fallback via the
+[frcvision dashboard](http://frcvision.local).
+
+To change your raspi name, you must log-in manually.  Note that using
+the raspi-config tool is __insufficient__ for this task due to frc
+conventions. Also note that this step may not be needed since we
+generally prefer to rely on ip addresses (since we have multiple
+raspis to manage).
+
+```sh
+# renaming your raspi may not be necessary
+# first the usual step
+sudo hostnamectl set-hostname drivecamfront
+
+# next, the frc fixup:
+# sudo edit /etc/hosts with nano or vi to look like this:
+
+27.0.0.1       localhost
+::1            localhost ip6-localhost ip6-loopback
+ff02::1        ip6-allnodes
+ff02::2        ip6-allrouters
+
+127.0.1.1      drivecamfront
+
+# after editing this file, reboot the machine and potentially the router
+```
 
 ### install python extensions
 
 ``` bash
-# following may be present in wpilibpi, but shouldn't hurt
 sudo python3 -m pip install picamera
+# following may be present in frcvision, but shouldn't hurt
 sudo python3 -m pip install numpy
 sudo python3 -m pip install pynetworktables 
 ```
 
-### pull git repository
+### install node and extensions
 
-* `cd`
-* `mkdir -p spartronics`
-* `cd spartronics`
-* `git clone https://github.com/Spartronics4915/Vision`
-
-### install GStreamer and plugins
 ```bash
-sudo apt install gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-good
+sudo apt-get install nodejs # version should be > 10.0
+sudo apt-get install npm  # might be the wrong version (ie 5.8.0)
+# to resolve npm install issue: UNABLE_TO_GET_ISSUER_CERT_LOCALLY
+npm config set registry http://registry.npmjs.org/ 
+sudo npm install
 ```
-
-### Copy scripts to the home directory
-```bash
-cd ~/spartronics/Vision/tools/DriverCamScripts/RPi
-cp -rp .??* * ~
-```
-
-### rename/renumber your raspi (going off the outside network)
-
-If you are done with needing access to the outside network, then it's time to set up each camera with a static 
-address.
-
-You can establish a static IP via the WPILibPi dashboard.  If you haven't renamed your Pi
-yet, it can be accessed via [wpilibpi dashboard](http://wpilibpi.local). If you have named your Pi, replace 'wpilibpi' with the Pi's name.
-
-Using the WPILibPi dashboard, set one of the following static IP addresses, based on the camera's use case:
-```
-Name		IP Address		Port
----
-frontcam	10.49.15.11		5805
-backcam		10.49.15.12		5806
-upcam		10.49.15.13		5807
-vision		10.49.15.10
-
-gateway		10.49.15.1
-DNS server	10.49.15.1
-
-Subnet mask	255.255.0.0
-```
-On the dashboard, under 'Network Settings', change the 'DHCP' to 'Static', and fill in the IPv4 address field with
-the appropriate value from the table above.
-
-On the dashboard, under 'Vision Settings', make sure that the 'Client' button is on, and fill in the team number (4915).
-
-Also, since we are NOT using a USB camera, make sure to click the 'Remove' button if there is a camera listed in this section.
-
-Always remember to click 'Save' on each page when you are done with your changes.
-
 
 ### validate camera
 
@@ -485,6 +487,12 @@ Always remember to click 'Save' on each page when you are done with your changes
 >>> import picamera
 >>> import networktables
 ```
+
+### pull git repository
+
+* `mkdir -p spartronics`
+* `cd spartronics`
+* `git clone https://github.com/Spartronics4915/Vision`
 
 ### optional - install support for h264 feed
 
@@ -536,7 +544,7 @@ suggest that `h264player is the preferred solution`.
 Support for h264player is checked in to our Vision repository
 [here](https://github.com/Spartronics4915/Vision/tree/master/h264player).
 To install the support, you simply pull the Vision repository to your raspi
-and wire it into the WPILibPi application like so:
+and wire it into the FRCVision application like so:
 
 ```bash
 % mkdir ~/spartronics
@@ -546,7 +554,7 @@ and wire it into the WPILibPi application like so:
 % cp startH264player.sh ~
 ```
 
-Note that moving from one version of WPILibPi to another, we may need
+Note that moving from one version of FRCVision to another, we may need
 to update the node_modules associated with the h264player.  Here's how:
 
 ```bash
@@ -628,9 +636,9 @@ sudo apt-get install xfce4 xfce4-terminal
    If you don't know the device id: `lsblk`.
 * remember to eject/umount the thumbdrive!
 
-#### WPILibPi services
+#### FRCVision-rPi services
 
-`pi@wpilibpi(rw):~$ pstree`
+`pi@frcvision(rw):~$ pstree`
 
 ``` text
 systemd─┬─agetty
@@ -667,7 +675,7 @@ replaced by python3).
 
 The svscanboot process subtree is all about keeping your camera server process
 running.  The default cameraServer detects the installed cameras and writes
-a files to `/boot/frc.json`.  This file can be configured from the WPILibPi
+a files to `/boot/frc.json`.  This file can be configured from the FRCVision
 dashboard under `Vision Settings`. If you don't want the built-in
 discoverable cameras (USB or raspicam) from being locked, you can remove
 them from the list of enabled cameras.  You can also configure settings
@@ -675,7 +683,7 @@ like capture resolution, brightness and auto-exposure via this interface.
 The results of your configuration activities trigger updates to /boot/frc.json
 but you can also manually edit this file (using vi, of course).
 
-Here's a list of services listing on the ports. The WPILibPi dashboard
+Here's a list of services listing on the ports. The FRCVision dashboard
 is listening on the standard http port.  Port 1740 is the network tables
 service.  22 is ssh and 1181 is the mjpeg streaming port.
 
@@ -854,7 +862,7 @@ Test with `raspistill -p "0,0,640,480"`.
     % systemctl list-units --type=service
     ```
 
-### wpilibpi webpage doesn't appear at http://wpilibpi.local
+### frcvision webpage doesn't appear at http://frcvision.local
 
 * are there more than one raspis on the network?  Then you
     should be using static IP addresses and using the ip address
@@ -914,7 +922,7 @@ Test with `raspistill -p "0,0,640,480"`.
 
 ### uv4l webpage doesn't appear
 
-Test by pointing your browser to `http://wpilibpi.local:8080` (or static IP)
+Test by pointing your browser to `http://frcvision.local:8080` (or static IP)
 
 * is someone listening on port 8080?
 
@@ -932,7 +940,7 @@ Test by pointing your browser to `http://wpilibpi.local:8080` (or static IP)
 
   There are two ways to auto-launch:
     1. via systemctl
-    2. via `Application` tab of wpilibpi webapp.
+    2. via `Application` tab of frcvision webapp.
 
   We currently recommend running it via `Application`
   to eliminate the chance of contention during boot.
@@ -943,7 +951,7 @@ Test by pointing your browser to `http://wpilibpi.local:8080` (or static IP)
 ### vision services aren't available
 
 Currently we recommend installing vision services through
-the wpilibpi webapp's `Application` panel.  Your script may fail due to syntax errors or missing resources.  The
+the frcvision webapp's `Application` panel.  Your script may fail due to syntax errors or missing resources.  The
 application manager will repeatedly attempt to relaunch
 your script even in the error case. Best to debug the
 script manually before installing it as the application.
@@ -952,105 +960,4 @@ script manually before installing it as the application.
 
 * make sure to enter the correct team number into `Vision Settings`
 * make sure robot is on the same network as raspi
-* check the console output in the wpilibpi webapp
-
-# Archived sections
----
->With the change to using GStreamer, NodeJS is no longer needed.  Left for archival purposes
->
->### install node and extensions
->
->* Installing NodeJS seems to be somewhat problematic - the versions available in apt-get are old and
->don't seem to be configured correctly. Perusing various sets of instructions on the net led to installing
->from the 'unnofficial-builds.nodejs.org' site, specifically the 16.9.1 LTS version.  Get it with the folliwing
->	```bash
->	wget https://unofficial-builds.nodejs.org/download/release/v16.9.1/node-v16.9.1-linux-armv6l.tar.gz 
->	```
->	and install with the following:
->	```bash
->	sudo mkdir -p /usr/local/lib/nodejs
->	tar xvzf node-v16.9.1-linux-armv6l.tar.gz
->	sudo mv node-v16.9.1-linux-armv6l /usr/local/lib/nodejs/
->	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/node node
->	ln -s /usr/local/lib/nodejs/node-v16.9.1-linux-armv6l/bin/npm npm
->	```
->* Test for successful install by checking versions:
->	```bash
->	node -v
->	npm -v
->	```
->	In this case, the commands return 'v16.9.1' and '7.21.1', respectively.
->
----
-
----
->### Renaming the pi
-> **Following probably not needed. It looks like the new base image already does this**
->
->To change your raspi name, you must log-in manually.  Note that using
->the raspi-config tool is __insufficient__ for this task due to frc
->conventions. Also note that this step may not be needed since we
->generally prefer to rely on ip addresses (since we have multiple
->raspis to manage).
->
->```sh
-># renaming your raspi may not be necessary
-># first the usual step
->sudo hostnamectl set-hostname drivecamfront
->
-># next, the frc fixup:
-># sudo edit /etc/hosts with nano or vi to look like this:
->
->127.0.0.1       localhost
->::1            localhost ip6-localhost ip6-loopback
->ff02::1        ip6-allnodes
->ff02::2        ip6-allrouters
->
->127.0.1.1      drivecamfront
->
-># after editing this file, reboot the machine and potentially the router
->```
-
----
----
->### Backing up SD card - old methods
->  **This section is outdated - left for archival purposes**
->
->  Here's a [link](https://thepihut.com/blogs/raspberry-pi-tutorials/17789160-backing-up-and-restoring-your-raspberry-pis-sd-card)
->  to a variety of methods to accomplish this task.  The larger your microsd,
->  the longer this process will take.  On Linux and MacOS you can use this:
->
->  ```sh
->  sudo dd if=/dev/diskN of=~/Desktop/myRaspiImg bs=512;
->  # where N is your microSD, you can findit either via:
->  #  `mount` or `diskutil list`
->
->  # to monitor its progress, you can periodically send it a signal
->  # (either background the dd process or perform this in another shell)
->  while true; do sudo killall -INFO dd; sleep 60; done # on linux use -USR1
->  ```
->
->Note well: if your "working disk" is much larger than your target disk, you can
->reduce the time it takes to perform the duplication through the use of 
->a piclone-like facility, like [this script](https://github.com/raspberrypi-ui/piclone/blob/master/src/backup), coupled with a usb-mounted target microsd card on
->your master pi.
->
->  ```bash
->  backup /dev/sd01  # one parameter: target disk device /dev/sda[1-N]
->  ```
->
->  And to create a duplicate, reverse the process:
->
->  ```sh
->  # make sure the /dev/diskN is unmounted either via:
->  #     `sudo diskutil unmountDisk /dev/diskN` or `sudo umount /dev/diskN`
->  sudo dd if=~/Desktop/myRaspiImg of=/dev/diskN bs=512;
->  ```
->
->__Unfortunately__, this particular script wasn't able to successfully duplicate
->an FRC vision system, perhaps because the number of mount points and file systems
->is unusual.
->
->**End of archival section**
->
----
+* check the console output in the frcvision webapp
