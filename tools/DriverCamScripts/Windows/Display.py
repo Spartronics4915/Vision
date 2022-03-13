@@ -6,7 +6,6 @@ from optparse import OptionParser
 # Messy
 global WindowPos
 
-static_ip = "10.49.15.20"
 
 display_info = {
         'front': 
@@ -198,12 +197,12 @@ def main(argv):
     global WindowPos
     WindowPos = False
 
-    # Check to see if static IP has been set
+    # Check to see if correct IP has been set
     my_ip = get_ip()
-    if my_ip != static_ip:
+    if "49.15" not in my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
-        print("      Set a static IP of %s for the WiFi connection!!!" % static_ip)
+        print("      Make sure you set up the Wi-Fi connection!!!")
         print("********************************************************************")
 
         input("Enter any key")
