@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /home/pi
-exec 2>&1
-exec pgrphack /usr/local/bin/setuidgids pi ./gstreamit.sh > /dev/null
+#cd /home/pi
+#exec 2>&1
+#exec pgrphack /usr/local/bin/setuidgids pi ./gstreamit.sh > /dev/null
