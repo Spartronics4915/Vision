@@ -3,6 +3,7 @@
 <!-- TOC depthFrom:2 orderedList:false -->
 
 - [Building a Raspberry PI for FRC - using WPILibPi](#building-a-raspberry-pi-for-frc---using-wpilibpi)
+  - [TL;DR Config Details](#config-details)
   - [Introduction](#introduction)
   - [Theory of operation](#theory-of-operation)
   - [Prepare for Competition](#prepare-for-competition)
