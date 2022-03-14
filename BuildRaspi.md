@@ -2,9 +2,8 @@
 
 <!-- TOC depthFrom:2 orderedList:false -->
 
-
 - [Building a Raspberry PI for FRC - using WPILibPi](#building-a-raspberry-pi-for-frc---using-wpilibpi)
-  - [TL;DR Skip to Config](#config-details)
+  - [TL;DR Config Details](#config-details)
   - [Introduction](#introduction)
   - [Theory of operation](#theory-of-operation)
   - [Prepare for Competition](#prepare-for-competition)
@@ -16,12 +15,13 @@
     - [make sure you have a raspi 3 or 4 with picam](#make-sure-you-have-a-raspi-3-or-4-with-picam)
     - [build microSD card (minimum 8GB)](#build-microsd-card-minimum-8gb)
     - [on first boot](#on-first-boot)
-    - [rename/renumber your raspi](#renamerenumber-your-raspi)
     - [install python extensions](#install-python-extensions)
-    - [install node and extensions](#install-node-and-extensions)
+    - [pull git repository](#pull-git-repository)
+    - [install GStreamer and plugins](#install-gstreamer-and-plugins)
+    - [Copy scripts to the home directory](#copy-scripts-to-the-home-directory)
+    - [rename/renumber your raspi (going off the outside network)](#renamerenumber-your-raspi-going-off-the-outside-network)
     - [validate camera](#validate-camera)
     - [verify opencv/python and picamera](#verify-opencvpython-and-picamera)
-    - [pull git repository](#pull-git-repository)
     - [optional - install support for h264 feed](#optional---install-support-for-h264-feed)
       - [install h264player](#install-h264player)
       - [install rpi-webrtc-streamer (deprecated)](#install-rpi-webrtc-streamer-deprecated)
@@ -34,11 +34,14 @@
   - [Troubleshooting](#troubleshooting)
     - [no camera functionality](#no-camera-functionality)
     - [uv4l service is starting on reboot and we don't want it to](#uv4l-service-is-starting-on-reboot-and-we-dont-want-it-to)
-    - [wpilibpi webpage doesn't appear at http://wpilibpi.local](#wpilibpi-webpage-doesnt-appear-at-httpwpilibpi)
+    - [wpilibpi webpage doesn't appear at http://wpilibpi.local](#wpilibpi-webpage-doesnt-appear-at-httpwpilibpilocal)
     - [webrtc isn't working](#webrtc-isnt-working)
     - [uv4l webpage doesn't appear](#uv4l-webpage-doesnt-appear)
     - [vision services aren't available](#vision-services-arent-available)
     - [vision services can't connect to robot](#vision-services-cant-connect-to-robot)
+  - [Archived sections](#archived-sections)
+  - [>](#)
+  - [>](#-1)
 
 <!-- /TOC -->
 
@@ -954,7 +957,8 @@ script manually before installing it as the application.
 * make sure robot is on the same network as raspi
 * check the console output in the wpilibpi webapp
 
-# Archived sections
+## Archived sections
+
 ---
 >With the change to using GStreamer, NodeJS is no longer needed.  Left for archival purposes
 >
