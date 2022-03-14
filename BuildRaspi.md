@@ -957,7 +957,7 @@ script manually before installing it as the application.
 * make sure robot is on the same network as raspi
 * check the console output in the wpilibpi webapp
 
-# Archived sections
+## Archived sections
 ---
 >With the change to using GStreamer, NodeJS is no longer needed.  Left for archival purposes
 >
