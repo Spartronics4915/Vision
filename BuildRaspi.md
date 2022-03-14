@@ -39,7 +39,7 @@
     - [uv4l webpage doesn't appear](#uv4l-webpage-doesnt-appear)
     - [vision services aren't available](#vision-services-arent-available)
     - [vision services can't connect to robot](#vision-services-cant-connect-to-robot)
-  - [# Archived sections](#-archived-sections)
+  - [Archived sections](#archived-sections)
   - [>](#)
   - [>](#-1)
 
