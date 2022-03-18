@@ -43,10 +43,20 @@ display_info = {
             'camip':    "10.49.15.11",
             'user':     "pi",
             'active':   'true'
+            },
+        'romi':
+            {
+            'name':     "Romi",
+            'coords':   [1265, 0],
+            'size':     [640,480],
+            'port':     "5820",
+            'camip':    "10.0.0.160",
+            'user':     "pi",
+            'active':   "true"
             }
         }
 
-def get_ip():
+def get_ip(is4915=True):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
     try:
@@ -197,17 +207,6 @@ def main(argv):
     global WindowPos
     WindowPos = False
 
-    # Check to see if correct IP has been set
-    my_ip = get_ip()
-    if "49.15" not in my_ip:
-        print("********************************************************************")
-        print("      Incorrect ip: %s" % my_ip)
-        print("      Make sure you set up the Wi-Fi connection!!!")
-        print("********************************************************************")
-
-        input("Enter any key")
-        sys.exit()
-
     ''' Main for display start script '''
     parser = OptionParser(usage=usage)
     parser.add_option("-p", type="string", dest="disp_port",
@@ -226,6 +225,17 @@ def main(argv):
     # Check that camera is valid
     camera = args[0].lower()
     action = args[1].lower()
+
+    # Check to see if correct IP has been set
+    my_ip = get_ip()
+    if camera != "romi" and "49.15" not in my_ip:
+        print("********************************************************************")
+        print("      Incorrect ip: %s" % my_ip)
+        print("      Make sure you set up the Wi-Fi connection!!!")
+        print("********************************************************************")
+
+        input("Enter any key")
+        sys.exit()
 
     displays = []
     if camera == 'all':
