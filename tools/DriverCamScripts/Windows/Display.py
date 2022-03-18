@@ -6,7 +6,7 @@ from optparse import OptionParser
 # Messy
 global WindowPos
 
-
+windows_user = "spartronics"
 display_info = {
         'front': 
             {
@@ -92,7 +92,7 @@ def startDisplay(display='front', port=None):
     if port:
         disp_port = port
     print("Starting %s display on %s" % (display, disp_port))
-    command = "c:\\Users\\spartronics\\StartDisplay.bat"
+    command = "c:\\Users\\%s\\StartDisplay.bat" % windows_user
     WindowPos = False
     p = Popen([command, disp_port])
 
