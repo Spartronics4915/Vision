@@ -6,7 +6,7 @@ from optparse import OptionParser
 # Messy
 global WindowPos
 
-windows_user = "spartronics"
+windows_user = "rando"
 display_info = {
         'front': 
             {
@@ -18,7 +18,7 @@ display_info = {
             'port':     "5805",
             'camip':    "10.49.15.12",
             'user':     "pi",
-            'active':   'true'
+            'active':   'false'
             },
         'back': 
             {
@@ -42,11 +42,11 @@ display_info = {
             'port':     "5806",
             'camip':    "10.49.15.11",
             'user':     "pi",
-            'active':   'true'
+            'active':   'false'
             },
         'romi':
             {
-            'name':     "Romi",
+            'name':     "RomiCam",
             'coords':   [1265, 0],
             'size':     [640,480],
             'port':     "5820",
@@ -269,6 +269,8 @@ def main(argv):
             disp_port = options.disp_port
         if options.disp_name:
             disp_name = options.disp_name
+        if options.camera_name:
+            camera_name = options.camera_name
 
         # the main actions
         if action == 'start':
