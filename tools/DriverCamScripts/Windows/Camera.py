@@ -35,16 +35,6 @@ display_info = {
             'camip':    "10.49.15.11",
             'user':     "pi",
             'active':   "true"
-            },
-        'romi':
-            {
-            'name':     "Romi",
-            'coords':   [600, 600],
-            'size':     [640,480],
-            'port':     "5820",
-            'camip':    "10.0.0.160",
-            'user':     "pi",
-            'active':   "true"
             }
         }
 
@@ -105,6 +95,17 @@ usage="""
 def main(argv):
 
 
+    # Check that the right static IP has been set
+    my_ip = get_ip()
+    if "49.15" not in my_ip:
+        print("********************************************************************")
+        print("      Incorrect ip: %s" % my_ip)
+        print("      Make sure you set up the Wi-Fi connection!!!")
+        print("********************************************************************")
+
+        input("Enter any key")
+        sys.exit()
+
     parser = OptionParser(usage=usage)
     parser.add_option('-p', dest='port_override', type='string',
             help='Override the default port for video for selected camera')
@@ -123,17 +124,6 @@ def main(argv):
     # Check that camera is valid
     camera = args[0].lower()
     action = args[1].lower()
-
-    # Check that the right static IP has been set
-    my_ip = get_ip()
-    if camera != "romi" and "49.15" not in my_ip:
-        print("********************************************************************")
-        print("      Incorrect ip: %s" % my_ip)
-        print("      Make sure you set up the Wi-Fi connection!!!")
-        print("********************************************************************")
-
-        input("Enter any key")
-        sys.exit()
 
     cameras = []
     if camera == 'all':

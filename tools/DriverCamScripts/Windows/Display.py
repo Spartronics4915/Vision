@@ -6,7 +6,8 @@ from optparse import OptionParser
 # Messy
 global WindowPos
 
-windows_user = "rando"
+
+windows_user = "spartronics"
 display_info = {
         'front': 
             {
@@ -18,7 +19,7 @@ display_info = {
             'port':     "5805",
             'camip':    "10.49.15.12",
             'user':     "pi",
-            'active':   'false'
+            'active':   'true'
             },
         'back': 
             {
@@ -42,21 +43,11 @@ display_info = {
             'port':     "5806",
             'camip':    "10.49.15.11",
             'user':     "pi",
-            'active':   'false'
-            },
-        'romi':
-            {
-            'name':     "RomiCam",
-            'coords':   [1265, 0],
-            'size':     [640,480],
-            'port':     "5820",
-            'camip':    "10.0.0.160",
-            'user':     "pi",
-            'active':   "true"
+            'active':   'true'
             }
         }
 
-def get_ip(is4915=True):
+def get_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.settimeout(0)
     try:
@@ -92,7 +83,7 @@ def startDisplay(display='front', port=None):
     if port:
         disp_port = port
     print("Starting %s display on %s" % (display, disp_port))
-    command = "c:\\Users\\%s\\StartDisplay.bat" % windows_user
+    command = "c:\\Users\\%s\\StartDisplay.bat" % windows_name
     WindowPos = False
     p = Popen([command, disp_port])
 
@@ -207,6 +198,17 @@ def main(argv):
     global WindowPos
     WindowPos = False
 
+    # Check to see if correct IP has been set
+    my_ip = get_ip()
+    if "49.15" not in my_ip:
+        print("********************************************************************")
+        print("      Incorrect ip: %s" % my_ip)
+        print("      Make sure you set up the Wi-Fi connection!!!")
+        print("********************************************************************")
+
+        input("Enter any key")
+        sys.exit()
+
     ''' Main for display start script '''
     parser = OptionParser(usage=usage)
     parser.add_option("-p", type="string", dest="disp_port",
@@ -225,17 +227,6 @@ def main(argv):
     # Check that camera is valid
     camera = args[0].lower()
     action = args[1].lower()
-
-    # Check to see if correct IP has been set
-    my_ip = get_ip()
-    if camera != "romi" and "49.15" not in my_ip:
-        print("********************************************************************")
-        print("      Incorrect ip: %s" % my_ip)
-        print("      Make sure you set up the Wi-Fi connection!!!")
-        print("********************************************************************")
-
-        input("Enter any key")
-        sys.exit()
 
     displays = []
     if camera == 'all':
@@ -269,8 +260,6 @@ def main(argv):
             disp_port = options.disp_port
         if options.disp_name:
             disp_name = options.disp_name
-        if options.camera_name:
-            camera_name = options.camera_name
 
         # the main actions
         if action == 'start':
