@@ -81,11 +81,15 @@ def killCamera(camera_ip='10.49.15.12', user='pi'):
 
 def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam'):
     """ Check the camera process """
+    is_running = False
     command = "./check_gstream.sh"
     result = Connection(camera_ip,user=user).run(command, hide=True)
     msg = "{0.stdout}"
     print("%s: " % name)
     print(msg.format(result))
+    if result == "Running":
+        is_running = True
+    return is_running
 
 
 usage="""
