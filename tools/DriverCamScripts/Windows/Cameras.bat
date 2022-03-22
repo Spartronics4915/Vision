@@ -6,5 +6,5 @@ if [%1]==[] (
 
 Camera.py %1 %2
 if "%2" == "check" (
-	set /p ent="Enter any key"
+	pause
 )
