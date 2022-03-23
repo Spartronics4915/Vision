@@ -434,6 +434,13 @@ cd ~/spartronics/Vision/tools/DriverCamScripts/RPi
 cp -rp .??* * ~
 ```
 
+### Copy 'run' to /service/camera to auto start camera
+
+```bash
+cd ~/spartronics/Vision/tools/DriverCamScripts/RPi
+sudo cp run /service/camera
+```
+
 ### rename/renumber your raspi (going off the outside network)
 
 If you are done with needing access to the outside network, then it's time to set up each camera with a static 
