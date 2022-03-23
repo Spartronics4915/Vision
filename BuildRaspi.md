@@ -436,8 +436,10 @@ cp -rp .??* * ~
 
 ### Copy 'run' to /service/camera to auto start camera
 
+```bash
 cd ~/spartronics/Vision/tools/DriverCamScripts/RPi
 sudo cp run /service/camera
+```
 
 ### rename/renumber your raspi (going off the outside network)
 
