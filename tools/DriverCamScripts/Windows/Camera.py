@@ -101,7 +101,7 @@ def main(argv):
 
     # Check that the right static IP has been set
     my_ip = get_ip()
-    if "49.15.20" not in my_ip:
+    if "49.15" not in my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
         print("      Make sure you set up the Wi-Fi or Ethernet connection!!!")
