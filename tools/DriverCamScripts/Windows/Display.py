@@ -1,13 +1,13 @@
 #! python3
 from subprocess import Popen, PIPE
-import win32gui, win32con, time, sys, socket
+import win32gui, win32con, time, sys, socket, os
 from optparse import OptionParser
 
 # Messy
 global WindowPos
 
 
-windows_user = "spartronics"
+windows_name = os.getlogin()
 display_info = {
         'front': 
             {
@@ -200,7 +200,7 @@ def main(argv):
 
     # Check to see if correct IP has been set
     my_ip = get_ip()
-    if "49.15.20" not in my_ip:
+    if "49.15" not in my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
         print("      Make sure you set up the Wi-Fi or Ethernet connection!!!")
