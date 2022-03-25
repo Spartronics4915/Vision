@@ -1,13 +1,13 @@
 #! python3
 from subprocess import Popen, PIPE
-import win32gui, win32con, time, sys, socket
+import win32gui, win32con, time, sys, socket, os
 from optparse import OptionParser
 
 # Messy
 global WindowPos
 
 
-windows_user = "spartronics"
+windows_name = os.getlogin()
 display_info = {
         'front': 
             {
