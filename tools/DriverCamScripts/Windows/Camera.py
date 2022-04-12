@@ -1,9 +1,11 @@
 #! python3
 
 import sys, socket
-from fabric import Connection
 from optparse import OptionParser
-
+from fabric import Connection
+# we use Connection to launch the gstreamer remotely on the raspberry pi over SSH
+# to do this we cannot use the default SSH port 22 as it's blocked by firewall on the FMS
+# So we will depend on seting up sshd on the pi to use port 5800 instead
 
 display_info = {
         'front':
@@ -68,14 +70,14 @@ def startCamera(port='5805', camera_ip='10.49.15.12', user='pi'):
     """ Start a camera process on a Raspberry Pi camera """
     my_ip = get_ip()
     command = "./gstreamit.sh %s %s > /dev/null 2>&1 &" % (my_ip, port)
-    result = Connection(camera_ip,user=user).run(command, hide=True)
+    result = Connection(camera_ip,user=user,port=5800).run(command, hide=False)
     msg = "Ran {0.command!r} on {0.connection.host}, got stdout:\n{0.stdout}"
     print(msg.format(result))
 
 def killCamera(camera_ip='10.49.15.12', user='pi'):
     """ Kill the camera process """
     command = "./kill_gstream.sh > /dev/null 2>&1 &"
-    result = Connection(camera_ip,user=user).run(command, hide=True)
+    result = Connection(camera_ip,user=user,port=5800).run(command, hide=False)
     msg = "Ran {0.command!r} on {0.connection.host}, got stdout:\n{0.stdout}"
     print(msg.format(result))
 
@@ -83,7 +85,7 @@ def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam'):
     """ Check the camera process """
     is_running = False
     command = "./check_gstream.sh"
-    result = Connection(camera_ip,user=user).run(command, hide=True)
+    result = Connection(camera_ip,user=user,port=5800).run(command, hide=False)
     msg = "{0.stdout}"
     print("%s: " % name)
     print(msg.format(result))
@@ -104,7 +106,7 @@ def main(argv):
     if "49.15" not in my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
-        print("      Make sure you set up the Wi-Fi or Ethernet connection!!!")
+        print("      Make sure you set up the Wi-Fi connection!!!")
         print("********************************************************************")
 
         input("Enter any key")
