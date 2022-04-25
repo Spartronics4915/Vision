@@ -44,6 +44,17 @@ display_info = {
             'camip':    "10.49.15.11",
             'user':     "pi",
             'active':   'true'
+            },
+        'romi':
+            {
+            'name':     "Romi",
+            'coords':   [600, 600],
+            'size':     [640, 480],
+            'port':     "5808",
+            'camip':    "10.49.15.15",
+            'user':     "pi",
+            'ssh':      "5800",
+            'active':   "true"
             }
         }
 
