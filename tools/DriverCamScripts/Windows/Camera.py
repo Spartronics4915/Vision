@@ -5,7 +5,7 @@ from optparse import OptionParser
 from fabric import Connection
 # we use Connection to launch the gstreamer remotely on the raspberry pi over SSH
 # to do this we cannot use the default SSH port 22 as it's blocked by firewall on the FMS
-# So we will depend on seting up sshd on the pi to use port 5800 instead
+# So we will depend on seting up sshd on the pi to use port 5801 instead
 
 display_info = {
         'front':
@@ -16,7 +16,7 @@ display_info = {
             'port':     "5805",
             'camip':    "10.49.15.12",
             'user':     "pi",
-            'ssh':      "5800",
+            'ssh':      "5801",
             'active':   "true"
             },
         'back':
@@ -27,7 +27,7 @@ display_info = {
             'port':     "5807",
             'camip':    "10.49.15.13",
             'user':     "pi",
-            'ssh':      "5800",
+            'ssh':      "5801",
             'active':   "false"
             },
         'up':
@@ -38,7 +38,7 @@ display_info = {
             'port':     "5806",
             'camip':    "10.49.15.11",
             'user':     "pi",
-            'ssh':      "5800",
+            'ssh':      "5801",
             'active':   "true"
             },
         'romi':
@@ -49,7 +49,7 @@ display_info = {
             'port':     "5808",
             'camip':    "10.49.15.15",
             'user':     "pi",
-            'ssh':      "5800",
+            'ssh':      "5801",
             'active':   "true"
             }
         }
@@ -80,7 +80,7 @@ def get_ip():
         s.close()
     return IP
 
-def startCamera(port='5805', camera_ip='10.49.15.12', user='pi', ssh='5800'):
+def startCamera(port='5805', camera_ip='10.49.15.12', user='pi', ssh='5801'):
     """ Start a camera process on a Raspberry Pi camera """
     my_ip = get_ip()
     command = "./gstreamit.sh %s %s > /dev/null 2>&1 &" % (my_ip, port)
@@ -88,14 +88,14 @@ def startCamera(port='5805', camera_ip='10.49.15.12', user='pi', ssh='5800'):
     msg = "Ran {0.command!r} on {0.connection.host}, got stdout:\n{0.stdout}"
     print(msg.format(result))
 
-def killCamera(camera_ip='10.49.15.12', user='pi', ssh='5800'):
+def killCamera(camera_ip='10.49.15.12', user='pi', ssh='5801'):
     """ Kill the camera process """
     command = "./kill_gstream.sh > /dev/null 2>&1 &"
     result = Connection(camera_ip,user=user,port=ssh).run(command, hide=False)
     msg = "Ran {0.command!r} on {0.connection.host}, got stdout:\n{0.stdout}"
     print(msg.format(result))
 
-def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam', ssh='5800'):
+def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam', ssh='5801'):
     """ Check the camera process """
     is_running = False
     command = "./check_gstream.sh"
