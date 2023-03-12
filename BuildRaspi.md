@@ -413,7 +413,9 @@ See also: https://docs.wpilib.org/en/latest/docs/software/vision-processing/rasp
 # following may be present in wpilibpi, but shouldn't hurt
 sudo python3 -m pip install picamera
 sudo python3 -m pip install numpy
-sudo python3 -m pip install pynetworktables 
+sudo python3 -m pip install -U pyntcore
+
+(the last one, pyntcore, may take a while, as some dependencies may need to be installed.)
 ```
 
 ### pull git repository
