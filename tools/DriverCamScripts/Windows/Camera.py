@@ -1,6 +1,8 @@
 #! python3
 
-import sys, socket
+import sys
+from socket import getaddrinfo, gethostname
+import ipaddress
 from optparse import OptionParser
 from fabric import Connection
 # we use Connection to launch the gstreamer remotely on the raspberry pi over SSH
@@ -8,6 +10,18 @@ from fabric import Connection
 # So we will depend on seting up sshd on the pi to use port 5801 instead
 
 display_info = {
+        'drivercam':
+            {
+            'name':     "DriverCam",
+            'coords':   [1265, 0],
+            'coords2':   [1937, 10],
+            'coords3':   [1928, 10],
+            'size':     [640, 480],
+            'port':     "5805",
+            'camip':    "10.49.15.12",
+            'user':     "pi",
+            'active':   'true'
+            },
         'front':
             {
             'name':     "FrontCam",
@@ -17,7 +31,7 @@ display_info = {
             'camip':    "10.49.15.12",
             'user':     "pi",
             'ssh':      "5801",
-            'active':   "true"
+            'active':   'false'
             },
         'back':
             {
@@ -28,7 +42,7 @@ display_info = {
             'camip':    "10.49.15.13",
             'user':     "pi",
             'ssh':      "5801",
-            'active':   "false"
+            'active':   'false'
             },
         'up':
             {
@@ -39,7 +53,7 @@ display_info = {
             'camip':    "10.49.15.11",
             'user':     "pi",
             'ssh':      "5801",
-            'active':   "true"
+            'active':   'false'
             },
         'romi':
             {
@@ -50,7 +64,7 @@ display_info = {
             'camip':    "10.49.15.15",
             'user':     "pi",
             'ssh':      "5801",
-            'active':   "true"
+            'active':   'false'
             }
         }
 
@@ -67,18 +81,45 @@ def get_available_cameras():
 available_cameras = get_available_cameras()
 available_actions = ["start", "stop", "check"]
 
+def get_all_ips(ip_addr_proto="ipv4", ignore_local_ips=True):
+    # By default, this method only returns non-local IPv4 addresses
+    # To return IPv6 only, call get_ip('ipv6')
+    # To return both IPv4 and IPv6, call get_ip('both')
+    # To return local IPs, call get_ip(None, False)
+    # Can combine options like so get_ip('both', False)
+
+    af_inet = 2
+    if ip_addr_proto == "ipv6":
+        af_inet = 30
+    elif ip_addr_proto == "both":
+        af_inet = 0
+
+    system_ip_list = getaddrinfo(gethostname(), None, af_inet, 1, 0)
+    ip_list = []
+
+    for ip in system_ip_list:
+        ip = ip[4][0]
+
+        try:
+            ipaddress.ip_address(str(ip))
+            ip_address_valid = True
+        except ValueError:
+            ip_address_valid = False
+        else:
+            if ipaddress.ip_address(ip).is_loopback and ignore_local_ips or ipaddress.ip_address(ip).is_link_local and ignore_local_ips:
+                pass
+            elif ip_address_valid:
+                ip_list.append(ip)
+
+    return ip_list
+
 def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.settimeout(0)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.49.15.255', 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        IP = '127.0.0.1'
-    finally:
-        s.close()
-    return IP
+    ip_list = get_all_ips()
+
+    for ipaddr in ip_list:
+        if '10.49.15' in ipaddr:
+            return ipaddr
+    return None
 
 def startCamera(port='5805', camera_ip='10.49.15.12', user='pi', ssh='5801'):
     """ Start a camera process on a Raspberry Pi camera """
@@ -117,7 +158,7 @@ def main(argv):
 
     # Check that the right static IP has been set
     my_ip = get_ip()
-    if "49.15" not in my_ip:
+    if  not my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
         print("      Make sure you set up the Wi-Fi connection!!!")
