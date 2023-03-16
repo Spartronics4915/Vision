@@ -20,6 +20,7 @@ display_info = {
             'port':     "5805",
             'camip':    "10.49.15.12",
             'user':     "pi",
+            'ssh':      "5801",
             'active':   'true'
             },
         'front':
@@ -33,7 +34,7 @@ display_info = {
             'ssh':      "5801",
             'active':   'false'
             },
-        'back':
+        'backcam':
             {
             'name':     "BackCam",
             'coords':   [500, 500],
@@ -42,7 +43,7 @@ display_info = {
             'camip':    "10.49.15.13",
             'user':     "pi",
             'ssh':      "5801",
-            'active':   'false'
+            'active':   'true'
             },
         'up':
             {

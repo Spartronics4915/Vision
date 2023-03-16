@@ -36,7 +36,7 @@ display_info = {
             'user':     "pi",
             'active':   'false'
             },
-        'back': 
+        'backcam': 
             {
             'name':     "BackCam",
             'coords':   [500, 500],
@@ -46,7 +46,7 @@ display_info = {
             'port':     "5807",
             'camip':    "10.49.15.13",
             'user':     "pi",
-            'active':   'false'
+            'active':   'true'
             },
         'up':
             {
