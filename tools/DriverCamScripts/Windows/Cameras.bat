@@ -1,6 +1,6 @@
 @echo off
 if [%1]==[] (
-	echo "Usage: Cameras.bat front|back|up|all start|stop|check"
+	echo "Usage: Cameras.bat driver|front|back|up|all start|stop|check"
 	exit /b
 )
 

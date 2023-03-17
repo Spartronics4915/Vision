@@ -10,12 +10,10 @@ from fabric import Connection
 # So we will depend on seting up sshd on the pi to use port 5801 instead
 
 display_info = {
-        'drivercam':
+        'driver':
             {
             'name':     "DriverCam",
             'coords':   [1265, 0],
-            'coords2':   [1937, 10],
-            'coords3':   [1928, 10],
             'size':     [640, 480],
             'port':     "5805",
             'camip':    "10.49.15.12",
@@ -29,12 +27,12 @@ display_info = {
             'coords':   [400, 400],
             'size':     [640, 480],
             'port':     "5805",
-            'camip':    "10.49.15.12",
+            'camip':    "10.49.15.11",
             'user':     "pi",
             'ssh':      "5801",
             'active':   'false'
             },
-        'backcam':
+        'back':
             {
             'name':     "BackCam",
             'coords':   [500, 500],
@@ -51,7 +49,7 @@ display_info = {
             'coords':   [600, 600],
             'size':     [640, 480],
             'port':     "5806",
-            'camip':    "10.49.15.11",
+            'camip':    "10.49.15.14",
             'user':     "pi",
             'ssh':      "5801",
             'active':   'false'
@@ -151,7 +149,7 @@ def checkCamera(camera_ip='10.49.15.12', user='pi', name='FrontCam', ssh='5801')
 
 
 usage="""
-%prog [-h] [options] front|back|up|all start|stop|check"""
+%prog [-h] [options] driver|front|back|up|all start|stop|check"""
 
 
 def main(argv):

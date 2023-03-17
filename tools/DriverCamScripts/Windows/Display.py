@@ -12,12 +12,13 @@ global WindowPos
 gstream_name = 'Direct3D11 renderer'
 windows_name = os.getlogin()
 display_info = {
-        'drivercam': 
+        'driver': 
             {
             'name':     "DriverCam",
             'coords':   [1265, 0],
             'coords2':   [1937, 10],
             'coords3':   [1928, 10],
+            'coords4':   [-111, -1076],
             'size':     [640, 480],
             'port':     "5805",
             'camip':    "10.49.15.12",
@@ -30,18 +31,20 @@ display_info = {
             'coords':   [1265, 0],
             'coords2':   [1937, 10],
             'coords3':   [1928, 10],
+            'coords4':   [1928, 10],
             'size':     [640, 480],
             'port':     "5805",
-            'camip':    "10.49.15.12",
+            'camip':    "10.49.15.11",
             'user':     "pi",
             'active':   'false'
             },
-        'backcam': 
+        'back': 
             {
             'name':     "BackCam",
             'coords':   [500, 500],
             'coords2':   [500, 500],
             'coords3':   [500, 500],
+            'coords4':   [535, -1076],
             'size':     [640, 480],
             'port':     "5807",
             'camip':    "10.49.15.13",
@@ -54,9 +57,10 @@ display_info = {
             'coords':   [1265, 472],
             'coords2':   [2565, 10],
             'coords3':   [1928, 485],
+            'coords4':   [1928, 485],
             'size':     [640, 480],
             'port':     "5806",
-            'camip':    "10.49.15.11",
+            'camip':    "10.49.15.14",
             'user':     "pi",
             'active':   'false'
             },
@@ -125,7 +129,7 @@ def get_available_cameras():
 
 available_cameras = get_available_cameras()
 
-available_actions = ['start', 'stop', 'check', 'find', 'portrait', 'landscape']
+available_actions = ['start', 'stop', 'check', 'find', 'portrait', 'landscape', 'external']
 
 def startDisplay(display='front', port=None):
     ''' Start a display on a certain port '''
@@ -153,6 +157,8 @@ def moveDisplay(display='front', name=None, orientation=None):
             this_spec['coords'] = display_spec.get('coords2')
         elif orientation == 'portrait':
             this_spec['coords'] = display_spec.get('coords3')
+        elif orientation == 'external':
+            this_spec['coords'] = display_spec.get('coords4')
         else:
             this_spec['coords'] = display_spec.get('coords')
 
@@ -334,7 +340,7 @@ def main(argv):
 
             startDisplay(display=camera, port=disp_port)
     
-            print("Started display")
+            print("Started landscape display")
 
             #time.sleep(5)
             for x in range(5):
@@ -349,7 +355,7 @@ def main(argv):
 
             startDisplay(display=camera, port=disp_port)
     
-            print("Started display")
+            print("Started portrait display")
 
             #time.sleep(5)
             for x in range(5):
@@ -358,6 +364,21 @@ def main(argv):
                     break
 
                 moveDisplay(display=camera, name=disp_name, orientation='portrait')
+                time.sleep(2)
+
+        elif action == 'external':
+
+            startDisplay(display=camera, port=disp_port)
+    
+            print("Started external display")
+
+            #time.sleep(5)
+            for x in range(5):
+                findDisplay(display=camera, name=disp_name)
+                if WindowPos:
+                    break
+
+                moveDisplay(display=camera, name=disp_name, orientation='external')
                 time.sleep(2)
 
         elif action == 'stop':
