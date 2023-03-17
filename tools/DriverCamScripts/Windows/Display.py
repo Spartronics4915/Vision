@@ -1,25 +1,42 @@
 #! python3
 from subprocess import Popen, PIPE
-import win32gui, win32con, time, sys, socket, os
+import win32gui, win32con, time, sys, os
 from optparse import OptionParser
+from socket import getaddrinfo, gethostname
+import ipaddress
 
 # Messy
 global WindowPos
 
 
+gstream_name = 'Direct3D11 renderer'
 windows_name = os.getlogin()
 display_info = {
+        'driver': 
+            {
+            'name':     "DriverCam",
+            'coords':   [1265, 0],
+            'coords2':   [1937, 10],
+            'coords3':   [1928, 10],
+            'coords4':   [-111, -1076],
+            'size':     [640, 480],
+            'port':     "5805",
+            'camip':    "10.49.15.12",
+            'user':     "pi",
+            'active':   'true'
+            },
         'front': 
             {
             'name':     "FrontCam",
             'coords':   [1265, 0],
             'coords2':   [1937, 10],
             'coords3':   [1928, 10],
+            'coords4':   [1928, 10],
             'size':     [640, 480],
             'port':     "5805",
-            'camip':    "10.49.15.12",
+            'camip':    "10.49.15.11",
             'user':     "pi",
-            'active':   'true'
+            'active':   'false'
             },
         'back': 
             {
@@ -27,11 +44,12 @@ display_info = {
             'coords':   [500, 500],
             'coords2':   [500, 500],
             'coords3':   [500, 500],
+            'coords4':   [535, -1076],
             'size':     [640, 480],
             'port':     "5807",
             'camip':    "10.49.15.13",
             'user':     "pi",
-            'active':   'false'
+            'active':   'true'
             },
         'up':
             {
@@ -39,26 +57,65 @@ display_info = {
             'coords':   [1265, 472],
             'coords2':   [2565, 10],
             'coords3':   [1928, 485],
+            'coords4':   [1928, 485],
             'size':     [640, 480],
             'port':     "5806",
-            'camip':    "10.49.15.11",
+            'camip':    "10.49.15.14",
             'user':     "pi",
-            'active':   'true'
+            'active':   'false'
+            },
+        'romi':
+            {
+            'name':     "Romi",
+            'coords':   [600, 600],
+            'size':     [640, 480],
+            'port':     "5808",
+            'camip':    "10.49.15.15",
+            'user':     "pi",
+            'ssh':      "5800",
+            'active':   'false'
             }
         }
 
+def get_all_ips(ip_addr_proto="ipv4", ignore_local_ips=True):
+    # By default, this method only returns non-local IPv4 addresses
+    # To return IPv6 only, call get_ip('ipv6')
+    # To return both IPv4 and IPv6, call get_ip('both')
+    # To return local IPs, call get_ip(None, False)
+    # Can combine options like so get_ip('both', False)
+
+    af_inet = 2
+    if ip_addr_proto == "ipv6":
+        af_inet = 30
+    elif ip_addr_proto == "both":
+        af_inet = 0
+
+    system_ip_list = getaddrinfo(gethostname(), None, af_inet, 1, 0)
+    ip_list = []
+
+    for ip in system_ip_list:
+        ip = ip[4][0]
+
+        try:
+            ipaddress.ip_address(str(ip))
+            ip_address_valid = True
+        except ValueError:
+            ip_address_valid = False
+        else:
+            if ipaddress.ip_address(ip).is_loopback and ignore_local_ips or ipaddress.ip_address(ip).is_link_local and ignore_local_ips:
+                pass
+            elif ip_address_valid:
+                ip_list.append(ip)
+
+    return ip_list
+
 def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.settimeout(0)
-    try:
-        # doesn't even have to be reachable
-        s.connect(('10.49.15.255', 1))
-        IP = s.getsockname()[0]
-    except Exception:
-        IP = '127.0.0.1'
-    finally:
-        s.close()
-    return IP
+    ip_list = get_all_ips()
+
+    for ipaddr in ip_list:
+        if '10.49.15' in ipaddr:
+            return ipaddr
+    return None
 
 def get_available_cameras():
     """ Check display_info list for active cameras """
@@ -72,7 +129,7 @@ def get_available_cameras():
 
 available_cameras = get_available_cameras()
 
-available_actions = ['start', 'stop', 'check', 'find', 'portrait', 'landscape']
+available_actions = ['start', 'stop', 'check', 'find', 'portrait', 'landscape', 'external']
 
 def startDisplay(display='front', port=None):
     ''' Start a display on a certain port '''
@@ -100,11 +157,13 @@ def moveDisplay(display='front', name=None, orientation=None):
             this_spec['coords'] = display_spec.get('coords2')
         elif orientation == 'portrait':
             this_spec['coords'] = display_spec.get('coords3')
+        elif orientation == 'external':
+            this_spec['coords'] = display_spec.get('coords4')
         else:
             this_spec['coords'] = display_spec.get('coords')
 
         this_spec['size'] = display_spec.get('size')
-        this_spec['old_name'] = 'GStreamer D3D'
+        this_spec['old_name'] = gstream_name
         print("Moving display %s to %s" % (this_spec['old_name'], this_spec['name']))
         win32gui.EnumWindows(enumHandlerMove, this_spec)
     else:
@@ -200,7 +259,7 @@ def main(argv):
 
     # Check to see if correct IP has been set
     my_ip = get_ip()
-    if "49.15" not in my_ip:
+    if not my_ip:
         print("********************************************************************")
         print("      Incorrect ip: %s" % my_ip)
         print("      Make sure you set up the Wi-Fi or Ethernet connection!!!")
@@ -281,7 +340,7 @@ def main(argv):
 
             startDisplay(display=camera, port=disp_port)
     
-            print("Started display")
+            print("Started landscape display")
 
             #time.sleep(5)
             for x in range(5):
@@ -296,7 +355,7 @@ def main(argv):
 
             startDisplay(display=camera, port=disp_port)
     
-            print("Started display")
+            print("Started portrait display")
 
             #time.sleep(5)
             for x in range(5):
@@ -305,6 +364,21 @@ def main(argv):
                     break
 
                 moveDisplay(display=camera, name=disp_name, orientation='portrait')
+                time.sleep(2)
+
+        elif action == 'external':
+
+            startDisplay(display=camera, port=disp_port)
+    
+            print("Started external display")
+
+            #time.sleep(5)
+            for x in range(5):
+                findDisplay(display=camera, name=disp_name)
+                if WindowPos:
+                    break
+
+                moveDisplay(display=camera, name=disp_name, orientation='external')
                 time.sleep(2)
 
         elif action == 'stop':
